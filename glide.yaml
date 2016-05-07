@@ -1,0 +1,10 @@
+package: github.com/kulikov/serve
+import:
+- package: github.com/spf13/viper
+- package: gopkg.in/yaml.v2
+- package: github.com/codegangsta/cli
+- package: github.com/hashicorp/consul/api
+- package: github.com/gambol99/go-marathon
+- package: github.com/Jeffail/gabs
+- package: github.com/ghodss/yaml
+- package: github.com/kulikov/hookup

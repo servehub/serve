@@ -1,0 +1,70 @@
+{
+  "services": [
+    {
+      "id": "hookup-v1.1-8001",
+      "name": "hookup",
+      "tags": [
+        "version:1.1",
+        "host:api.4game.com",
+        "location:/v3/",
+        "staging:stage"
+      ],
+      "port": 8001,
+      "checks": [
+        {
+          "tcp": "localhost:8001",
+          "interval": "5s"
+        }
+      ]
+    },
+    {
+      "id": "hookup-v1.2-8002",
+      "name": "hookup",
+      "tags": [
+        "version:1.2",
+        "host:api.4game.com",
+        "location:/v3/",
+        "staging:live"
+      ],
+      "port": 8002,
+      "checks": [
+        {
+          "tcp": "localhost:8002",
+          "interval": "5s"
+        }
+      ]
+    },
+    {
+      "id": "kidzite-api-1.0.11-8003",
+      "name": "kidzite-api",
+      "tags": [
+        "version:1.0.11",
+        "host:api.kidzania.ru",
+        "staging:stage"
+      ],
+      "port": 8003,
+      "checks": [
+        {
+          "tcp": "localhost:8003",
+          "interval": "5s"
+        }
+      ]
+    },
+    {
+      "id": "kidzite-api-1.0.11-8004",
+      "name": "kidzite-api",
+      "tags": [
+        "version:1.0.11",
+        "host:api.kidzania.ru",
+        "staging:stage"
+      ],
+      "port": 8004,
+      "checks": [
+        {
+          "tcp": "localhost:8004",
+          "interval": "5s"
+        }
+      ]
+    }
+  ]
+}

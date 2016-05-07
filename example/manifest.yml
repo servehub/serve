@@ -1,0 +1,86 @@
+info:
+  name: forgame-api2
+  description: 4game REST API v2
+  version: 2.0
+  category: service/http
+  owner:
+    name: Dmitry Kulikov
+    email: kulikov.dm@gmail.com
+
+include:
+  - samza-task:
+      mem: { qa: 256, live: 1024 }
+
+notify:
+  - slack: alert-api2
+
+build:
+  - shell: sbt ';set version := "'${SERVE_BUILD_VERSION}'"' clean test pack
+
+  - marathon: { package: target/pack }
+
+  - debian:
+      user: innova
+      daemon:
+        bin: $APPLICATION_PATH/bin/start
+        args: --port=$PORT1 --env=qa
+
+  - docker: {}
+
+deploy:
+  site:
+    branch: master # by default
+
+    routes:
+      - domain: { qa: api.4gametest.com, live: api.4game.com }
+        location: /v2/
+      - domain: { qa: api2.4gametest.com, live: api2.4game.com }
+      - domain: { qa: go.4gametest.com, live: go.4game.com }
+
+    marathon:
+      instances: { qa: 1, live: 4 }
+      mem: { qa: 256, live: 1024 }
+      cpu: { qa: 0.2, live: 3 }
+
+    debian:
+      cluster: { qa: cpb.qa.inn.ru, live: cpb.lux.inn.eu }
+
+  featured-site:
+    branch: "^feature-(<feature>.*)$"
+
+    routes:
+      - domain: "{{feature}}.4gametest.com"
+        location: /some_location/
+
+    debian:
+      cluster: cpb.qa.inn.ru
+
+  service:
+    marathon:
+      cmd: bin/start
+      instances: 1
+      mem: 256
+
+    debian:
+      cluster: cpb.qa.inn.ru
+
+monitoring:
+  alerts:
+    - name: RPS
+      graphite:
+        metric: sumSeries(inn.*.kidzania.api.http.timer.all.m5_rate)
+        warn.max: 3000
+        crit.max: 4000
+
+    - name: Request time
+      graphite:
+        metric: averageSeries(inn.*.kidzania.api.http.timer.all.p75)
+        warn.max: { live: 15 }
+        crit.max: { live: 30 }
+
+    - name: Errors rate
+      elastic:
+        query: tag:"kidzania-api" AND level:ERROR
+        from: 10min
+        warn: 1
+        crit: 10

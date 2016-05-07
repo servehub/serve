@@ -1,0 +1,37 @@
+{{- range services}}{{range service .Name}}{{end}}{{end -}}
+
+{{- with $data := plugin "/vagrant/serve" "consul" "nginx-tempalte-context" | parseJSON}}
+
+{{range $upstream, $addresses := $data.upstreams}}
+upstream {{$upstream}} {
+  {{- range $addr := $addresses}}
+    server {{$addr.address}}:{{$addr.port}};
+  {{- end}}
+}
+{{end}}
+
+{{range $domain, $locations := $data.servers}}
+server {
+  listen 80;
+  server_name {{$domain}};
+
+  {{range $location, $ups := $locations}}
+  location {{$location}} {
+    {{- if $ups.stage}}
+      if ($is_staging = "stage") {
+        proxy_pass http://{{$ups.stage}}/;
+      }
+
+      {{- if $ups.live}}
+      if ($is_staging = "live") {
+          proxy_pass http://{{$ups.live}}/;
+      }
+      {{- end}}
+    {{- else}}
+      proxy_pass http://{{$ups.live}}/;
+    {{- end}}
+  }
+  {{end}}
+}
+{{end}}
+{{- end}}

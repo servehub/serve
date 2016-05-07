@@ -1,0 +1,9 @@
+env: qa
+
+alerts:
+  elastic:
+    host: "http://elastic:9200"
+    filepath: "/usr/lib/check_mk_agent/local/check_mk_elastic_alerts.sh"
+
+  graphite:
+    filepath: "/usr/lib/check_mk_agent/local/check_mk_graphite_metrics.sh"

@@ -1,0 +1,91 @@
+hash: 2d394916a6d2e292082124fa810828f3fe42f369441cc9cb1b78dff314c5f3f9
+updated: 2016-04-29T21:01:43.258252+03:00
+imports:
+- name: github.com/BurntSushi/toml
+  version: bbd5bb678321a0d6e58f1099321dfa73391c1b6f
+- name: github.com/cloudfoundry-incubator/candiedyaml
+  version: 99c3df83b51532e3615f851d8c2dbb638f5313bf
+- name: github.com/codegangsta/cli
+  version: 71f57d300dd6a780ac1856c005c4b518cfd498ec
+- name: github.com/donovanhide/eventsource
+  version: c3f57f280ec708df24886d9e62f2fd178d69d8e8
+- name: github.com/gambol99/go-marathon
+  version: 8953f682004f048ab785dee17cb667e44c6ee8e2
+- name: github.com/ghodss/yaml
+  version: 1a6f069841556a7bcaff4a397ca6e8328d266c2f
+- name: github.com/google/go-querystring
+  version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
+  subpackages:
+  - query
+- name: github.com/hashicorp/consul
+  version: 16f34bfa304e81030d5a63ec15733f41c6fc208c
+  subpackages:
+  - api
+- name: github.com/hashicorp/go-cleanhttp
+  version: 875fb671b3ddc66f8e2f0acc33829c8cb989a38d
+- name: github.com/hashicorp/hcl
+  version: 578dd9746824a54637686b51a41bad457a56bcef
+  subpackages:
+  - hcl/ast
+  - hcl/parser
+  - hcl/token
+  - json/parser
+  - hcl/scanner
+  - hcl/strconv
+  - json/scanner
+  - json/token
+- name: github.com/hashicorp/serf
+  version: e4ec8cc423bbe20d26584b96efbeb9102e16d05f
+  subpackages:
+  - coordinate
+  - serf
+- name: github.com/Jeffail/gabs
+  version: ee1575a53249b51d636e62464ca43a13030afdb5
+- name: github.com/kr/pretty
+  version: add1dbc86daf0f983cd4a48ceb39deb95c729b67
+- name: github.com/kr/text
+  version: bb797dc4fb8320488f47bf11de07a733d7233e1f
+- name: github.com/kulikov/hookup
+  version: 0dff05547ef28cd4d0a1be557a9c6c901e076b86
+- name: github.com/labstack/echo
+  version: 2f8639b7e63afbb68c934fc89db564486ecf7917
+  subpackages:
+  - engine/standard
+  - middleware
+  - engine
+- name: github.com/labstack/gommon
+  version: f4ba73f8bcf88df1524069c117f7878cf530ee4e
+  subpackages:
+  - log
+  - color
+- name: github.com/magiconair/properties
+  version: c265cfa48dda6474e208715ca93e987829f572f8
+- name: github.com/mattn/go-colorable
+  version: 9cbef7c35391cca05f15f8181dc0b18bc9736dbb
+- name: github.com/mattn/go-isatty
+  version: 56b76bdf51f7708750eac80fa38b952bb9f32639
+- name: github.com/mitchellh/mapstructure
+  version: 281073eb9eb092240d33ef253c404f1cca550309
+- name: github.com/spf13/cast
+  version: 27b586b42e29bec072fe7379259cc719e1289da6
+- name: github.com/spf13/jwalterweatherman
+  version: 33c24e77fb80341fe7130ee7c594256ff08ccc46
+- name: github.com/spf13/pflag
+  version: 7f60f83a2c81bc3c3c0d5297f61ddfa68da9d3b7
+- name: github.com/spf13/viper
+  version: c975dc1b4eacf4ec7fdbf0873638de5d090ba323
+- name: github.com/valyala/fasttemplate
+  version: 3b874956e03f1636d171bda64b130f9135f42cff
+- name: golang.org/x/net
+  version: e45385e9b226f570b1f086bf287b25d3d4117776
+  subpackages:
+  - context
+- name: golang.org/x/sys
+  version: 20457ee8ea8546920d3f4e19e405da45250dc5a5
+  subpackages:
+  - unix
+- name: gopkg.in/fsnotify.v1
+  version: 875cf421b32f8f1b31bd43776297876d01542279
+- name: gopkg.in/yaml.v2
+  version: a83829b6f1293c91addabc89d0571c246397bbf4
+devImports: []
