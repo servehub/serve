@@ -1,14 +1,14 @@
 package supervisor
 
 import (
-	"github.com/codegangsta/cli"
-	"io/ioutil"
 	"log"
+
+	"github.com/codegangsta/cli"
 )
 
 func SupervisorCommand() cli.Command {
 	return cli.Command{
-		Name:  "supervisor",
+		Name: "supervisor",
 		Flags: []cli.Flag{
 			cli.IntFlag{Name: "max-retry", Value: -1},
 		},

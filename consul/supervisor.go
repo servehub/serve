@@ -19,9 +19,6 @@ func SupervisorCommand() cli.Command {
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "name"},
 			cli.StringFlag{Name: "version", Value: "0.0"},
-			cli.StringFlag{Name: "domain"},
-			cli.StringFlag{Name: "location"},
-			cli.StringFlag{Name: "staging"},
 			cli.StringFlag{Name: "port"},
 		},
 		Subcommands: []cli.Command{
@@ -89,7 +86,7 @@ func SupervisorCommand() cli.Command {
 					signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
 					log.Println(<-ch)
 
-					cmd.Process.Kill()
+					cmd.Process.Signal(syscall.SIGTERM)
 					time.Sleep(time.Second)
 
 					log.Println("Stopped.")
