@@ -14,55 +14,32 @@ include:
 notify:
   - slack: alert-api2
 
+ci:
+  branches:
+    - master
+    - featured: "^feature-(<feature>.*)$"
+
 build:
   - shell: sbt ';set version := "'${SERVE_BUILD_VERSION}'"' clean test pack
-
   - marathon: { package: target/pack }
 
-  - debian:
-      user: innova
-      daemon:
-        bin: $APPLICATION_PATH/bin/start
-        args: --port=$PORT1 --env=qa
-
-  - docker: {}
-
 deploy:
-  site:
-    branch: master # by default
+  type: site
 
-    routes:
-      - domain: { qa: api.4gametest.com, live: api.4game.com }
-        location: /v2/
-      - domain: { qa: api2.4gametest.com, live: api2.4game.com }
-      - domain: { qa: go.4gametest.com, live: go.4game.com }
+  routes:
+    - host: { qa: api.4gametest.com, live: api.4game.com }
+      location: /v2/
+    - host: { qa: api2.4gametest.com, live: api2.4game.com }
+    - host: { qa: go.4gametest.com, live: go.4game.com }
 
-    marathon:
-      instances: { qa: 1, live: 4 }
-      mem: { qa: 256, live: 1024 }
-      cpu: { qa: 0.2, live: 3 }
+    - host: "{{ feature }}-api2.4gametest.com"
+      location: /some-location/
+      featured: true
 
-    debian:
-      cluster: { qa: cpb.qa.inn.ru, live: cpb.lux.inn.eu }
-
-  featured-site:
-    branch: "^feature-(<feature>.*)$"
-
-    routes:
-      - domain: "{{feature}}.4gametest.com"
-        location: /some_location/
-
-    debian:
-      cluster: cpb.qa.inn.ru
-
-  service:
-    marathon:
-      cmd: bin/start
-      instances: 1
-      mem: 256
-
-    debian:
-      cluster: cpb.qa.inn.ru
+  marathon:
+    instances: { qa: 1, live: 4 }
+    mem: { qa: 256, live: 1024 }
+    cpu: { qa: 0.2, live: 3 }
 
 monitoring:
   alerts:

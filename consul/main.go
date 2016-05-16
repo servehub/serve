@@ -36,16 +36,8 @@ func TagsFromFlags(c *cli.Context) map[string]string {
 		tags["version"] = t
 	}
 
-	if t := c.GlobalString("domain"); t != "" {
-		tags["domain"] = t
-	}
-
-	if t := c.GlobalString("location"); t != "" {
-		tags["location"] = t
-	}
-
-	if t := c.GlobalString("staging"); t != "" {
-		tags["staging"] = t
+	if t := c.GlobalString("name"); t != "" {
+		tags["name"] = t
 	}
 
 	return tags

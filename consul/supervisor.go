@@ -17,8 +17,7 @@ func SupervisorCommand() cli.Command {
 		Name:  "supervisor",
 		Usage: "Wrapper for registering service into consul and remove it after stop",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "name"},
-			cli.StringFlag{Name: "version", Value: "0.0"},
+			cli.StringFlag{Name: "service"},
 			cli.StringFlag{Name: "port"},
 		},
 		Subcommands: []cli.Command{
@@ -38,7 +37,7 @@ func SupervisorCommand() cli.Command {
 
 					consul, _ := api.NewClient(api.DefaultConfig())
 
-					serviceId := c.GlobalString("name") + "-" + c.GlobalString("version") + "-" + c.GlobalString("port")
+					serviceId := c.GlobalString("service") + ":" + c.GlobalString("port")
 
 					// wait for child process compelete and unregister it from consul
 					go func() {
@@ -67,17 +66,15 @@ func SupervisorCommand() cli.Command {
 
 					// Register service into consul
 					if err := consul.Agent().ServiceRegister(&api.AgentServiceRegistration{
-						ID:                serviceId,
-						Name:              c.GlobalString("name"),
-						Tags:              MapToList(TagsFromFlags(c)),
-						Port:              c.GlobalInt("port"),
-						EnableTagOverride: true,
+						ID:   serviceId,
+						Name: c.GlobalString("service"),
+						Port: c.GlobalInt("port"),
 						Check: &api.AgentServiceCheck{
 							TCP:      "localhost:" + c.GlobalString("port"),
 							Interval: "5s",
 						},
 					}); err != nil {
-						cmd.Process.Kill()
+						cmd.Process.Signal(syscall.SIGTERM)
 						log.Fatal(err)
 					}
 
@@ -87,7 +84,7 @@ func SupervisorCommand() cli.Command {
 					log.Println(<-ch)
 
 					cmd.Process.Signal(syscall.SIGTERM)
-					time.Sleep(time.Second)
+					time.Sleep(time.Second) // await while child stopped
 
 					log.Println("Stopped.")
 				},

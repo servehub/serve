@@ -6,8 +6,8 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/hashicorp/consul/api"
 
-	consulCmd "github.com/kulikov/serve/consul"
-	"github.com/kulikov/serve/utils"
+	consulCmd "github.com/InnovaCo/serve/consul"
+	"github.com/InnovaCo/serve/utils"
 )
 
 func ReleaseSiteCommand() cli.Command {

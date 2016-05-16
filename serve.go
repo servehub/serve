@@ -5,16 +5,16 @@ import (
 
 	"github.com/codegangsta/cli"
 
-	appCmd "github.com/kulikov/serve/app"
-	"github.com/kulikov/serve/consul"
-	"github.com/kulikov/serve/github"
-	"github.com/kulikov/serve/marathon"
+	appCmd "github.com/InnovaCo/serve/app"
+	"github.com/InnovaCo/serve/consul"
+	"github.com/InnovaCo/serve/github"
+	"github.com/InnovaCo/serve/marathon"
 )
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "serve"
-	app.Version = "0.2"
+	app.Version = "0.3"
 	app.Usage = "Automate your infrastructure!"
 
 	app.Commands = []cli.Command{

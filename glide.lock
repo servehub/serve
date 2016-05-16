@@ -1,12 +1,12 @@
-hash: 2d394916a6d2e292082124fa810828f3fe42f369441cc9cb1b78dff314c5f3f9
-updated: 2016-05-10T18:09:53.238727269+03:00
+hash: e51d67636a76a23227170f2f5fca06956aff8b2bf0acf43173f60c49334998a8
+updated: 2016-05-16T19:31:59.402687985+03:00
 imports:
 - name: github.com/BurntSushi/toml
   version: f0aeabca5a127c4078abb8c8d64298b147264b55
 - name: github.com/cloudfoundry-incubator/candiedyaml
   version: 99c3df83b51532e3615f851d8c2dbb638f5313bf
 - name: github.com/codegangsta/cli
-  version: de28b8426b87c85d1263be52350487e02ba1e0ed
+  version: 3a52a3b8124e194986964c547054f0a7b8f56892
 - name: github.com/dgrijalva/jwt-go
   version: 40bd0f3b4891a9d7f121bfb7b8e8b0525625e262
 - name: github.com/donovanhide/eventsource
@@ -22,7 +22,7 @@ imports:
   subpackages:
   - query
 - name: github.com/hashicorp/consul
-  version: 2f0a95a2d90983aee380a8651a98d03a802d9a15
+  version: 75010d1924fd68e5e32b891b9a4e0a75932ac6e8
   subpackages:
   - api
 - name: github.com/hashicorp/go-cleanhttp
@@ -47,25 +47,14 @@ imports:
   version: c28ac41b517d24bf381d39d5a294fac6536d81fa
 - name: github.com/kulikov/hookup
   version: c1c1500f95fae71ebc937dc8c8bbd0476d6d0c34
-- name: github.com/kulikov/serve
-  version: c6871d7cd05435f7f868fcc5ef45ec0a6e05e837
-  subpackages:
-  - app
-  - consul
-  - github
-  - marathon
-  - gocd
-  - manifest
-  - manifest/alerts
-  - utils
 - name: github.com/labstack/echo
-  version: c4d6f16fc48f39b7d6eacd9496ba49cc5a8216c4
+  version: 52a5dcf3cf5d0c4f35e6ed1ea78128662a3d9338
   subpackages:
   - engine/standard
   - middleware
   - engine
 - name: github.com/labstack/gommon
-  version: 2e62be24dbb1ceb226554aaccfe5a89ec71043b3
+  version: b5f03e345acd2096591b6f738cb8d2b9b3231c50
   subpackages:
   - log
   - bytes
@@ -73,7 +62,7 @@ imports:
 - name: github.com/magiconair/properties
   version: c265cfa48dda6474e208715ca93e987829f572f8
 - name: github.com/mattn/go-colorable
-  version: 45ce6a6f60010487dd0dbab368b5fbbed1c14ef0
+  version: e8a10ddc7d2a7fe255f6fd7f501070a4cb62c183
 - name: github.com/mattn/go-isatty
   version: 56b76bdf51f7708750eac80fa38b952bb9f32639
 - name: github.com/mitchellh/mapstructure
@@ -89,7 +78,7 @@ imports:
 - name: github.com/valyala/fasttemplate
   version: 3b874956e03f1636d171bda64b130f9135f42cff
 - name: golang.org/x/net
-  version: 2a35e686583654a1b89ca79c4ac78cb3d6529ca3
+  version: ef00b378c73f107bf44d5c9b69875255ce89b79a
   subpackages:
   - context
 - name: golang.org/x/sys

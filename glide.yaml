@@ -1,4 +1,4 @@
-package: github.com/kulikov/serve
+package: github.com/InnovaCo/serve
 import:
 - package: github.com/spf13/viper
 - package: gopkg.in/yaml.v2

@@ -14,10 +14,10 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/kulikov/hookup"
-	"github.com/kulikov/serve/gocd"
-	"github.com/kulikov/serve/manifest"
-	"github.com/kulikov/serve/manifest/alerts"
-	"github.com/kulikov/serve/utils"
+	"github.com/InnovaCo/serve/gocd"
+	"github.com/InnovaCo/serve/manifest"
+	"github.com/InnovaCo/serve/manifest/alerts"
+	"github.com/InnovaCo/serve/utils"
 )
 
 type (

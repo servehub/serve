@@ -1,16 +1,17 @@
 package app
 
 import (
+	"io/ioutil"
+
+	"github.com/Jeffail/gabs"
 	"github.com/codegangsta/cli"
 	"github.com/ghodss/yaml"
-	"github.com/Jeffail/gabs"
-	"io/ioutil"
 )
 
 func BuildCommand() cli.Command {
 	return cli.Command{
 		Name:  "build",
-		Usage: "Duild package",
+		Usage: "Build package",
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "branch"},
 			cli.StringFlag{Name: "build-number"},
