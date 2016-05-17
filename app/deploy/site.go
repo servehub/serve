@@ -12,6 +12,7 @@ import (
 	"github.com/InnovaCo/serve/manifest"
 	"github.com/fatih/color"
 	"github.com/InnovaCo/serve/utils"
+	"github.com/hashicorp/consul/api"
 )
 
 type SiteDeploy struct {}
@@ -58,6 +59,27 @@ func (_ SiteDeploy) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 
 func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 	log.Println("Release done!", sub)
+
+	conf := api.DefaultConfig()
+	conf.Address = m.GetString("consul.consul-host") + ":8500"
+
+	consul, _ := api.NewClient(conf)
+
+	routes := make([]map[string]string, 0)
+	for _, route := range sub.Array("routes") {
+
+		// todo: merge with --route flag
+		// filter featured: true route
+		routes = append(routes, map[string]string{
+			"host": route.GetString("host"),
+			"location": route.GetString("location"),
+		})
+	}
+
+	consul.KV().Put(&api.KVPair{
+		Key: fmt.Sprintf("services/%s/%s/routes", m.ServiceName(), m.BuildVersion()),
+		Value: []byte("test"),
+	}, nil)
 
 	// находим текущий в консуле и убеждаемся что с ним все ок
 	// добавляем ему роуты

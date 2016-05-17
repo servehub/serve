@@ -21,6 +21,9 @@ branches:
 marathon:
   marathon-host: { qa: mesos1-q.qa.inn.ru, live: ach1-lc.lux.inn.eu }
 
+consul:
+  consul-host: { qa: mesos1-q.qa.inn.ru, live: ach1-lc.lux.inn.eu }
+
 build:
   - shell: "mkdir -p target/pack && touch target/pack/index.txt"
   - marathon: { package: target/pack }
