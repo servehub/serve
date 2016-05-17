@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/codegangsta/cli"
+	"github.com/InnovaCo/serve/manifest"
 )
 
 func ReleaseCommand() cli.Command {
@@ -14,6 +15,20 @@ func ReleaseCommand() cli.Command {
 			cli.StringFlag{Name: "route"},
 		},
 		Action: func(c *cli.Context) error {
+			mf := manifest.LoadManifest(c)
+
+			if mf.Has("deploy") {
+				strategy, err := GetStrategy("release", mf.GetStringOr("deploy.type", "default"))
+
+				if err != nil {
+					log.Fatalf("Release error: %v", err)
+				}
+
+				return strategy.Run(mf, mf.Sub("deploy"))
+			}
+
+			return nil
+
 			// вынести это все в отдельную стратегию — site
 			// там для мастер и для фича-веток сделать одинаковое поведение — -v1.0.34 прибавлять, в марафоне искать старую версию и т.п.
 

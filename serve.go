@@ -7,7 +7,6 @@ import (
 
 	appCmd "github.com/InnovaCo/serve/app"
 	"github.com/InnovaCo/serve/consul"
-	"github.com/InnovaCo/serve/github"
 	"github.com/InnovaCo/serve/marathon"
 )
 
@@ -21,7 +20,7 @@ func main() {
 		appCmd.AppCommand(),
 		consul.ConsulCommand(),
 		marathon.MarathonCommand(),
-		github.WebhookServerCommand(),
+		//github.WebhookServerCommand(),
 	}
 
 	app.Run(os.Args)

@@ -1,11 +1,10 @@
 package app
 
 import (
-	"io/ioutil"
+	"log"
 
-	"github.com/Jeffail/gabs"
+	"github.com/InnovaCo/serve/manifest"
 	"github.com/codegangsta/cli"
-	"github.com/ghodss/yaml"
 )
 
 func BuildCommand() cli.Command {
@@ -16,27 +15,27 @@ func BuildCommand() cli.Command {
 			cli.StringFlag{Name: "branch"},
 			cli.StringFlag{Name: "build-number"},
 		},
-		Action: func(c *cli.Context) {
+		Action: func(c *cli.Context) error {
 
-			data, _ := ioutil.ReadFile("example/manifest.yml")
-			jsonData, _ := yaml.YAMLToJSON(data)
+			mf := manifest.LoadManifest(c)
 
-			tree, _ := gabs.ParseJSON(jsonData)
-
-			builds, _ := tree.Path("build").Children()
-			for _, build := range builds {
-				if build.Exists("shell") {
-					println("shell ", build.Path("shell").Data().(string))
+			for _, bldr := range mf.Array("build") {
+				name, err := bldr.FirstKey()
+				if err != nil {
+					log.Fatalf("Build error: %v", err)
 				}
 
-				if build.Exists("marathon") {
-					println("marathon ", build.Path("marathon.package").Data().(string))
+				strategy, err := GetStrategy("build", name)
+				if err != nil {
+					log.Fatalf("Build error: %v", err)
 				}
 
-				if build.Exists("debian") {
-					println("debian ", build.Path("debian").String())
+				if err := strategy.Run(mf, bldr); err != nil {
+					return err
 				}
 			}
+
+			return nil
 		},
 	}
 }

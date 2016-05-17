@@ -20,8 +20,10 @@ ci:
     - featured: "^feature-(<feature>.*)$"
 
 build:
-  - shell: sbt ';set version := "'${SERVE_BUILD_VERSION}'"' clean test pack
-  - marathon: { package: target/pack }
+  - shell: "mkdir -p target/pack && touch target/pack/index.txt"
+  - marathon:
+      marathon-host: { qa: mesos1-q.qa.inn.ru, live: ach1-lc.lux.inn.eu }
+      package: target/pack
 
 deploy:
   type: site

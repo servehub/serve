@@ -1,5 +1,11 @@
 package utils
 
+import (
+	"fmt"
+	"os/exec"
+	"os"
+)
+
 func Contains(elm string, list []string) bool {
 	for _, v := range list {
 		if v == elm {
@@ -27,4 +33,15 @@ func MergeMaps(maps ...map[string]string) map[string]string {
 		}
 	}
 	return out
+}
+
+func RunCmdf(cmdline string, a ...interface{}) error {
+	return RunCmd(fmt.Sprintf(cmdline, a...))
+}
+
+func RunCmd(cmdline string) error {
+	cmd := exec.Command("/bin/bash", "-c", cmdline)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }
