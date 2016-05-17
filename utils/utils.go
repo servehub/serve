@@ -48,3 +48,17 @@ func RunCmd(cmdline string) error {
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }
+
+func MapsEqual(a, b map[string]string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for k, v := range a {
+		if w, ok := b[k]; !ok || v != w {
+			return false
+		}
+	}
+
+	return true
+}

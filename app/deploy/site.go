@@ -11,6 +11,7 @@ import (
 	"github.com/InnovaCo/serve/app/build"
 	"github.com/InnovaCo/serve/manifest"
 	"github.com/fatih/color"
+	"github.com/InnovaCo/serve/utils"
 )
 
 type SiteDeploy struct {}
@@ -57,5 +58,20 @@ func (_ SiteDeploy) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 
 func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 	log.Println("Release done!", sub)
+
+	// находим текущий в консуле и убеждаемся что с ним все ок
+	// добавляем ему роуты
+
+	// ищем есть ли старый с такими же роутами:
+	//    формируем массив роутов
+	//    ищем сервис с таким-же именем но другой версии, и содержащий один из указанных роутов
+	//    например в kv можно хранить /kv/services/{name-?branch}/v{version}} и там матчить через compareMaps
+	//    если хотябы один роут полностью совпал — это наш кандидат на убивание
+	// если есть — убиваем в консуле сразу и через 5 минут в марафоне
+
+	println(utils.MapsEqual(map[string]string{"name": "dima", "version": "1.0"}, map[string]string{"version": "1.0", "name": "dima"}))
+
+	log.Println("route")
+
 	return nil
 }
