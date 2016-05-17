@@ -1,10 +1,10 @@
 package app
 
 import (
-	"log"
+	"github.com/codegangsta/cli"
+	"github.com/fatih/color"
 
 	"github.com/InnovaCo/serve/manifest"
-	"github.com/codegangsta/cli"
 )
 
 func BuildCommand() cli.Command {
@@ -12,6 +12,7 @@ func BuildCommand() cli.Command {
 		Name:  "build",
 		Usage: "Build package",
 		Flags: []cli.Flag{
+			cli.StringFlag{Name: "env"},
 			cli.StringFlag{Name: "branch"},
 			cli.StringFlag{Name: "build-number"},
 		},
@@ -22,14 +23,15 @@ func BuildCommand() cli.Command {
 			for _, bldr := range mf.Array("build") {
 				name, err := bldr.FirstKey()
 				if err != nil {
-					log.Fatalf("Build error: %v", err)
+					panic(color.RedString("Build error: %v", err))
 				}
 
 				strategy, err := GetStrategy("build", name)
 				if err != nil {
-					log.Fatalf("Build error: %v", err)
+					panic(color.RedString("Build error: %v", err))
 				}
 
+				color.White("\nbuild %s -> %v", name, bldr)
 				if err := strategy.Run(mf, bldr); err != nil {
 					return err
 				}
@@ -39,11 +41,3 @@ func BuildCommand() cli.Command {
 		},
 	}
 }
-
-//type Manifest struct {
-//	conf *viper.Viper
-//}
-//
-//func (m *Manifest) GetString(key string) string {
-//	return m.conf.GetString(key)
-//}

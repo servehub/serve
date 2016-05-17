@@ -1,7 +1,7 @@
 info:
   name: forgame-api2
   description: 4game REST API v2
-  version: 2.0
+  version: "2.0"
   category: service/http
   owner:
     name: Dmitry Kulikov

@@ -8,3 +8,4 @@ import:
 - package: github.com/Jeffail/gabs
 - package: github.com/ghodss/yaml
 - package: github.com/kulikov/hookup
+- package: github.com/fatih/color

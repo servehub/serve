@@ -22,7 +22,7 @@ func AppCommand() cli.Command {
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "env"},
 			cli.StringFlag{Name: "branch"},
-			cli.StringFlag{Name: "build-number"},
+			cli.StringFlag{Name: "build-number",Value:"0"},
 		},
 		Subcommands: []cli.Command{
 			BuildCommand(),

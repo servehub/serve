@@ -2,8 +2,10 @@ package utils
 
 import (
 	"fmt"
-	"os/exec"
 	"os"
+	"os/exec"
+
+	"github.com/fatih/color"
 )
 
 func Contains(elm string, list []string) bool {
@@ -40,6 +42,7 @@ func RunCmdf(cmdline string, a ...interface{}) error {
 }
 
 func RunCmd(cmdline string) error {
+	color.Green("> %s", cmdline)
 	cmd := exec.Command("/bin/bash", "-c", cmdline)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

@@ -1,9 +1,11 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/codegangsta/cli"
+	"github.com/fatih/color"
 
 	appCmd "github.com/InnovaCo/serve/app"
 	"github.com/InnovaCo/serve/consul"
@@ -23,5 +25,7 @@ func main() {
 		//github.WebhookServerCommand(),
 	}
 
-	app.Run(os.Args)
+	if err := app.Run(os.Args); err != nil {
+		log.Fatalln(color.RedString("Exit: %v", err))
+	}
 }

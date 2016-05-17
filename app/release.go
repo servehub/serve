@@ -12,6 +12,9 @@ func ReleaseCommand() cli.Command {
 		Name:  "release",
 		Usage: "Release service",
 		Flags: []cli.Flag{
+			cli.StringFlag{Name: "env"},
+			cli.StringFlag{Name: "branch"},
+			cli.StringFlag{Name: "build-number"},
 			cli.StringFlag{Name: "route"},
 		},
 		Action: func(c *cli.Context) error {
