@@ -71,7 +71,7 @@ func (m *Manifest) FirstKey() (string, error) {
 }
 
 func (m *Manifest) Args(name string) string {
-	return m.parent.GetString("args." + name)
+	return m.parent.GetStringOr("args." + name, "")
 }
 
 func (m *Manifest) GetString(path string) string {

@@ -37,6 +37,7 @@ func (_ SiteDeploy) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 	if constrs := sub.GetStringOr("marathon.constraints", ""); constrs != "" {
 		cs := strings.SplitN(constrs, ":", 2)
 		app.AddConstraint(cs[0], "CLUSTER", cs[1])
+		app.AddLabel(cs[0], cs[1])
 	}
 
 	app.AddEnv("ENV", m.Args("env"))
@@ -52,8 +53,7 @@ func (_ SiteDeploy) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 
 	color.Green("marathon <- %s", app)
 
-	// todo: дожидаемся тут появления сервиса в консуле
-	return nil
+	return nil // todo: тут нужно дожидаться появления сервиса в консуле
 }
 
 func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
