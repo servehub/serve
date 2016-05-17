@@ -1,0 +1,5 @@
+#!/bin/bash -ex
+
+ROOT=$(cd $(dirname "${BASH_SOURCE[0]}")/../ && pwd)
+
+sudo ln -vfns $ROOT/bin/serve /usr/local/bin/serve
