@@ -3,6 +3,7 @@ package build
 import (
 	"github.com/InnovaCo/serve/manifest"
 	"github.com/InnovaCo/serve/utils"
+	"fmt"
 )
 
 type MarathonBuild struct{}
@@ -12,14 +13,19 @@ func (_ MarathonBuild) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 		return err
 	}
 
-	if err := utils.RunCmdf(
-		"curl -vsSf -XPUT -T package.tar.gz http://%s/task-registry/%s/%s-%s.tar.gz",
-		sub.GetString("marathon.marathon-host"),
-		m.ServiceName(),
-		m.ServiceName(),
-		m.BuildVersion()); err != nil {
+	if err := utils.RunCmdf("curl -vsSf -XPUT -T package.tar.gz %s", TaskRegistryUrl(m)); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func TaskRegistryUrl(m *manifest.Manifest) string {
+	return fmt.Sprintf(
+		"http://%s/task-registry/%s/%s-%s.tar.gz",
+		m.GetString("marathon.marathon-host"),
+		m.ServiceName(),
+		m.ServiceName(),
+		m.BuildVersion(),
+	)
 }

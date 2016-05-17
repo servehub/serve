@@ -13,7 +13,7 @@ func ReleaseCommand() cli.Command {
 		Usage: "Release service",
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "env"},
-			cli.StringFlag{Name: "branch"},
+			cli.StringFlag{Name: "feature"},
 			cli.StringFlag{Name: "build-number"},
 			cli.StringFlag{Name: "route"},
 		},

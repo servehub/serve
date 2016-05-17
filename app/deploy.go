@@ -13,7 +13,7 @@ func DeployCommand() cli.Command {
 		Usage: "Deploy service",
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "env"},
-			cli.StringFlag{Name: "branch"},
+			cli.StringFlag{Name: "feature"},
 			cli.StringFlag{Name: "build-number"},
 		},
 		Action: func(c *cli.Context) error {

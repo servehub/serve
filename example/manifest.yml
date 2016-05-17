@@ -14,16 +14,16 @@ include:
 notify:
   - slack: alert-api2
 
-ci:
-  branches:
-    - master
-    - featured: "^feature-(<feature>.*)$"
+branches:
+  - master
+  - featured: "^feature-(<feature>.*)$"
+
+marathon:
+  marathon-host: { qa: mesos1-q.qa.inn.ru, live: ach1-lc.lux.inn.eu }
 
 build:
   - shell: "mkdir -p target/pack && touch target/pack/index.txt"
-  - marathon:
-      marathon-host: { qa: mesos1-q.qa.inn.ru, live: ach1-lc.lux.inn.eu }
-      package: target/pack
+  - marathon: { package: target/pack }
 
 deploy:
   type: site
@@ -42,6 +42,7 @@ deploy:
     instances: { qa: 1, live: 4 }
     mem: { qa: 256, live: 1024 }
     cpu: { qa: 0.2, live: 3 }
+    constraints: "cpb:true"
 
 monitoring:
   alerts:
