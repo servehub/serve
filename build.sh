@@ -20,6 +20,7 @@ if [ ! -x /var/go/.golang/go/bin/glide ]; then
 fi
 
 export PATH=$PATH:/var/go/.golang/go/bin
+export GOROOT=/var/go/.golang/go
 export GOPATH=$ROOT/.gopath
 
 WORK_DIR=$GOPATH/src/github.com/InnovaCo/serve
