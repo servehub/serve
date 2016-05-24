@@ -26,10 +26,11 @@ func (_ SiteDeploy) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 
 	name := m.ServiceName() + "-v" + m.BuildVersion()
 
+	bs, bf, bmax := 1.0, 2.0, 30.0
 	app := &marathon.Application{
-		BackoffSeconds: 3,
-		BackoffFactor: 2,
-		MaxLaunchDelaySeconds: 30,
+		BackoffSeconds: &bs,
+		BackoffFactor: &bf,
+		MaxLaunchDelaySeconds: &bmax,
 	}
 
 	app.Name(m.GetStringOr("info.category", "") + "/" + name)
