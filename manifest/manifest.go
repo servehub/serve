@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strconv"
 
 	"github.com/Jeffail/gabs"
 	"github.com/codegangsta/cli"
 	"github.com/fatih/color"
 	"github.com/ghodss/yaml"
-	"strconv"
+	"github.com/valyala/fasttemplate"
 )
 
 func LoadManifest(c *cli.Context) *Manifest {
@@ -31,8 +32,8 @@ func LoadManifest(c *cli.Context) *Manifest {
 }
 
 type Manifest struct {
-	tree *gabs.Container
-	ctx *cli.Context
+	tree   *gabs.Container
+	ctx    *cli.Context
 	parent *Manifest
 }
 
@@ -75,7 +76,21 @@ func (m *Manifest) FirstKey() (string, error) {
 }
 
 func (m *Manifest) Args(name string) string {
-	return m.parent.GetStringOr("args." + name, "")
+	return m.parent.GetStringOr("args."+name, "")
+}
+
+func (m *Manifest) Template(path string) string {
+	return fasttemplate.New(m.GetStringOr(path, ""), "{{", "}}").ExecuteString(map[string]interface{}{
+		"feature": m.Args("feature"),
+	})
+}
+
+func (m *Manifest) TemplateOr(path string, defaultVal string) string {
+	if m.tree.ExistsP(path) {
+		return m.Template(path)
+	} else {
+		return defaultVal
+	}
 }
 
 func (m *Manifest) GetString(path string) string {
@@ -106,6 +121,14 @@ func (m *Manifest) GetIntOr(path string, defaultVal int) int {
 	} else {
 		return defaultVal
 	}
+}
+
+func (m *Manifest) GetBool(path string) bool {
+	v, err := strconv.ParseBool(m.GetStringOr(path, "false"))
+	if err != nil {
+		log.Fatalln(color.RedString("Value is not a boolean: %s = %s", path, m.GetString(path)))
+	}
+	return v
 }
 
 func (m *Manifest) value(path string) interface{} {

@@ -1,6 +1,7 @@
 package deploy
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"strconv"
@@ -28,8 +29,8 @@ func (_ SiteDeploy) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 
 	bs, bf, bmax := 1.0, 2.0, 30.0
 	app := &marathon.Application{
-		BackoffSeconds: &bs,
-		BackoffFactor: &bf,
+		BackoffSeconds:        &bs,
+		BackoffFactor:         &bf,
 		MaxLaunchDelaySeconds: &bmax,
 	}
 
@@ -75,37 +76,60 @@ func (_ SiteDeploy) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 			return fmt.Errorf("Service `%s` not started!", name)
 		}
 
-		log.Println(color.GreenString("Service `%s` successfily deloyed!", name))
+		log.Println(color.GreenString("Service `%s` successfully started!", name))
 		return nil
 	}, backoff.NewExponentialBackOff())
 }
 
 func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
-	log.Println("Release done!", sub)
+	consul := ConsulClient(m)
 
-	conf := api.DefaultConfig()
-	conf.Address = m.GetString("consul.consul-host") + ":8500"
+	name := m.ServiceName() + "-v" + m.BuildVersion()
+	services, _, err := consul.Health().Service(name, "", true, nil)
+	if err != nil {
+		return err
+	}
 
-	consul, _ := api.NewClient(conf)
+	if len(services) == 0 {
+		return fmt.Errorf("Service `%s` not started!", name)
+	} else {
+		log.Printf("Service `%s` started with %v instances.", name, len(services))
+	}
+
+	routeFlags := make(map[string]string, 0)
+	if m.Args("route") != "" {
+		if err := json.Unmarshal([]byte(m.Args("route")), &routeFlags); err != nil {
+			return err
+		}
+	}
 
 	routes := make([]map[string]string, 0)
 	for _, route := range sub.Array("routes") {
-
-		// todo: merge with --route flag
-		// filter featured: true route
-		routes = append(routes, map[string]string{
-			"host":     route.GetString("host"),
-			"location": route.GetString("location"),
-		})
+		if route.GetBool("featured") == (m.Args("feature") != "") {
+			routes = append(routes, utils.MergeMaps(map[string]string{
+				"host":     route.Template("host"),
+				"location": route.TemplateOr("location", "/"),
+			}, routeFlags))
+		}
 	}
 
-	consul.KV().Put(&api.KVPair{
-		Key:   fmt.Sprintf("services/%s/%s/routes", m.ServiceName(), m.BuildVersion()),
-		Value: []byte("test"),
-	}, nil)
+	routesJson, err := json.MarshalIndent(routes, "", "  ")
+	if err != nil {
+		return err
+	}
 
-	// находим текущий в консуле и убеждаемся что с ним все ок
-	// добавляем ему роуты
+	if _, err := consul.KV().Put(&api.KVPair{
+		Key:   fmt.Sprintf("services/%s/routes", name),
+		Value: routesJson,
+	}, nil); err != nil {
+		return fmt.Errorf("Error on save routes for `%s`!", name)
+	}
+
+	log.Println(color.GreenString("Service `%s` released with routes: %s", name, string(routesJson)))
+	return nil
+
+	// + находим текущий в консуле и убеждаемся что с ним все ок
+	// + добавляем ему роуты
 
 	// ищем есть ли старый с такими же роутами:
 	//    формируем массив роутов

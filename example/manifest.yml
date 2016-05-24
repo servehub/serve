@@ -45,8 +45,8 @@ deploy:
     instances: { qa: 1, live: 4 }
     mem: { qa: 256, live: 1024 }
     cpu: { qa: 0.2, live: 3 }
-    cmd: "hookup --port $PORT0"
-    constraints: "mks:true"
+    cmd: "bin/hookup --port $PORT0"
+    constraints: "cep:true"
 
 monitoring:
   alerts:
