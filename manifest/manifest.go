@@ -61,6 +61,10 @@ func (m *Manifest) Array(path string) []*Manifest {
 }
 
 func (m *Manifest) FirstKey() (string, error) {
+	if s, ok := m.tree.Data().(string); ok {
+		return s, nil
+	}
+
 	if res, err := m.tree.ChildrenMap(); err == nil {
 		for k, _ := range res {
 			return k, nil

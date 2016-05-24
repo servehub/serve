@@ -11,6 +11,7 @@ import (
 
 var strategies = map[string]Strategy{
 	"build.shell": build.ShellBuild{},
+	"build.sbt-pack": build.SbtPackBuild{},
 	"build.marathon": build.MarathonBuild{},
 	"deploy.site": deploy.SiteDeploy{},
 	"release.site": deploy.SiteRelease{},

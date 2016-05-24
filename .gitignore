@@ -1,3 +1,5 @@
 /consul/.vagrant
-vendor/
-bin/
+/bin/
+/vendor/
+/project/
+/target/

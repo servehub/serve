@@ -2,7 +2,7 @@ info:
   name: forgame-api2
   description: 4game REST API v2
   version: "2.0"
-  category: service/http
+  category: services/http
   owner:
     name: Dmitry Kulikov
     email: kulikov.dm@gmail.com
@@ -22,7 +22,7 @@ marathon:
   marathon-host: { qa: mesos1-q.qa.inn.ru, live: ach1-lc.lux.inn.eu }
 
 consul:
-  consul-host: { qa: mesos1-q.qa.inn.ru, live: ach1-lc.lux.inn.eu }
+  consul-host: { qa: 127.0.0.1, live: ach1-lc.lux.inn.eu }
 
 build:
   - shell: "mkdir -p target/pack && touch target/pack/index.txt"
@@ -45,7 +45,8 @@ deploy:
     instances: { qa: 1, live: 4 }
     mem: { qa: 256, live: 1024 }
     cpu: { qa: 0.2, live: 3 }
-    constraints: "cpb:true"
+    cmd: "hookup --port $PORT0"
+    constraints: "mks:true"
 
 monitoring:
   alerts:

@@ -6,17 +6,18 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cenk/backoff"
+	"github.com/fatih/color"
 	marathon "github.com/gambol99/go-marathon"
+	"github.com/hashicorp/consul/api"
 
 	"github.com/InnovaCo/serve/app/build"
 	"github.com/InnovaCo/serve/manifest"
-	"github.com/fatih/color"
 	"github.com/InnovaCo/serve/utils"
-	"github.com/hashicorp/consul/api"
 )
 
-type SiteDeploy struct {}
-type SiteRelease struct {}
+type SiteDeploy struct{}
+type SiteRelease struct{}
 
 func (_ SiteDeploy) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 	conf := marathon.NewDefaultConfig()
@@ -27,9 +28,13 @@ func (_ SiteDeploy) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 
 	app := &marathon.Application{}
 	app.Name(m.GetStringOr("info.category", "") + "/" + name)
-	app.Command(fmt.Sprintf("serve consul supervisor --service '%s' --port \\${PORT0} start %s", name, sub.GetStringOr("marathon.cmd", "bin/start")))
+	app.Command(fmt.Sprintf("serve consul supervisor --service '%s' --port $PORT0 start %s", name, sub.GetStringOr("marathon.cmd", "bin/start")))
 	app.Count(sub.GetIntOr("marathon.instances", 1))
 	app.Memory(float64(sub.GetIntOr("marathon.mem", 256)))
+
+	app.BackoffSeconds(3)
+	app.BackoffFactor(2)
+	app.MaxLaunchDelaySeconds(30)
 
 	if cpu, err := strconv.ParseFloat(sub.GetStringOr("marathon.cpu", "0.1"), 64); err == nil {
 		app.CPU(cpu)
@@ -54,7 +59,23 @@ func (_ SiteDeploy) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 
 	color.Green("marathon <- %s", app)
 
-	return nil // todo: тут нужно дожидаться появления сервиса в консуле
+	consul := ConsulClient(m)
+
+	return backoff.Retry(func() error {
+		services, _, err := consul.Health().Service(name, "", true, nil)
+
+		if err != nil {
+			return err
+		}
+
+		if len(services) == 0 {
+			log.Printf("Service `%s` not started yet! Retry...", name)
+			return fmt.Errorf("Service `%s` not started!", name)
+		}
+
+		log.Println(color.GreenString("Service `%s` successfily deloyed!", name))
+		return nil
+	}, backoff.NewExponentialBackOff())
 }
 
 func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
@@ -71,13 +92,13 @@ func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 		// todo: merge with --route flag
 		// filter featured: true route
 		routes = append(routes, map[string]string{
-			"host": route.GetString("host"),
+			"host":     route.GetString("host"),
 			"location": route.GetString("location"),
 		})
 	}
 
 	consul.KV().Put(&api.KVPair{
-		Key: fmt.Sprintf("services/%s/%s/routes", m.ServiceName(), m.BuildVersion()),
+		Key:   fmt.Sprintf("services/%s/%s/routes", m.ServiceName(), m.BuildVersion()),
 		Value: []byte("test"),
 	}, nil)
 
@@ -96,4 +117,12 @@ func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 	log.Println("route")
 
 	return nil
+}
+
+func ConsulClient(m *manifest.Manifest) *api.Client {
+	conf := api.DefaultConfig()
+	conf.Address = m.GetString("consul.consul-host") + ":8500"
+
+	consul, _ := api.NewClient(conf)
+	return consul
 }

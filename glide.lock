@@ -1,18 +1,22 @@
-hash: 613a98f2e1f7348854cb78871b3de9f5e7a7a6370c12a246d3c2bc8f6efd3622
-updated: 2016-05-17T19:47:11.823479975+03:00
+hash: 79453a7ee1cda3243ac223d549f207cbf816506114068e08699d4897a90e1e6f
+updated: 2016-05-24T16:03:13.378000636+03:00
 imports:
 - name: github.com/BurntSushi/toml
   version: f0aeabca5a127c4078abb8c8d64298b147264b55
+- name: github.com/cenk/backoff
+  version: c29158af31815ccc31ca29c86c121bc39e00d3d8
 - name: github.com/cloudfoundry-incubator/candiedyaml
   version: 99c3df83b51532e3615f851d8c2dbb638f5313bf
 - name: github.com/codegangsta/cli
-  version: 0eb4e0be6c214f8904ef6989b11072c7b897c657
+  version: 1ce6660d5de65095e81443b119d50585984142c7
 - name: github.com/donovanhide/eventsource
   version: c3f57f280ec708df24886d9e62f2fd178d69d8e8
+- name: github.com/fatih/color
+  version: 533cd7fd8a85905f67a1753afb4deddc85ea174f
 - name: github.com/fsnotify/fsnotify
   version: 30411dbcefb7a1da7e84f75530ad3abe4011b4f8
 - name: github.com/gambol99/go-marathon
-  version: 9982f5bb00be49e5578f7a465bfc281e89a710e2
+  version: 52466f39391c90839b2a75715d5c5af68b7e7502
 - name: github.com/ghodss/yaml
   version: e8e0db9016175449df0e9c4b6e6995a9433a395c
 - name: github.com/google/go-querystring
@@ -20,7 +24,7 @@ imports:
   subpackages:
   - query
 - name: github.com/hashicorp/consul
-  version: 75010d1924fd68e5e32b891b9a4e0a75932ac6e8
+  version: f6fef66e1bf17be4f3c9855fbec6de802ca6bd7d
   subpackages:
   - api
 - name: github.com/hashicorp/go-cleanhttp
@@ -47,10 +51,14 @@ imports:
   version: c1c1500f95fae71ebc937dc8c8bbd0476d6d0c34
 - name: github.com/magiconair/properties
   version: c265cfa48dda6474e208715ca93e987829f572f8
+- name: github.com/mattn/go-colorable
+  version: 9cbef7c35391cca05f15f8181dc0b18bc9736dbb
+  repo: https://github.com/mattn/go-colorable
+- name: github.com/mattn/go-isatty
+  version: 56b76bdf51f7708750eac80fa38b952bb9f32639
+  repo: https://github.com/mattn/go-isatty
 - name: github.com/mitchellh/mapstructure
   version: 281073eb9eb092240d33ef253c404f1cca550309
-- name: github.com/Sirupsen/logrus
-  version: cd7d1bbe41066b6c1f19780f895901052150a575
 - name: github.com/spf13/cast
   version: 27b586b42e29bec072fe7379259cc719e1289da6
 - name: github.com/spf13/jwalterweatherman
