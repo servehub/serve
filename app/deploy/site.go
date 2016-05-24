@@ -26,15 +26,16 @@ func (_ SiteDeploy) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 
 	name := m.ServiceName() + "-v" + m.BuildVersion()
 
-	app := &marathon.Application{}
+	app := &marathon.Application{
+		BackoffSeconds: 3,
+		BackoffFactor: 2,
+		MaxLaunchDelaySeconds: 30,
+	}
+
 	app.Name(m.GetStringOr("info.category", "") + "/" + name)
 	app.Command(fmt.Sprintf("serve consul supervisor --service '%s' --port $PORT0 start %s", name, sub.GetStringOr("marathon.cmd", "bin/start")))
 	app.Count(sub.GetIntOr("marathon.instances", 1))
 	app.Memory(float64(sub.GetIntOr("marathon.mem", 256)))
-
-	app.BackoffSeconds(3)
-	app.BackoffFactor(2)
-	app.MaxLaunchDelaySeconds(30)
 
 	if cpu, err := strconv.ParseFloat(sub.GetStringOr("marathon.cpu", "0.1"), 64); err == nil {
 		app.CPU(cpu)
