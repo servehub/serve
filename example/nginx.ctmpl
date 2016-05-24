@@ -1,6 +1,6 @@
-{{- range services}}{{range service .Name}}{{end}}{{end -}}
+{{- range ls "services/routes"}}{{range service .Key}}{{end}}{{end -}}
 
-{{- with $data := plugin "serve" "consul" "nginx-tempalte-context" | parseJSON}}
+{{- with $data := plugin "serve" "consul" "nginx-template-context" | parseJSON}}
 
 {{range $upstream, $addresses := $data.upstreams}}
 upstream {{$upstream}} {
@@ -18,12 +18,12 @@ server {
   {{range $location, $ups := $locations}}
   location {{$location}} {
     {{- if $ups.stage}}
-      if ($is_staging = "stage") {
+      if ($staging = "stage") {
         proxy_pass http://{{$ups.stage}}/;
       }
 
       {{- if $ups.live}}
-      if ($is_staging = "live") {
+      if ($staging = "live") {
           proxy_pass http://{{$ups.live}}/;
       }
       {{- end}}

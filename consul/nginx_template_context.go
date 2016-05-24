@@ -15,8 +15,8 @@ var upstreamNameRegex = regexp.MustCompile("[^\\w]+")
 
 func NginxTemplateContextCommand() cli.Command {
 	return cli.Command{
-		Name:  "nginx-tempalte-context",
-		Usage: "Collect and return data for consul-tempalte",
+		Name:  "nginx-template-context",
+		Usage: "Collect and return data for consul-template",
 		Action: func(c *cli.Context) error {
 			consul, _ := api.NewClient(api.DefaultConfig())
 
