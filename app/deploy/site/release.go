@@ -21,6 +21,7 @@ type SiteRelease struct{}
 func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 	consul := serveConsul.ConsulClient(m)
 
+	// check current service is alive
 	name := m.ServiceName() + "-v" + m.BuildVersion()
 	services, _, err := consul.Health().Service(name, "", true, nil)
 	if err != nil {
@@ -40,6 +41,7 @@ func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 		}
 	}
 
+	// collect routes
 	routes := make([]map[string]string, 0)
 	for _, route := range sub.Array("routes") {
 		if route.GetBool("featured") == (m.Args("feature") != "") {
@@ -55,8 +57,9 @@ func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 		return err
 	}
 
+	// write routes to consul kv
 	if _, err := consul.KV().Put(&api.KVPair{
-		Key:   fmt.Sprintf("services/%s/routes", name),
+		Key:   fmt.Sprintf("services/routes/%s", name),
 		Value: routesJson,
 	}, nil); err != nil {
 		return err
@@ -64,13 +67,14 @@ func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 
 	log.Println(color.GreenString("Service `%s` released with routes: %s", name, string(routesJson)))
 
-	kvPairs, _, err := consul.KV().List(fmt.Sprintf("services/%s-v", m.ServiceName()), nil)
+	// find old services with this routes
+	kvPairs, _, err := consul.KV().List(fmt.Sprintf("services/routes/%s-v", m.ServiceName()), nil)
 	if err != nil {
 		return err
 	}
 
 	for _, kv := range kvPairs {
-		if strings.HasSuffix(kv.Key, "/routes") && !strings.Contains(kv.Key, name) {
+		if !strings.Contains(kv.Key, name) { // skip current service
 			oldRoutes := make([]map[string]string, 0)
 			if err := json.Unmarshal(kv.Value, &oldRoutes); err != nil {
 				return err
@@ -79,7 +83,7 @@ func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 			for _, route := range routes {
 				for _, oldRoute := range oldRoutes {
 					if utils.MapsEqual(route, oldRoute) {
-						oldName := strings.TrimSuffix(strings.TrimPrefix(kv.Key, "services/"), "/routes")
+						oldName := strings.TrimPrefix(kv.Key, "services/routes/")
 						log.Printf("Found %s with routes %v. Remove it!", oldName, oldRoute)
 
 						if _, err := consul.KV().Delete(kv.Key, nil); err != nil {

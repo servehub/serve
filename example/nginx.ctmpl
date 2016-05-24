@@ -1,6 +1,6 @@
 {{- range services}}{{range service .Name}}{{end}}{{end -}}
 
-{{- with $data := plugin "/vagrant/serve" "consul" "nginx-tempalte-context" | parseJSON}}
+{{- with $data := plugin "serve" "consul" "nginx-tempalte-context" | parseJSON}}
 
 {{range $upstream, $addresses := $data.upstreams}}
 upstream {{$upstream}} {
@@ -10,10 +10,10 @@ upstream {{$upstream}} {
 }
 {{end}}
 
-{{range $domain, $locations := $data.servers}}
+{{range $host, $locations := $data.servers}}
 server {
   listen 80;
-  server_name {{$domain}};
+  server_name {{$host}};
 
   {{range $location, $ups := $locations}}
   location {{$location}} {
