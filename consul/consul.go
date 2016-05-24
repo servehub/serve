@@ -4,6 +4,8 @@ import (
 	"regexp"
 
 	"github.com/codegangsta/cli"
+	"github.com/InnovaCo/serve/manifest"
+	"github.com/hashicorp/consul/api"
 )
 
 func ConsulCommand() cli.Command {
@@ -50,3 +52,12 @@ func MapToList(m map[string]string) []string {
 	}
 	return out
 }
+
+func ConsulClient(m *manifest.Manifest) *api.Client {
+	conf := api.DefaultConfig()
+	conf.Address = m.GetString("consul.consul-host") + ":8500"
+
+	consul, _ := api.NewClient(conf)
+	return consul
+}
+

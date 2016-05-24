@@ -5,7 +5,7 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/InnovaCo/serve/manifest"
-	"github.com/InnovaCo/serve/app/deploy"
+	"github.com/InnovaCo/serve/app/deploy/site"
 	"github.com/InnovaCo/serve/app/build"
 )
 
@@ -13,8 +13,8 @@ var strategies = map[string]Strategy{
 	"build.shell": build.ShellBuild{},
 	"build.sbt-pack": build.SbtPackBuild{},
 	"build.marathon": build.MarathonBuild{},
-	"deploy.site": deploy.SiteDeploy{},
-	"release.site": deploy.SiteRelease{},
+	"deploy.site": site.SiteDeploy{},
+	"release.site": site.SiteRelease{},
 }
 
 func AppCommand() cli.Command {

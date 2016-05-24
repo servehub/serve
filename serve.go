@@ -9,7 +9,6 @@ import (
 
 	appCmd "github.com/InnovaCo/serve/app"
 	"github.com/InnovaCo/serve/consul"
-	"github.com/InnovaCo/serve/marathon"
 )
 
 func main() {
@@ -21,7 +20,6 @@ func main() {
 	app.Commands = []cli.Command{
 		appCmd.AppCommand(),
 		consul.ConsulCommand(),
-		marathon.MarathonCommand(),
 		//github.WebhookServerCommand(),
 	}
 
