@@ -1,5 +1,5 @@
-hash: 79453a7ee1cda3243ac223d549f207cbf816506114068e08699d4897a90e1e6f
-updated: 2016-05-24T16:03:13.378000636+03:00
+hash: 18ff61f5411b51833be9d11d7b694d9f2b399630f4d62311086372600ce3b952
+updated: 2016-05-25T12:48:27.686520313+03:00
 imports:
 - name: github.com/BurntSushi/toml
   version: f0aeabca5a127c4078abb8c8d64298b147264b55
@@ -8,7 +8,7 @@ imports:
 - name: github.com/cloudfoundry-incubator/candiedyaml
   version: 99c3df83b51532e3615f851d8c2dbb638f5313bf
 - name: github.com/codegangsta/cli
-  version: 1ce6660d5de65095e81443b119d50585984142c7
+  version: 595ba45e735c1e9c1f9ddc9e2ef21997fca893f2
 - name: github.com/donovanhide/eventsource
   version: c3f57f280ec708df24886d9e62f2fd178d69d8e8
 - name: github.com/fatih/color
@@ -24,7 +24,7 @@ imports:
   subpackages:
   - query
 - name: github.com/hashicorp/consul
-  version: f6fef66e1bf17be4f3c9855fbec6de802ca6bd7d
+  version: 14c24154e8db989a8d17fd5e15f1b6ce7885f29e
   subpackages:
   - api
 - name: github.com/hashicorp/go-cleanhttp
@@ -67,6 +67,8 @@ imports:
   version: cb88ea77998c3f024757528e3305022ab50b43be
 - name: github.com/spf13/viper
   version: d8a428b8a30606e1d0b355d91edf282609ade1a6
+- name: github.com/valyala/fasttemplate
+  version: 3b874956e03f1636d171bda64b130f9135f42cff
 - name: golang.org/x/sys
   version: 20457ee8ea8546920d3f4e19e405da45250dc5a5
   subpackages:

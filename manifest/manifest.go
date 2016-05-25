@@ -14,8 +14,16 @@ import (
 )
 
 func LoadManifest(c *cli.Context) *Manifest {
-	data, _ := ioutil.ReadFile("example/manifest.yml")
-	jsonData, _ := yaml.YAMLToJSON(data)
+	data, err := ioutil.ReadFile(c.String("manifest"))
+	if err != nil {
+		log.Fatalln(color.RedString("Manifest file `%s` not found: %v", c.String("manifest"), err))
+	}
+
+	jsonData, err := yaml.YAMLToJSON(data)
+	if err != nil {
+		log.Fatalln(color.RedString("Error on parse manifest: %v!", err))
+	}
+
 	tree, _ := gabs.ParseJSON(jsonData)
 
 	for _, fn := range append(c.GlobalFlagNames(), c.FlagNames()...) {

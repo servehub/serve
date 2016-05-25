@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 
 	"github.com/codegangsta/cli"
 	"github.com/fatih/color"
@@ -21,6 +22,11 @@ func main() {
 		appCmd.AppCommand(),
 		consul.ConsulCommand(),
 		//github.WebhookServerCommand(),
+	}
+
+	app.Before = func(c *cli.Context) error {
+		log.Println(color.MagentaString(">>> %s\n", strings.Join(c.Args(), " ")))
+		return nil
 	}
 
 	if err := app.Run(os.Args); err != nil {

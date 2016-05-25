@@ -1,11 +1,10 @@
 package consul
 
 import (
-	"regexp"
-
 	"github.com/codegangsta/cli"
-	"github.com/InnovaCo/serve/manifest"
 	"github.com/hashicorp/consul/api"
+
+	"github.com/InnovaCo/serve/manifest"
 )
 
 func ConsulCommand() cli.Command {
@@ -18,41 +17,6 @@ func ConsulCommand() cli.Command {
 	}
 }
 
-var tagSplitRegex = regexp.MustCompile(":")
-
-func ParseTags(tags []string) map[string]string {
-	output := make(map[string]string)
-	for _, t := range tags {
-		tt := tagSplitRegex.Split(t, 2)
-		if len(tt) > 1 {
-			output[tt[0]] = tt[1]
-		}
-	}
-	return output
-}
-
-func TagsFromFlags(c *cli.Context) map[string]string {
-	tags := make(map[string]string, 0)
-
-	if t := c.GlobalString("version"); t != "" {
-		tags["version"] = t
-	}
-
-	if t := c.GlobalString("name"); t != "" {
-		tags["name"] = t
-	}
-
-	return tags
-}
-
-func MapToList(m map[string]string) []string {
-	out := make([]string, 0)
-	for k, v := range m {
-		out = append(out, k+":"+v)
-	}
-	return out
-}
-
 func ConsulClient(m *manifest.Manifest) *api.Client {
 	conf := api.DefaultConfig()
 	conf.Address = m.GetString("consul.consul-host") + ":8500"
@@ -60,4 +24,3 @@ func ConsulClient(m *manifest.Manifest) *api.Client {
 	consul, _ := api.NewClient(conf)
 	return consul
 }
-

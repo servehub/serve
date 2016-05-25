@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 
@@ -42,7 +43,7 @@ func RunCmdf(cmdline string, a ...interface{}) error {
 }
 
 func RunCmd(cmdline string) error {
-	color.Green("> %s", cmdline)
+	log.Println(color.YellowString("> %s", cmdline))
 	cmd := exec.Command("/bin/bash", "-c", cmdline)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
