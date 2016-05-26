@@ -1,11 +1,12 @@
 package app
 
 import (
+	"log"
+
 	"github.com/codegangsta/cli"
 	"github.com/fatih/color"
 
 	"github.com/InnovaCo/serve/manifest"
-	"log"
 )
 
 func BuildCommand() cli.Command {

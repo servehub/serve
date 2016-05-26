@@ -64,6 +64,7 @@ func (_ SiteDeploy) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 		services, _, err := consul.Health().Service(name, "", true, nil)
 
 		if err != nil {
+			log.Println(color.RedString("Error in check health in consul: %v", err))
 			return err
 		}
 
