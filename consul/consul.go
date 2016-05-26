@@ -13,6 +13,7 @@ func ConsulCommand() cli.Command {
 		Subcommands: []cli.Command{
 			SupervisorCommand(),
 			NginxTemplateContextCommand(),
+			RouteCommand(),
 		},
 	}
 }
