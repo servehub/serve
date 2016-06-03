@@ -17,19 +17,15 @@ server {
 
   {{range $location, $ups := $locations}}
   location {{$location}} {
+    set $proxy_pass_upstream '{{$ups.live}}';
+
     {{- if $ups.stage}}
       if ($staging = "stage") {
-        proxy_pass http://{{$ups.stage}}/;
+        set $proxy_pass_upstream '{{$ups.stage}}';
       }
-
-      {{- if $ups.live}}
-      if ($staging = "live") {
-          proxy_pass http://{{$ups.live}}/;
-      }
-      {{- end}}
-    {{- else}}
-      proxy_pass http://{{$ups.live}}/;
     {{- end}}
+
+    proxy_pass http://$proxy_pass_upstream/;
   }
   {{end}}
 }
