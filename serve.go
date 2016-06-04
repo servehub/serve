@@ -9,6 +9,7 @@ import (
 
 	appCmd "github.com/InnovaCo/serve/app"
 	"github.com/InnovaCo/serve/consul"
+	"github.com/InnovaCo/serve/supervisor"
 )
 
 func main() {
@@ -20,6 +21,7 @@ func main() {
 	app.Commands = []cli.Command{
 		appCmd.AppCommand(),
 		consul.ConsulCommand(),
+		supervisor.SupervisorCommand(),
 		//github.WebhookServerCommand(),
 	}
 

@@ -58,9 +58,9 @@ func SupervisorCommand() cli.Command {
 						}
 
 						if result != nil {
-							os.Exit(0)
-						} else {
 							os.Exit(2)
+						} else {
+							os.Exit(0)
 						}
 					}()
 
