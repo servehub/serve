@@ -24,6 +24,9 @@ marathon:
 consul:
   consul-host: { qa: 127.0.0.1, live: ach1-lc.lux.inn.eu }
 
+docker:
+  registry-host: http://docker.msk.inn.ru/registry
+
 build:
   - shell: "mkdir -p target/pack && touch target/pack/index.txt"
   - marathon: { package: target/pack }

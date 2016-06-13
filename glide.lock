@@ -1,30 +1,32 @@
-hash: 18ff61f5411b51833be9d11d7b694d9f2b399630f4d62311086372600ce3b952
-updated: 2016-05-25T12:48:27.686520313+03:00
+hash: 9acd02dfce2c651e026d99bef415c105b41fb20cbd8d95225d8d36233c0c3282
+updated: 2016-06-13T22:40:56.235778597+03:00
 imports:
 - name: github.com/BurntSushi/toml
   version: f0aeabca5a127c4078abb8c8d64298b147264b55
 - name: github.com/cenk/backoff
-  version: c29158af31815ccc31ca29c86c121bc39e00d3d8
+  version: cdf48bbc1eb78d1349cbda326a4a037f7ba565c6
 - name: github.com/cloudfoundry-incubator/candiedyaml
   version: 99c3df83b51532e3615f851d8c2dbb638f5313bf
 - name: github.com/codegangsta/cli
-  version: 595ba45e735c1e9c1f9ddc9e2ef21997fca893f2
+  version: e5bef42c62aa7d25aba4880dc02b7624f01e9e19
+- name: github.com/docker/engine-api
+  version: bf992794fd0d29c96021b16b284d706e0ac780b0
 - name: github.com/donovanhide/eventsource
-  version: c3f57f280ec708df24886d9e62f2fd178d69d8e8
+  version: fd1de70867126402be23c306e1ce32828455d85b
 - name: github.com/fatih/color
-  version: 533cd7fd8a85905f67a1753afb4deddc85ea174f
+  version: 87d4004f2ab62d0d255e0a38f1680aa534549fe3
 - name: github.com/fsnotify/fsnotify
   version: 30411dbcefb7a1da7e84f75530ad3abe4011b4f8
 - name: github.com/gambol99/go-marathon
-  version: 52466f39391c90839b2a75715d5c5af68b7e7502
+  version: a558128c87724cd7430060ef5aedf39f83937f55
 - name: github.com/ghodss/yaml
-  version: e8e0db9016175449df0e9c4b6e6995a9433a395c
+  version: aa0c862057666179de291b67d9f093d12b5a8473
 - name: github.com/google/go-querystring
   version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
   subpackages:
   - query
 - name: github.com/hashicorp/consul
-  version: 14c24154e8db989a8d17fd5e15f1b6ce7885f29e
+  version: 6d35960361f10a74eb1454bedef24ab7f87a636e
   subpackages:
   - api
 - name: github.com/hashicorp/go-cleanhttp
@@ -41,7 +43,7 @@ imports:
   - json/scanner
   - json/token
 - name: github.com/hashicorp/serf
-  version: e4ec8cc423bbe20d26584b96efbeb9102e16d05f
+  version: 6c4672d66fc6312ddde18399262943e21175d831
   subpackages:
   - coordinate
   - serf
@@ -53,10 +55,8 @@ imports:
   version: c265cfa48dda6474e208715ca93e987829f572f8
 - name: github.com/mattn/go-colorable
   version: 9cbef7c35391cca05f15f8181dc0b18bc9736dbb
-  repo: https://github.com/mattn/go-colorable
 - name: github.com/mattn/go-isatty
   version: 56b76bdf51f7708750eac80fa38b952bb9f32639
-  repo: https://github.com/mattn/go-isatty
 - name: github.com/mitchellh/mapstructure
   version: 281073eb9eb092240d33ef253c404f1cca550309
 - name: github.com/spf13/cast
@@ -64,9 +64,9 @@ imports:
 - name: github.com/spf13/jwalterweatherman
   version: 33c24e77fb80341fe7130ee7c594256ff08ccc46
 - name: github.com/spf13/pflag
-  version: cb88ea77998c3f024757528e3305022ab50b43be
+  version: 367864438f1b1a3c7db4da06a2f55b144e6784e0
 - name: github.com/spf13/viper
-  version: d8a428b8a30606e1d0b355d91edf282609ade1a6
+  version: c1ccc378a054ea8d4e38d8c67f6938d4760b53dd
 - name: github.com/valyala/fasttemplate
   version: 3b874956e03f1636d171bda64b130f9135f42cff
 - name: golang.org/x/sys
