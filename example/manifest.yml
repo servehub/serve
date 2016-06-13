@@ -27,6 +27,7 @@ consul:
 build:
   - shell: "mkdir -p target/pack && touch target/pack/index.txt"
   - marathon: { package: target/pack }
+  - docker
 
 deploy:
   type: site
@@ -47,6 +48,9 @@ deploy:
     cpu: { qa: 0.2, live: 3 }
     cmd: "bin/hookup --port $PORT0"
     constraints: "cep:true"
+    docker:
+      portMappings:
+        - containerPort: 80
 
 monitoring:
   alerts:
