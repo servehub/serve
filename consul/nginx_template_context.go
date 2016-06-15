@@ -79,6 +79,7 @@ func NginxTemplateContextCommand() cli.Command {
 
 					if _, ok := servers[route["host"]][location]; !ok {
 						servers[route["host"]][location] = make(map[string]string, 0)
+						servers[route["host"]][location]["service"] = name // todo: backward compatibility for inn-ci-tools, remove after
 					}
 
 					if _, ok := servers[route["host"]][location][staging]; !ok {
