@@ -24,7 +24,7 @@ func TaskRegistryUrl(m *manifest.Manifest) string {
 	return fmt.Sprintf(
 		"http://%s/task-registry/%s/%s-v%s.tar.gz",
 		m.GetString("marathon.marathon-host"),
-		m.ServiceName(),
+		m.ServiceFullName("/"),
 		m.ServiceName(),
 		m.BuildVersion(),
 	)

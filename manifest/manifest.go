@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/Jeffail/gabs"
 	"github.com/codegangsta/cli"
@@ -170,4 +171,12 @@ func (m *Manifest) ServiceName() string {
 
 func (m *Manifest) BuildVersion() string {
 	return fmt.Sprintf("%s.%s", m.GetString("info.version"), m.Args("build-number"))
+}
+
+func (m *Manifest) ServiceFullName(separator string) string {
+	return strings.TrimPrefix(strings.Replace(m.GetStringOr("info.category", "")+"/", "/", separator, -1)+m.ServiceName(), separator)
+}
+
+func (m *Manifest) ServiceFullNameWithVersion(separator string) string {
+	return m.ServiceFullName(separator) + "-v" + m.BuildVersion()
 }

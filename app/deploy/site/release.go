@@ -22,16 +22,16 @@ func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 	consul := serveConsul.ConsulClient(m)
 
 	// check current service is alive
-	name := m.ServiceName() + "-v" + m.BuildVersion()
-	services, _, err := consul.Health().Service(name, "", true, nil)
+	fullName := m.ServiceFullName("/") + "-v" + m.BuildVersion()
+	services, _, err := consul.Health().Service(fullName, "", true, nil)
 	if err != nil {
 		return err
 	}
 
 	if len(services) == 0 {
-		return fmt.Errorf("Service `%s` not started!", name)
+		return fmt.Errorf("Service `%s` not started!", fullName)
 	} else {
-		log.Printf("Service `%s` started with %v instances.", name, len(services))
+		log.Printf("Service `%s` started with %v instances.", fullName, len(services))
 	}
 
 	routeFlags := make(map[string]string, 0)
@@ -59,34 +59,34 @@ func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 
 	// write routes to consul kv
 	if _, err := consul.KV().Put(&api.KVPair{
-		Key:   fmt.Sprintf("services/routes/%s", name),
+		Key:   fmt.Sprintf("services/routes/%s", fullName),
 		Value: routesJson,
 	}, nil); err != nil {
 		return err
 	}
 
-	log.Println(color.GreenString("Service `%s` released with routes: %s", name, string(routesJson)))
+	log.Println(color.GreenString("Service `%s` released with routes: %s", fullName, string(routesJson)))
 
 	// find old services with this routes
-	kvPairs, _, err := consul.KV().List(fmt.Sprintf("services/routes/%s-v", m.ServiceName()), nil)
+	routesData, _, err := consul.KV().List(fmt.Sprintf("services/routes/%s-v", m.ServiceFullName("/")), nil)
 	if err != nil {
 		return err
 	}
 
-	for _, kv := range kvPairs {
-		if !strings.Contains(kv.Key, name) { // skip current service
+	for _, existRoute := range routesData {
+		if !strings.Contains(existRoute.Key, fullName) { // skip current service
 			oldRoutes := make([]map[string]string, 0)
-			if err := json.Unmarshal(kv.Value, &oldRoutes); err != nil {
+			if err := json.Unmarshal(existRoute.Value, &oldRoutes); err != nil {
 				return err
 			}
 
 			for _, route := range routes {
 				for _, oldRoute := range oldRoutes {
 					if utils.MapsEqual(route, oldRoute) {
-						oldName := strings.TrimPrefix(kv.Key, "services/routes/")
+						oldName := strings.TrimPrefix(existRoute.Key, "services/routes/")
 						log.Printf("Found %s with routes %v. Remove it!", oldName, oldRoute)
 
-						if _, err := consul.KV().Delete(kv.Key, nil); err != nil {
+						if _, err := consul.KV().Delete(existRoute.Key, nil); err != nil {
 							return err
 						}
 
@@ -96,7 +96,7 @@ func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 						log.Printf("Delete %s from marathon", oldName)
 
 						marathonApi := serveMarathon.MarathonClient(m)
-						if _, err := marathonApi.DeleteApplication(m.GetStringOr("info.category", "") + "/" + oldName); err != nil {
+						if _, err := marathonApi.DeleteApplication(oldName); err != nil {
 							log.Println(color.RedString("Error on delete old instance: %v", err))
 							return err
 						}
