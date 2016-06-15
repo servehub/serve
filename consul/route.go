@@ -44,12 +44,12 @@ func RouteCommand() cli.Command {
 				}
 			}
 
-			routes := utils.MergeMaps(map[string]string{
+			route := utils.MergeMaps(map[string]string{
 				"host":     c.String("host"),
 				"location": c.String("location"),
 			}, routeFlags)
 
-			routesJson, err := json.MarshalIndent(routes, "", "  ")
+			routesJson, err := json.MarshalIndent([]map[string]string{route}, "", "  ")
 			if err != nil {
 				return err
 			}
