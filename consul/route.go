@@ -8,6 +8,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/fatih/color"
 	"github.com/hashicorp/consul/api"
+	"github.com/cenk/backoff"
 
 	"github.com/InnovaCo/serve/utils"
 )
@@ -26,15 +27,25 @@ func RouteCommand() cli.Command {
 			consul, _ := api.NewClient(api.DefaultConfig())
 
 			name := c.String("service")
-			services, _, err := consul.Health().Service(name, "", true, nil)
+
+			err := backoff.Retry(func() error {
+				services, _, err := consul.Health().Service(name, "", true, nil)
+				if err != nil {
+					log.Println(color.RedString("Error in check health in consul: %v", err))
+					return err
+				}
+
+				if len(services) == 0 {
+					log.Printf("Service `%s` not started yet! Retry...", name)
+					return fmt.Errorf("Service `%s` not started!", name)
+				} else {
+					log.Printf("Service `%s` started with %v instances.", name, len(services))
+					return nil
+				}
+			}, backoff.NewExponentialBackOff())
+
 			if err != nil {
 				return err
-			}
-
-			if len(services) == 0 {
-				return fmt.Errorf("Service `%s` not started!", name)
-			} else {
-				log.Printf("Service `%s` started with %v instances.", name, len(services))
 			}
 
 			routeFlags := make(map[string]string, 0)
