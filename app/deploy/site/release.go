@@ -96,7 +96,7 @@ func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 						log.Printf("Delete %s from marathon", oldName)
 
 						marathonApi := serveMarathon.MarathonClient(m)
-						if _, err := marathonApi.DeleteApplication(oldName); err != nil {
+						if _, err := marathonApi.DeleteApplication(m.GetStringOr("info.category", "") + "/" + oldName); err != nil {
 							log.Println(color.RedString("Error on delete old instance: %v", err))
 							return err
 						}
