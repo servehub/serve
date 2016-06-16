@@ -169,7 +169,7 @@ func (m *Manifest) ServiceName() string {
 		suffix = "-" + f
 	}
 
-	return escape(m.GetString("info.name") + suffix)
+	return Escape(m.GetString("info.name") + suffix)
 }
 
 func (m *Manifest) BuildVersion() string {
@@ -177,13 +177,13 @@ func (m *Manifest) BuildVersion() string {
 }
 
 func (m *Manifest) ServiceFullName(separator string) string {
-	return strings.TrimPrefix(strings.Replace(escape(m.GetStringOr("info.category", ""))+"/", "/", separator, -1)+m.ServiceName(), separator)
+	return strings.TrimPrefix(strings.Replace(Escape(m.GetStringOr("info.category", ""))+"/", "/", separator, -1)+m.ServiceName(), separator)
 }
 
 func (m *Manifest) ServiceFullNameWithVersion(separator string) string {
-	return m.ServiceFullName(separator) + "-v" + escape(m.BuildVersion())
+	return m.ServiceFullName(separator) + "-v" + Escape(m.BuildVersion())
 }
 
-func escape(s string) string {
+func Escape(s string) string {
 	return escapeRegex.ReplaceAllString(s, "-")
 }
