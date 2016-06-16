@@ -21,7 +21,7 @@ type SiteDeploy struct{}
 func (_ SiteDeploy) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 	marathonApi := serveMarathon.MarathonClient(m)
 
-	fullName := m.ServiceFullName("/") + "-v" + m.BuildVersion()
+	fullName := m.ServiceFullNameWithVersion("/")
 
 	bs, bf, bmax := 1.0, 2.0, 30.0
 	app := &marathon.Application{

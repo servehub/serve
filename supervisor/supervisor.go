@@ -47,7 +47,7 @@ func SupervisorCommand() cli.Command {
 			// Handle shutdown signals and kill child process
 			ch := make(chan os.Signal)
 			signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
-			log.Println(<-ch)
+			log.Println("supervisor: signal", <-ch)
 
 			if cmd != nil {
 				cmd.Process.Signal(syscall.SIGTERM)

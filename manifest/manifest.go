@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -13,6 +14,8 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/valyala/fasttemplate"
 )
+
+var escapeRegex = regexp.MustCompile(`[^\w\-/_]+`)
 
 func LoadManifest(c *cli.Context) *Manifest {
 	data, err := ioutil.ReadFile(c.String("manifest"))
@@ -166,7 +169,7 @@ func (m *Manifest) ServiceName() string {
 		suffix = "-" + f
 	}
 
-	return m.GetString("info.name") + suffix
+	return escape(m.GetString("info.name") + suffix)
 }
 
 func (m *Manifest) BuildVersion() string {
@@ -174,9 +177,13 @@ func (m *Manifest) BuildVersion() string {
 }
 
 func (m *Manifest) ServiceFullName(separator string) string {
-	return strings.TrimPrefix(strings.Replace(m.GetStringOr("info.category", "")+"/", "/", separator, -1)+m.ServiceName(), separator)
+	return strings.TrimPrefix(strings.Replace(escape(m.GetStringOr("info.category", ""))+"/", "/", separator, -1)+m.ServiceName(), separator)
 }
 
 func (m *Manifest) ServiceFullNameWithVersion(separator string) string {
-	return m.ServiceFullName(separator) + "-v" + m.BuildVersion()
+	return m.ServiceFullName(separator) + "-v" + escape(m.BuildVersion())
+}
+
+func escape(s string) string {
+	return escapeRegex.ReplaceAllString(s, "-")
 }

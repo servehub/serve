@@ -22,10 +22,8 @@ func (_ MarathonBuild) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 
 func TaskRegistryUrl(m *manifest.Manifest) string {
 	return fmt.Sprintf(
-		"http://%s/task-registry/%s/%s-v%s.tar.gz",
+		"http://%s/task-registry/%s.tar.gz",
 		m.GetString("marathon.marathon-host"),
-		m.ServiceFullName("/"),
-		m.ServiceName(),
-		m.BuildVersion(),
+		m.ServiceFullNameWithVersion("/"),
 	)
 }

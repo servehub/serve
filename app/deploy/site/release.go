@@ -22,7 +22,7 @@ func (_ SiteRelease) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
 	consul := serveConsul.ConsulClient(m)
 
 	// check current service is alive
-	fullName := m.ServiceFullName("/") + "-v" + m.BuildVersion()
+	fullName := m.ServiceFullNameWithVersion("/")
 	services, _, err := consul.Health().Service(fullName, "", true, nil)
 	if err != nil {
 		return err
