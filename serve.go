@@ -2,30 +2,31 @@ package main
 
 import (
 	"log"
-	"os"
 
-	"github.com/codegangsta/cli"
-	"github.com/fatih/color"
+	"gopkg.in/alecthomas/kingpin.v2"
 
-	appCmd "github.com/InnovaCo/serve/app"
-	"github.com/InnovaCo/serve/consul"
-	"github.com/InnovaCo/serve/supervisor"
+	"github.com/InnovaCo/serve/manifest"
+)
+
+var (
+  manifestPath = kingpin.Flag("manifest", "Path to manifest.yml file.").Default("manifest.yml").ExistingFile()
+  vars         = *kingpin.Flag("var", "key=value pairs with manifest vars.").StringMap()
+  pluginName   = kingpin.Arg("plugin", "Plugin name for run.").Required().String()
 )
 
 func main() {
-	app := cli.NewApp()
-	app.Name = "serve"
-	app.Version = "0.3"
-	app.Usage = "Automate your infrastructure!"
+	kingpin.Parse()
 
-	app.Commands = []cli.Command{
-		appCmd.AppCommand(),
-		consul.ConsulCommand(),
-		supervisor.SupervisorCommand(),
-		//github.WebhookServerCommand(),
+	m := manifest.Load(*manifestPath, vars)
+
+	plugins, err := m.FindPlugins(*pluginName)
+	if err != nil {
+		log.Fatalf("Error find plugins for '%s': %v", *pluginName, err)
 	}
 
-	if err := app.Run(os.Args); err != nil {
-		log.Fatalln(color.RedString("Exit: %v", err))
+	for _, pair := range plugins {
+		if err := pair.Plugin.Run(pair.Data); err != nil {
+			log.Fatalln("Error on run plugin %s: %v", pair, err)
+		}
 	}
 }

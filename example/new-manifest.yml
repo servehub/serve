@@ -1,0 +1,40 @@
+info:
+  name: forgame-api2
+  description: 4game REST API v2
+  version: 2.1
+  category: services/facade
+  owner:
+    name: Dmitry Kulikov
+    email: kulikov.dm@gmail.com
+
+import:
+  - file: /etc/default/serve/global-manifest.yaml
+
+build:
+  - sh: "mkdir -p target/pack && touch target/pack/index.txt"
+  - sbt-pack: {}
+  - debian:
+      repo: apt1-ti.msk.inn.ru
+      user: uploader
+      source: target/pack
+      name: "{{ meta.package }}"
+  - zip:
+      repo: "apt1-ti.msk.inn.ru/{{ info.category }}/"
+      source: target/pack
+  - npm:
+      version: 5.1
+  - debian:
+      repo: new-new-new
+  - docker:
+      registry: http://docker.msk.inn.ru/registry
+      image: "test.png"
+  - sh: "second shell"
+  - tests:
+      type: unit
+
+
+test:
+  new:
+    name: Dima
+
+new-build: test me
