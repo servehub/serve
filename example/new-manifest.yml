@@ -1,7 +1,7 @@
 info:
   name: forgame-api2
   description: 4game REST API v2
-  version: 2.1
+  version: "2.1"
   category: services/facade
   owner:
     name: Dmitry Kulikov
@@ -13,6 +13,7 @@ include:
 build:
   - sh: "mkdir -p target/pack && touch target/pack/index.txt"
   - sbt_pack: {}
+  - marathon: {}
 #  - debian:
 #      repo: apt1-ti.msk.inn.ru
 #      user: uploader
