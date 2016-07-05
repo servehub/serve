@@ -2,6 +2,7 @@ package: github.com/InnovaCo/serve
 import:
   - package: gopkg.in/alecthomas/kingpin.v2
   - package: gopkg.in/yaml.v2
+  - package: gopkg.in/flosch/pongo2.v3
   - package: github.com/hashicorp/consul/api
   - package: github.com/gambol99/go-marathon
   - package: github.com/Jeffail/gabs

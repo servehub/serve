@@ -1,19 +1,17 @@
 package manifest
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
-	"regexp"
+	"strings"
 
 	"github.com/Jeffail/gabs"
 	"github.com/fatih/color"
 	"github.com/ghodss/yaml"
-	//"fmt"
-	"fmt"
-	"strings"
-)
 
-var escapeRegex = regexp.MustCompile(`[^\w\-/_]+`)
+	"github.com/InnovaCo/serve/manifest/processor"
+)
 
 func Load(path string, vars map[string]string) *Manifest {
 	data, err := ioutil.ReadFile(path)
@@ -30,6 +28,13 @@ func Load(path string, vars map[string]string) *Manifest {
 
 	for k, v := range vars {
 		tree.Set(k, "vars", v)
+	}
+
+	for name, proc := range processor.ProcessorRegestry.GetAll() {
+		tree, err = proc.Process(tree)
+		if err != nil {
+			log.Fatalf("Error in processor '%s': %v", name, err)
+		}
 	}
 
 	return &Manifest{tree: tree}
@@ -62,7 +67,7 @@ func (m Manifest) FindPlugins(plugin string) ([]PluginPair, error) {
 				result = append(result, makePluginPair(plugin, item))
 			} else if res, err := item.ChildrenMap(); err == nil {
 				for subplugin, data := range res {
-					result = append(result, makePluginPair(plugin + "." + subplugin, data))
+					result = append(result, makePluginPair(plugin+"."+subplugin, data))
 					break
 				}
 			}
