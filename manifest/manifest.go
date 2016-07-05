@@ -43,13 +43,13 @@ func (m Manifest) String() string {
 	return m.tree.String()
 }
 
+func (m Manifest) GetString(path string) string {
+	return fmt.Sprintf("%v", m.tree.Path(path).Data())
+}
+
 func (m Manifest) FindPlugins(plugin string) ([]PluginPair, error) {
 	tree := m.tree.Path(plugin)
 	result := make([]PluginPair, 0)
-
-	log.Println("\n")
-	log.Println("Tree", tree.String())
-	log.Println("\n")
 
 	if tree.Data() == nil {
 		return result, fmt.Errorf("Plugin '%s' not found in manifest", plugin)
@@ -79,27 +79,8 @@ func makePluginPair(plugin string, data *gabs.Container) PluginPair {
 		obj := gabs.New()
 		ns := strings.Split(plugin, ".")
 		obj.Set(s, ns[len(ns)-1])
-		return PluginPair{TestPlugin{plugin}, Manifest{obj}}
+		return PluginPair{plugin, PluginRegestry.Get(plugin), Manifest{obj}}
 	} else {
-		return PluginPair{TestPlugin{plugin}, Manifest{data}}
+		return PluginPair{plugin, PluginRegestry.Get(plugin), Manifest{data}}
 	}
-}
-
-type PluginPair struct {
-	Plugin Plugin
-	Data Manifest
-}
-
-type Plugin interface {
-	Run(data Manifest) error
-}
-
-type TestPlugin struct {
-	Name string
-}
-
-
-func (p TestPlugin) Run(data Manifest) error {
-	log.Println("Run", p.Name, " --> ", data)
-	return nil
 }
