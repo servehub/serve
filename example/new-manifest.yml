@@ -7,12 +7,12 @@ info:
     name: Dmitry Kulikov
     email: kulikov.dm@gmail.com
 
-import:
-  - file: /etc/default/serve/global-manifest.yaml
+include:
+  - file: example/global-manifest.yml
 
 build:
   - sh: "mkdir -p target/pack && touch target/pack/index.txt"
-#  - sbt-pack: {}
+  - sbt_pack: {}
 #  - debian:
 #      repo: apt1-ti.msk.inn.ru
 #      user: uploader
@@ -32,9 +32,11 @@ build:
 #  - tests:
 #      type: unit
 
-
 test:
-  new:
-    name: Dima
+  new ? {{ vars.env }}:
+    qa: Dima-Qa
+    live: Dima-Live
+    dev: Dima-Dev
 
-new-build: test me
+  new-name: "dima"
+  old: "{{ test.new-name }}"

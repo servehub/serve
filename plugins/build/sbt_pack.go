@@ -1,16 +1,20 @@
 package build
 
-//import (
-//	"github.com/InnovaCo/serve/manifest"
-//	"github.com/InnovaCo/serve/utils"
-//)
-//
-//type SbtPackBuild struct{}
-//
-//func (_ SbtPackBuild) Run(m *manifest.Manifest, sub *manifest.Manifest) error {
-//	if err := utils.RunCmdf("sbt ';set version := \"%s\"' clean test pack", m.BuildVersion()); err != nil {
-//		return err
-//	}
-//
-//	return nil
-//}
+import (
+	"github.com/InnovaCo/serve/manifest"
+	"github.com/InnovaCo/serve/utils"
+)
+
+func init() {
+	manifest.PluginRegestry.Add("build.sbt_pack", SbtPackBuild{})
+}
+
+type SbtPackBuild struct{}
+
+func (p SbtPackBuild) Run(data manifest.Manifest) error {
+	if err := utils.RunCmdf("sbt ';set version := \"%s\"' clean test pack", data.GetString("version")); err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -10,7 +10,6 @@ import (
 	"github.com/InnovaCo/serve/manifest"
 
 	_ "github.com/InnovaCo/serve/plugins/build"
-	_ "github.com/InnovaCo/serve/plugins/test"
 )
 
 var (

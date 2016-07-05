@@ -95,3 +95,63 @@ func TestMatcherWithDefaultValue(t *testing.T) {
 		t.Fatal("Unexpected result!", updated)
 	}
 }
+
+func TestMatcherReordering(t *testing.T) {
+	jsonData := []byte(`
+		{
+			"vars": {
+				"env": "live"
+			},
+			"deploy": {
+				"host ? {{ vars.env }}": {
+					"*": "other",
+					"live": "live-host.com"
+				}
+			}
+		}
+	`)
+
+	tree, _ := gabs.ParseJSON(jsonData)
+
+	proc := Matcher{}
+
+	updated, err := proc.Process(tree)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if updated.String() != `{"deploy":{"host":"live-host.com"},"vars":{"env":"live"}}` {
+		t.Fatal("Unexpected result!", updated)
+	}
+}
+
+func TestMatcherReordering2(t *testing.T) {
+	jsonData := []byte(`
+		{
+			"vars": {
+				"env": "live"
+			},
+			"deploy": {
+				"host ? {{ vars.env }}": {
+					"live": "live-host.com",
+					"*": "other"
+				}
+			}
+		}
+	`)
+
+	tree, _ := gabs.ParseJSON(jsonData)
+
+	proc := Matcher{}
+
+	updated, err := proc.Process(tree)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if updated.String() != `{"deploy":{"host":"live-host.com"},"vars":{"env":"live"}}` {
+		t.Fatal("Unexpected result!", updated)
+	}
+}

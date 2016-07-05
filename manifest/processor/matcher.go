@@ -7,10 +7,6 @@ import (
 	"github.com/Jeffail/gabs"
 )
 
-func init() {
-	ProcessorRegestry.Add("matcher", Matcher{})
-}
-
 type Matcher struct{}
 
 func (m Matcher) Process(tree *gabs.Container) (*gabs.Container, error) {
@@ -30,9 +26,9 @@ func (m Matcher) Process(tree *gabs.Container) (*gabs.Container, error) {
 
 				matched := false
 				for k, v := range valmap {
-					if k == targetKey || k == "*" {
+					if k == targetKey {
 						matched = true
-					} else if strings.Contains(k, "*") {
+					} else if k != "*" && strings.Contains(k, "*") {
 						matched, err = regexp.MatchString(strings.Replace(k, "*", ".*", -1), targetKey)
 						if err != nil {
 							return err
@@ -43,6 +39,10 @@ func (m Matcher) Process(tree *gabs.Container) (*gabs.Container, error) {
 						output.Set(v, newKey)
 						break
 					}
+				}
+
+				if v, ok := valmap["*"]; ok && !matched {
+					output.Set(v, newKey)
 				}
 			}
 		}

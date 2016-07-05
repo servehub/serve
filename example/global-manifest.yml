@@ -1,0 +1,10 @@
+info:
+  build_version: "{{ info.version }}.{{ vars.build_number }}"
+
+vars:
+  env: dev
+  build_number: 0
+
+build:
+  sbt_pack:
+    version: "{{ info.build_version }}"

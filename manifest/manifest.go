@@ -2,40 +2,35 @@ package manifest
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"strings"
+	"regexp"
 
 	"github.com/Jeffail/gabs"
-	"github.com/fatih/color"
-	"github.com/ghodss/yaml"
-
 	"github.com/InnovaCo/serve/manifest/processor"
+	"github.com/InnovaCo/serve/manifest/loader"
 )
 
+var varsFilterRegexp = regexp.MustCompile("[^A-z0-9_]")
+
 func Load(path string, vars map[string]string) *Manifest {
-	data, err := ioutil.ReadFile(path)
+	tree, err := loader.LoadFile(path)
 	if err != nil {
-		log.Fatalln(color.RedString("Manifest file `%s` not found: %v", path, err))
+		log.Fatalln(err)
 	}
-
-	jsonData, err := yaml.YAMLToJSON(data)
-	if err != nil {
-		log.Fatalln(color.RedString("Error on parse manifest: %v!", err))
-	}
-
-	tree, _ := gabs.ParseJSON(jsonData)
 
 	for k, v := range vars {
-		tree.Set(k, "vars", v)
+		tree.Set(v, "vars", varsFilterRegexp.ReplaceAllString(k, "_"))
 	}
 
-	for name, proc := range processor.ProcessorRegestry.GetAll() {
+	for name, proc := range processor.GetAll() {
 		tree, err = proc.Process(tree)
 		if err != nil {
 			log.Fatalf("Error in processor '%s': %v", name, err)
 		}
 	}
+
+	log.Println(tree.StringIndent("", "  "))
 
 	return &Manifest{tree: tree}
 }

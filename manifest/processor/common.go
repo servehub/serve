@@ -5,7 +5,13 @@ import (
 	"gopkg.in/flosch/pongo2.v3"
 )
 
-var ProcessorRegestry = &processorRegestry{}
+func GetAll() []Processor {
+	return []Processor{
+		Include{},
+		Matcher{},
+		Templater{},
+	}
+}
 
 type Processor interface {
 	Process(tree *gabs.Container) (*gabs.Container, error)
@@ -43,22 +49,6 @@ func ProcessAll(tree *gabs.Container, visitor func(string, *gabs.Container, inte
 	}
 
 	return tree, nil
-}
-
-type processorRegestry struct {
-	processors map[string]Processor
-}
-
-func (r *processorRegestry) Add(name string, proc Processor) {
-	if r.processors == nil {
-		r.processors = make(map[string]Processor)
-	}
-
-	r.processors[name] = proc
-}
-
-func (r *processorRegestry) GetAll() map[string]Processor {
-	return r.processors
 }
 
 func template(s string, context interface{}) (string, error) {
