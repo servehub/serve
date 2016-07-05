@@ -8,8 +8,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/InnovaCo/serve/manifest"
-
-	_ "github.com/InnovaCo/serve/plugins/build"
+	_ "github.com/InnovaCo/serve/plugins"
 )
 
 var (

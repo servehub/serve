@@ -3,12 +3,13 @@ package manifest
 import (
 	"fmt"
 	"log"
-	"strings"
 	"regexp"
+	"strings"
 
 	"github.com/Jeffail/gabs"
-	"github.com/InnovaCo/serve/manifest/processor"
+
 	"github.com/InnovaCo/serve/manifest/loader"
+	"github.com/InnovaCo/serve/manifest/processor"
 )
 
 var varsFilterRegexp = regexp.MustCompile("[^A-z0-9_]")
@@ -30,7 +31,7 @@ func Load(path string, vars map[string]string) *Manifest {
 		}
 	}
 
-	log.Println(tree.StringIndent("", "  "))
+	log.Println("\n", tree.StringIndent("", "  "))
 
 	return &Manifest{tree: tree}
 }

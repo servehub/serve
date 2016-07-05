@@ -14,30 +14,10 @@ build:
   - sh: "mkdir -p target/pack && touch target/pack/index.txt"
   - sbt_pack: {}
   - marathon: {}
-#  - debian:
-#      repo: apt1-ti.msk.inn.ru
-#      user: uploader
-#      source: target/pack
-#      name: "{{ meta.package }}"
-#  - zip:
-#      repo: "apt1-ti.msk.inn.ru/{{ info.category }}/"
-#      source: target/pack
-#  - npm:
-#      version: 5.1
-#  - debian:
-#      repo: new-new-new
-#  - docker:
-#      registry: http://docker.msk.inn.ru/registry
-#      image: "test.png"
   - sh: "echo 'Hello, World!'"
-#  - tests:
-#      type: unit
 
 test:
   new ? {{ vars.env }}:
     qa: Dima-Qa
     live: Dima-Live
     dev: Dima-Dev
-
-  new-name: "dima"
-  old: "{{ test.new-name }}"
