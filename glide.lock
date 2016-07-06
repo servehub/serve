@@ -1,5 +1,5 @@
 hash: 23ebe2e3f9c00fc6a907c8cc95fc084d714fb9c391baffb5014c7242f1839d4d
-updated: 2016-07-06T17:23:53.832066124+03:00
+updated: 2016-07-06T19:31:05.901964907+03:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -15,12 +15,18 @@ imports:
   version: 1efa31f08b9333f1bd4882d61f9d668a70cd902e
 - name: github.com/docker/engine-api
   version: 139c221fcbe6e67dfac3c8807870e7136884a45b
+- name: github.com/donovanhide/eventsource
+  version: fd1de70867126402be23c306e1ce32828455d85b
 - name: github.com/fatih/color
   version: 87d4004f2ab62d0d255e0a38f1680aa534549fe3
 - name: github.com/gambol99/go-marathon
   version: 52070b94b0d56263fea23dc12cbfc0b22eb28f4a
 - name: github.com/ghodss/yaml
   version: aa0c862057666179de291b67d9f093d12b5a8473
+- name: github.com/google/go-querystring
+  version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
+  subpackages:
+  - query
 - name: github.com/hashicorp/consul
   version: 6e061b2d580d80347b7c5c4dfc8730de7403a145
   subpackages:
