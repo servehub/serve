@@ -12,7 +12,7 @@ import (
 	"github.com/InnovaCo/serve/manifest/processor"
 )
 
-var varsFilterRegexp = regexp.MustCompile("[^A-z0-9_]")
+var varsFilterRegexp = regexp.MustCompile("[^A-z0-9_\\.]")
 
 func Load(path string, vars map[string]string) *Manifest {
 	tree, err := loader.LoadFile(path)
@@ -49,12 +49,10 @@ func (m Manifest) GetString(path string) string {
 }
 
 func (m Manifest) FindPlugins(plugin string) ([]PluginPair, error) {
+	plugin = varsFilterRegexp.ReplaceAllString(plugin, "_")
+
 	tree := m.tree.Path(plugin)
 	result := make([]PluginPair, 0)
-
-	if tree.Data() == nil {
-		return result, fmt.Errorf("Plugin '%s' not found in manifest", plugin)
-	}
 
 	if _, ok := tree.Data().([]interface{}); ok {
 		arr, _ := tree.Children()
@@ -69,6 +67,10 @@ func (m Manifest) FindPlugins(plugin string) ([]PluginPair, error) {
 			}
 		}
 	} else {
+		if tree.Data() == nil {
+			tree = m.tree.Path("vars")
+		}
+
 		result = append(result, makePluginPair(plugin, tree))
 	}
 
@@ -80,8 +82,8 @@ func makePluginPair(plugin string, data *gabs.Container) PluginPair {
 		obj := gabs.New()
 		ns := strings.Split(plugin, ".")
 		obj.Set(s, ns[len(ns)-1])
-		return PluginPair{plugin, PluginRegestry.Get(plugin), Manifest{obj}}
-	} else {
-		return PluginPair{plugin, PluginRegestry.Get(plugin), Manifest{data}}
+		data = obj
 	}
+
+	return PluginPair{plugin, PluginRegestry.Get(plugin), Manifest{data}}
 }

@@ -1,0 +1,30 @@
+info:
+  name: service-name
+  description:
+  version: "1.0"
+  category:
+  owner:
+    name: name
+    email: example@example.com
+  build_version: "{{ info.version }}.{{ vars.build_number }}"
+  full_name: "{{ info.category }}/{{ info.name }}"
+  full_name_version: "{{ info.full_name }}-v{{ info.build_version }}"
+
+vars:
+  env: dev
+  build_number: 0
+
+marathon:
+  host: marathon.example.com
+  registry_url: "http://{{ marathon.host }}/task-registry/{{ info.full_name }}/{{ info.name }}-v{{ info.build_version }}.tar.gz"
+
+consul:
+  consul_host: consul.example.com
+
+build:
+  sbt_pack:
+    version: "{{ info.build_version }}"
+
+  marathon:
+    source: "target/pack"
+    registry_url: "{{ marathon.registry_url }}"
