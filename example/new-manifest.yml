@@ -8,7 +8,7 @@ info:
     email: kulikov.dm@gmail.com
 
 include:
-  - file: example/global-manifest.yml
+  - file: samza-task.yml
 
 build:
   - sh: "mkdir -p target/pack && touch target/pack/index.txt"
@@ -21,3 +21,16 @@ test:
     qa: Dima-Qa
     live: Dima-Live
     dev: Dima-Dev
+
+deploy:
+  marathon:
+    instances: 3
+    mem: 512
+    cpu: 1
+    cmd: "bin/mesos-start"
+    constraints: "kidz:true"
+
+release:
+  site:
+    routes:
+      - host ? {{ vars.env }}: { qa: api2.kidzite.qa, live: api2.kidzite.space }
