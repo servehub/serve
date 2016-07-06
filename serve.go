@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	manifestPath = kingpin.Flag("manifest", "Path to manifest.yml file.").Default("manifest.yml").ExistingFile()
+	manifestPath = kingpin.Flag("manifest", "Path to manifest.yml file.").Default("manifest.yml").String()
 	vars         = *kingpin.Flag("var", "key=value pairs with manifest vars.").StringMap()
 	pluginName   = kingpin.Arg("plugin", "Plugin name for run.").Required().String()
 )
