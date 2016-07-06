@@ -10,6 +10,7 @@ import (
 
 	"github.com/InnovaCo/serve/manifest/loader"
 	"github.com/InnovaCo/serve/manifest/processor"
+	"strconv"
 )
 
 var varsFilterRegexp = regexp.MustCompile("[^A-z0-9_\\.]")
@@ -46,6 +47,48 @@ func (m Manifest) String() string {
 
 func (m Manifest) GetString(path string) string {
 	return fmt.Sprintf("%v", m.tree.Path(path).Data())
+}
+
+func (m Manifest) GetStringOr(path string, defaultVal string) string {
+	if m.tree.ExistsP(path) {
+		return m.GetString(path)
+	} else {
+		return defaultVal
+	}
+}
+
+func (m Manifest) GetInt(path string) int {
+	i, err := strconv.Atoi(m.GetString(path))
+	if err != nil {
+		log.Println("Error on parse integer from: %v", m.GetString(path))
+	}
+	return i
+}
+
+func (m Manifest) GetMap(path string) map[string]Manifest {
+	out := make(map[string]Manifest)
+	mmap, err := m.tree.Path(path).ChildrenMap()
+	if err != nil {
+		log.Println("Error get map from: %v", m.tree.Path(path).Data())
+	}
+
+	for k, v := range mmap {
+		out[k] = Manifest{v}
+	}
+	return out
+}
+
+func (m Manifest) GetArray(path string) []Manifest {
+	out := make([]Manifest, 0)
+	arr, err := m.tree.Path(path).Children()
+	if err != nil {
+		log.Println("Error get array from: %v", m.tree.Path(path).Data())
+	}
+
+	for _, v := range arr {
+		out = append(out, Manifest{v})
+	}
+	return out
 }
 
 func (m Manifest) FindPlugins(plugin string) ([]PluginPair, error) {

@@ -19,7 +19,7 @@ marathon:
   registry_url: "http://{{ marathon.host }}/task-registry/{{ info.full_name }}/{{ info.name }}-v{{ info.build_version }}.tar.gz"
 
 consul:
-  consul_host: consul.example.com
+  host: consul.example.com
 
 build:
   sbt_pack:
@@ -28,3 +28,31 @@ build:
   marathon:
     source: "target/pack"
     registry_url: "{{ marathon.registry_url }}"
+
+deploy:
+  marathon:
+    consul_host: "{{ consul.host }}"
+    marathon_host: "{{ marathon.host }}"
+    app_name: "{{ info.full_name_version }}"
+    package_uri: "{{ marathon.registry_url }}"
+    instances: 1
+    mem: 128
+    cpu: 0.1
+    cmd: "bin/start"
+    constraints: ""
+    environment:
+      ENV: "{{ vars.env }}"
+      SERVICE_NAME: "{{ info.name }}"
+      SERVICE_VERSION: "{{ info.build_version }}"
+      MEMORY: "{{ deploy.marathon.mem }}"
+
+release:
+  site:
+    consul_host: "{{ consul.host }}"
+    marathon_host: "{{ marathon.host }}"
+    full_name: "{{ info.full_name }}"
+    full_name_version: "{{ info.full_name_version }}"
+    route: "{{ vars.route }}"
+    routes:
+      - host: test.example.com
+        location: /
