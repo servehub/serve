@@ -9,6 +9,7 @@ func GetAll() []Processor {
 	return []Processor{
 		Include{},
 		Matcher{},
+		AnchorMerger{},
 		Templater{},
 	}
 }
