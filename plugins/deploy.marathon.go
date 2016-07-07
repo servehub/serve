@@ -55,7 +55,7 @@ func (p DeployMarathon) Run(data manifest.Manifest) error {
 	}
 
 	for k, v := range data.GetMap("environment") {
-		app.AddEnv(k, v.String())
+		app.AddEnv(k, fmt.Sprintf("%s", v.Unwrap()))
 	}
 
 	app.AddUris(data.GetString("package_uri"))

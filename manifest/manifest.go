@@ -45,6 +45,10 @@ func (m Manifest) String() string {
 	return m.tree.String()
 }
 
+func (m Manifest) Unwrap() interface{} {
+	return m.tree.Data()
+}
+
 func (m Manifest) GetString(path string) string {
 	return fmt.Sprintf("%v", m.tree.Path(path).Data())
 }
