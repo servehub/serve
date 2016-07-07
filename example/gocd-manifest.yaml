@@ -3,7 +3,7 @@
     login: {{ vars.login }}
     password: {{ vars.password }}
     url: https://go.inn.ru/go/api/admin/pipelines
-    delete: {{ vars.del_pipeline }}
+    delete: false
     data:
       group: other
       pipeline:

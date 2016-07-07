@@ -40,16 +40,16 @@ type Manifest struct {
 	tree *gabs.Container
 }
 
-func (m Manifest) String() string {
-	return m.tree.String()
+func (m Manifest) String(optional ... string) string {
+	if len(optional) >= 1 {
+		return m.tree.Search(strings.Join(optional, ".")).String()
+	} else {
+		return m.tree.String()
+	}
 }
 
 func (m Manifest) GetString(path string) string {
 	return m.tree.Path(path).Data().(string)
-}
-
-func (m Manifest) GenString(path string) string {
-	return m.tree.Search(path).String()
 }
 
 
