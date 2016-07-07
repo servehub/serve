@@ -45,8 +45,13 @@ func (m Manifest) String() string {
 }
 
 func (m Manifest) GetString(path string) string {
-	return fmt.Sprintf("%v", m.tree.Path(path).Data())
+	return m.tree.Path(path).Data().(string)
 }
+
+func (m Manifest) GenString(path string) string {
+	return m.tree.Search(path).String()
+}
+
 
 func (m Manifest) FindPlugins(plugin string) ([]PluginPair, error) {
 	tree := m.tree.Path(plugin)
