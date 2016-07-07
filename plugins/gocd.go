@@ -15,13 +15,15 @@ func init() {
 type GoCD struct{}
 
 /*
-function for GoCD actions: ADD/EDIT/DELETE
-tree is structure:
+plugin for manifest section "gocd"
+section structure:
 	login: "LOGIN"
 	password: "PASSWORD"
 	url: "URL"
 	delete: "TRUE/FALSE"
-	pipeline: PARAMS
+	pipeline:
+		according to the description: https://api.go.cd/current/#the-pipeline-config-object
+
  */
 func (p GoCD) Run(data manifest.Manifest) error {
 	fmt.Println("--> ", data)
