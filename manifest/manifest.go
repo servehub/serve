@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/Jeffail/gabs"
 
 	"github.com/InnovaCo/serve/manifest/loader"
 	"github.com/InnovaCo/serve/manifest/processor"
-	"strconv"
 )
 
 var varsFilterRegexp = regexp.MustCompile("[^A-z0-9_\\.]")

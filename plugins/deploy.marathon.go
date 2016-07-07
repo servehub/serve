@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -19,6 +20,8 @@ func init() {
 	manifest.PluginRegestry.Add("deploy.marathon", DeployMarathon{})
 }
 
+var nameEscapeRegex = regexp.MustCompile(`[^\w\-/_]+`)
+
 type DeployMarathon struct{}
 
 func (p DeployMarathon) Run(data manifest.Manifest) error {
@@ -27,7 +30,7 @@ func (p DeployMarathon) Run(data manifest.Manifest) error {
 		return err
 	}
 
-	fullName := data.GetString("app_name")
+	fullName := nameEscapeRegex.ReplaceAllString(data.GetString("app_name"), "-")
 
 	bs, bf, bmax := 1.0, 2.0, 30.0
 	app := &marathon.Application{

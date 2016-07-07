@@ -47,12 +47,11 @@ deploy:
       MEMORY: "{{ deploy.marathon.mem }}"
 
 release:
-  site:
-    consul_host: "{{ consul.host }}"
-    marathon_host: "{{ marathon.host }}"
-    full_name: "{{ info.full_name }}"
-    full_name_version: "{{ info.full_name_version }}"
-    route: "{{ vars.route }}"
-    routes:
-      - host: test.example.com
-        location: /
+  consul_host: "{{ consul.host }}"
+  marathon_host: "{{ marathon.host }}"
+  full_name: "{{ info.full_name }}"
+  full_name_version: "{{ info.full_name_version }}"
+  route: "{{ vars.route }}"
+  routes:
+    - host: test.example.com
+      location: /

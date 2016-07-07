@@ -2,6 +2,7 @@ package processor
 
 import (
 	"testing"
+
 	"github.com/Jeffail/gabs"
 )
 

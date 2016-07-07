@@ -15,19 +15,19 @@ import (
 )
 
 func init() {
-	manifest.PluginRegestry.Add("release.site", ReleaseSite{})
+	manifest.PluginRegestry.Add("release", Release{})
 }
 
-type ReleaseSite struct{}
+type Release struct{}
 
-func (p ReleaseSite) Run(data manifest.Manifest) error {
+func (p Release) Run(data manifest.Manifest) error {
 	consulApi, err := ConsulClient(data.GetString("consul_host"))
 	if err != nil {
 		return err
 	}
 
 	// check current service is alive
-	fullName := data.GetString("full_name_version")
+	fullName := nameEscapeRegex.ReplaceAllString(data.GetString("full_name_version"), "-")
 	services, _, err := consulApi.Health().Service(fullName, "", true, nil)
 	if err != nil {
 		return err
