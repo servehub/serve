@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	manifestPath = kingpin.Flag("manifest", "Path to manifest.yml file.").Default("manifest.yml").ExistingFile()
+	manifestPath = kingpin.Flag("manifest", "Path to manifest.yml file.").Default("manifest.yml").String()
+	plugin       = kingpin.Arg("plugin", "Plugin name for run.").Required().String()
 	vars         = *kingpin.Flag("var", "key=value pairs with manifest vars.").StringMap()
-	pluginName   = kingpin.Arg("plugin", "Plugin name for run.").Required().String()
 )
 
 func main() {
@@ -22,9 +22,9 @@ func main() {
 
 	m := manifest.Load(*manifestPath, vars)
 
-	plugins, err := m.FindPlugins(*pluginName)
+	plugins, err := m.FindPlugins(*plugin)
 	if err != nil {
-		log.Fatalf("Error find plugins for '%s': %v", *pluginName, err)
+		log.Fatalf("Error find plugins for '%s': %v", *plugin, err)
 	}
 
 	for _, pair := range plugins {

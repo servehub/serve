@@ -10,9 +10,10 @@ import (
 
 	"github.com/InnovaCo/serve/manifest/loader"
 	"github.com/InnovaCo/serve/manifest/processor"
+	"strconv"
 )
 
-var varsFilterRegexp = regexp.MustCompile("[^A-z0-9_]")
+var varsFilterRegexp = regexp.MustCompile("[^A-z0-9_\\.]")
 
 func Load(path string, vars map[string]string) *Manifest {
 	tree, err := loader.LoadFile(path)
@@ -40,26 +41,65 @@ type Manifest struct {
 	tree *gabs.Container
 }
 
-func (m Manifest) String(optional ... string) string {
-	if len(optional) >= 1 {
-		return m.tree.Search(strings.Join(optional, ".")).String()
-	} else {
-		return m.tree.String()
-	}
+func (m Manifest) String() string {
+	return m.tree.String()
 }
 
 func (m Manifest) GetString(path string) string {
-	return m.tree.Path(path).Data().(string)
+	return fmt.Sprintf("%v", m.tree.Path(path).Data())
 }
 
+func (m Manifest) GetStringOr(path string, defaultVal string) string {
+	if m.tree.ExistsP(path) {
+		return m.GetString(path)
+	} else {
+		return defaultVal
+	}
+}
+
+func (m Manifest) GetInt(path string) int {
+	i, err := strconv.Atoi(m.GetString(path))
+	if err != nil {
+		log.Println("Error on parse integer from: %v", m.GetString(path))
+	}
+	return i
+}
+
+func (m Manifest) GetMap(path string) map[string]Manifest {
+	out := make(map[string]Manifest)
+	mmap, err := m.tree.Path(path).ChildrenMap()
+	if err != nil {
+		log.Println("Error get map from: %v", m.tree.Path(path).Data())
+	}
+
+	for k, v := range mmap {
+		out[k] = Manifest{v}
+	}
+	return out
+}
+
+func (m Manifest) GetArray(path string) []Manifest {
+	out := make([]Manifest, 0)
+	arr, err := m.tree.Path(path).Children()
+	if err != nil {
+		log.Println("Error get array from: %v", m.tree.Path(path).Data())
+	}
+
+	for _, v := range arr {
+		out = append(out, Manifest{v})
+	}
+	return out
+}
+
+func (m Manifest) GetTree(path string) Manifest {
+	return Manifest{m.tree.Path(path)}
+}
 
 func (m Manifest) FindPlugins(plugin string) ([]PluginPair, error) {
+	plugin = varsFilterRegexp.ReplaceAllString(plugin, "_")
+
 	tree := m.tree.Path(plugin)
 	result := make([]PluginPair, 0)
-
-	if tree.Data() == nil {
-		return result, fmt.Errorf("Plugin '%s' not found in manifest", plugin)
-	}
 
 	if _, ok := tree.Data().([]interface{}); ok {
 		arr, _ := tree.Children()
@@ -74,6 +114,10 @@ func (m Manifest) FindPlugins(plugin string) ([]PluginPair, error) {
 			}
 		}
 	} else {
+		if tree.Data() == nil {
+			tree = m.tree.Path("vars")
+		}
+
 		result = append(result, makePluginPair(plugin, tree))
 	}
 
@@ -85,8 +129,8 @@ func makePluginPair(plugin string, data *gabs.Container) PluginPair {
 		obj := gabs.New()
 		ns := strings.Split(plugin, ".")
 		obj.Set(s, ns[len(ns)-1])
-		return PluginPair{plugin, PluginRegestry.Get(plugin), Manifest{obj}}
-	} else {
-		return PluginPair{plugin, PluginRegestry.Get(plugin), Manifest{data}}
+		data = obj
 	}
+
+	return PluginPair{plugin, PluginRegestry.Get(plugin), Manifest{data}}
 }

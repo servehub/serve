@@ -39,7 +39,7 @@ func (p GoCDDelete) Run(data manifest.Manifest) error {
 		return errors.New("GoCD url ot found")
 	}
 
-	if name = data.GetString("data.pipeline.name"); name == "" {
+	if name = data.GetString("pipeline_name"); name == "" {
 		return errors.New("GoCD pipeline name not found")
 	}
 

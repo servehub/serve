@@ -1,24 +1,19 @@
 ---
   gocd:
-    config:
-      &config
+    config: &config
       login: "{{ vars.login }}"
       password: "{{ vars.password }}"
       url: https://go.inn.ru/go/api/admin/pipelines
-      data:
-        group: other
-        pipeline:
-          name: gocd_test
+      pipeline_name: gocd_test
 
-    delete:
-        *config
+    delete: *config
 
     change:
       <<: *config
-      data:
+      pipeline:
         group: other
         pipeline:
-          name: gocd_test
+          name: "{{ gocd.config.pipeline_name }}"
           template: left-right-site-tpl
           label_template: "${COUNT}"
           parameters:

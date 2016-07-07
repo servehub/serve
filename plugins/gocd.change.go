@@ -43,14 +43,14 @@ func (p GoCDChange) Run(data manifest.Manifest) error {
 		return errors.New("GoCD url ot found")
 	}
 
-	if name = data.GetString("data.pipeline.name"); name == "" {
+	if name = data.GetString("pipeline_name"); name == "" {
 		return errors.New("GoCD pipeline name not found")
 	}
 
 	if resp, err := request(cmd, url + "/" + name, body, headers, login, password); err != nil {
 		return err
 	} else {
-		body = data.String("data")
+		body = data.GetTree("pipeline").String()
 
 		if resp.StatusCode == http.StatusOK {
 			fmt.Println("put pipeline: ", url)
