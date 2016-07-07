@@ -30,7 +30,8 @@ func main() {
 		log.Println(color.GreenString("%v:", pair.PluginName), pair.Data)
 
 		if err := pair.Plugin.Run(pair.Data); err != nil {
-			log.Fatalln("Error on run plugin %s: %v", pair, err)
+			fmt.Println("")
+			log.Fatalln(color.RedString("Error on run plugin `%s`: %v", pair.PluginName, err))
 		}
 	}
 }
