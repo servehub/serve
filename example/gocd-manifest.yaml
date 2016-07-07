@@ -1,9 +1,9 @@
 ---
   gocd:
-    login: login
-    password: passwd
+    login: {{ vars.login }}
+    password: {{ vars.password }}
     url: https://go.inn.ru/go/api/admin/pipelines
-    delete: false
+    delete: {{ vars.del_pipeline }}
     data:
       group: other
       pipeline:

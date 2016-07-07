@@ -17,12 +17,16 @@ type GoCD struct{}
 /*
 plugin for manifest section "gocd"
 section structure:
-	login: "LOGIN"
-	password: "PASSWORD"
-	url: "URL"
-	delete: "TRUE/FALSE"
-	pipeline:
-		according to the description: https://api.go.cd/current/#the-pipeline-config-object
+
+gocd:
+	login: LOGIN
+	password: PASSWORD
+	url: GOCD_URL
+	delete: true or false
+	data:
+		group: GROUP
+		pipeline:
+			according to the description: https://api.go.cd/current/#the-pipeline-config-object
 
  */
 func (p GoCD) Run(data manifest.Manifest) error {
