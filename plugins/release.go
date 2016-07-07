@@ -71,7 +71,7 @@ func (p Release) Run(data manifest.Manifest) error {
 	log.Println(color.GreenString("Service `%s` released with routes: %s", fullName, string(routesJson)))
 
 	// find old services with this routes
-	routesData, _, err := consulApi.KV().List(fmt.Sprintf("services/routes/%s-v", data.GetString("full_name")), nil)
+	routesData, _, err := consulApi.KV().List(fmt.Sprintf("services/routes/%s-v", nameEscapeRegex.ReplaceAllString(data.GetString("full_name"), "-")), nil)
 	if err != nil {
 		return err
 	}
