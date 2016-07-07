@@ -15,12 +15,9 @@ func LoadFile(path string) (*gabs.Container, error) {
 		return nil, errors.New(color.RedString("Manifest file `%s` not found: %v", path, err))
 	}
 
-	jsonData, err := yaml.YAMLToJSON(data)
-	if err != nil {
+	if jsonData, err := yaml.YAMLToJSON(data); err != nil {
 		return nil, errors.New(color.RedString("Error on parse manifest: %v!", err))
+	} else {
+		return gabs.ParseJSON(jsonData)
 	}
-
-	tree, _ := gabs.ParseJSON(jsonData)
-
-	return tree, nil
 }

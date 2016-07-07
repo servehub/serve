@@ -91,6 +91,10 @@ func (m Manifest) GetArray(path string) []Manifest {
 	return out
 }
 
+func (m Manifest) GetTree(path string) Manifest {
+	return Manifest{m.tree.Path(path)}
+}
+
 func (m Manifest) FindPlugins(plugin string) ([]PluginPair, error) {
 	plugin = varsFilterRegexp.ReplaceAllString(plugin, "_")
 
