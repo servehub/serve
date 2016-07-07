@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/Jeffail/gabs"
 
 	"github.com/InnovaCo/serve/manifest/loader"
 	"github.com/InnovaCo/serve/manifest/processor"
-	"strconv"
 )
 
 var varsFilterRegexp = regexp.MustCompile("[^A-z0-9_\\.]")
@@ -60,7 +60,7 @@ func (m Manifest) GetStringOr(path string, defaultVal string) string {
 func (m Manifest) GetInt(path string) int {
 	i, err := strconv.Atoi(m.GetString(path))
 	if err != nil {
-		log.Println("Error on parse integer from: %v", m.GetString(path))
+		log.Printf("Error on parse integer '%v' from: %v", path, m.GetString(path))
 	}
 	return i
 }
@@ -69,7 +69,7 @@ func (m Manifest) GetMap(path string) map[string]Manifest {
 	out := make(map[string]Manifest)
 	mmap, err := m.tree.Path(path).ChildrenMap()
 	if err != nil {
-		log.Println("Error get map from: %v", m.tree.Path(path).Data())
+		log.Printf("Error get map '%v' from: %v", path, m.tree.Path(path).Data())
 	}
 
 	for k, v := range mmap {
@@ -82,7 +82,7 @@ func (m Manifest) GetArray(path string) []Manifest {
 	out := make([]Manifest, 0)
 	arr, err := m.tree.Path(path).Children()
 	if err != nil {
-		log.Println("Error get array from: %v", m.tree.Path(path).Data())
+		log.Printf("Error get array `%v` from: %v", path, m.tree.Path(path).Data())
 	}
 
 	for _, v := range arr {
