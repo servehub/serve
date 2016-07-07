@@ -2,7 +2,9 @@ package manifest
 
 import "log"
 
-var PluginRegestry = &pluginRegestry{}
+type Plugin interface {
+	Run(data Manifest) error
+}
 
 type PluginPair struct {
 	PluginName string
@@ -10,9 +12,7 @@ type PluginPair struct {
 	Data Manifest
 }
 
-type Plugin interface {
-	Run(data Manifest) error
-}
+var PluginRegestry = &pluginRegestry{}
 
 type pluginRegestry struct {
 	plugins map[string]Plugin

@@ -15,28 +15,6 @@ import (
 
 var varsFilterRegexp = regexp.MustCompile("[^A-z0-9_\\.]")
 
-func Load(path string, vars map[string]string) *Manifest {
-	tree, err := loader.LoadFile(path)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	for k, v := range vars {
-		tree.Set(v, "vars", varsFilterRegexp.ReplaceAllString(k, "_"))
-	}
-
-	for name, proc := range processor.GetAll() {
-		tree, err = proc.Process(tree)
-		if err != nil {
-			log.Fatalf("Error in processor '%s': %v", name, err)
-		}
-	}
-
-	log.Println("\n", tree.StringIndent("", "  "))
-
-	return &Manifest{tree: tree}
-}
-
 type Manifest struct {
 	tree *gabs.Container
 }
@@ -126,6 +104,26 @@ func (m Manifest) FindPlugins(plugin string) ([]PluginPair, error) {
 	}
 
 	return result, nil
+}
+
+func Load(path string, vars map[string]string) *Manifest {
+	tree, err := loader.LoadFile(path)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	for k, v := range vars {
+		tree.Set(v, "vars", varsFilterRegexp.ReplaceAllString(k, "_"))
+	}
+
+	for name, proc := range processor.GetAll() {
+		tree, err = proc.Process(tree)
+		if err != nil {
+			log.Fatalf("Error in processor '%s': %v", name, err)
+		}
+	}
+
+	return &Manifest{tree: tree}
 }
 
 func makePluginPair(plugin string, data *gabs.Container) PluginPair {

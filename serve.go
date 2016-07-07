@@ -11,18 +11,16 @@ import (
 	_ "github.com/InnovaCo/serve/plugins"
 )
 
-var (
-	manifestPath = kingpin.Flag("manifest", "Path to manifest.yml file.").Default("manifest.yml").String()
-	plugin       = kingpin.Arg("plugin", "Plugin name for run.").Required().String()
-	vars         = *kingpin.Flag("var", "key=value pairs with manifest vars.").StringMap()
-)
-
 func main() {
+	manifestFile := kingpin.Flag("manifest", "Path to manifest.yml file.").Default("manifest.yml").String()
+	plugin       := kingpin.Arg("plugin", "Plugin name for run.").Required().String()
+	vars         := *kingpin.Flag("var", "key=value pairs with manifest vars.").StringMap()
+
 	kingpin.Parse()
 
-	m := manifest.Load(*manifestPath, vars)
+	mnf := manifest.Load(*manifestFile, vars)
 
-	plugins, err := m.FindPlugins(*plugin)
+	plugins, err := mnf.FindPlugins(*plugin)
 	if err != nil {
 		log.Fatalf("Error find plugins for '%s': %v", *plugin, err)
 	}
