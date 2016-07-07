@@ -1,51 +1,72 @@
 ---
   gocd:
-    login: {{ vars.login }}
-    password: {{ vars.password }}
-    url: https://go.inn.ru/go/api/admin/pipelines
-    delete: false
-    data:
-      group: other
-      pipeline:
-        name: gocd_test
-        template: left-right-site-tpl
-        label_template: "${COUNT}"
-        parameters:
-          - name: project
-            value: inn-gocd_test
+    config:
+      login: {{ vars.login }}
+      password: {{ vars.password }}
+      url: https://go.inn.ru/go/api/admin/pipelines
+      data:
+        group: other
+        pipeline:
+          name: gocd_test
 
-          - name: repo.url
-            value: git@github.inn.ru:tools/LookOnce.git
+    delete:
+      login: {{ vars.login }}
+      password: {{ vars.password }}
+      url: https://go.inn.ru/go/api/admin/pipelines
+      data:
+        group: other
+        pipeline:
+          name: gocd_test
 
-          - name: qa-cluster
-            value: otplink1-q.qa.inn.ru
+    change:
+      login: {{ vars.login }}
+      password: {{ vars.password }}
+      url: https://go.inn.ru/go/api/admin/pipelines
+      data:
+        group: other
+        pipeline:
+          name: gocd_test
+          template: left-right-site-tpl
+          label_template: "${COUNT}"
+          parameters:
+            - name: project
+              value: inn-gocd_test
 
-          - name: live-cluster
+            - name: repo.url
+              value: git@github.inn.ru:tools/LookOnce.git
 
-          - name: site
-            value: lookonce
+            - name: qa-cluster
+              value: otplink1-q.qa.inn.ru
 
-          - name: version
-            value: 1.0
+            - name: live-cluster
 
-          - name: deploy-attrs
-            value: --marker-source=pid:/var/run/innova/inn-lookonce.pid
+            - name: site
+              value: lookonce
 
-          - name: qa-tests-arg
-        environment_variables:
-          - name: SHA
+            - name: version
+              value: 1.0
 
-          - name: BRANCH
-            value: master
-            secure: false
+            - name: deploy-attrs
+              value: --marker-source=pid:/var/run/innova/inn-lookonce.pid
 
-          - name: GITHUB_TOKEN
-            encrypted_value: NusYoj7M3l2vGqZo8ro8sakI8bLKQO2gqH1/AN3mUKt42DGaM7P8YS1L46rus4UL
-            secure: true
-        materials:
-          - type: git
-            attributes:
-              url: "#{repo.url}"
-              destination: sources
+            - name: qa-tests-arg
+          environment_variables:
+            - name: SHA
+
+            - name: BRANCH
+              value: master
+              secure: false
+
+            - name: GITHUB_TOKEN
+              encrypted_value: NusYoj7M3l2vGqZo8ro8sakI8bLKQO2gqH1/AN3mUKt42DGaM7P8YS1L46rus4UL
+              secure: true
+          materials:
+            - type: git
+              attributes:
+                url: "#{repo.url}"
+                destination: sources
+
+
+
 
 

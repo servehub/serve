@@ -9,30 +9,31 @@ import (
 )
 
 func init() {
-	manifest.PluginRegestry.Add("gocd", GoCD{})
+	manifest.PluginRegestry.Add("gocd.change", GoCDChange{})
+	manifest.PluginRegestry.Add("gocd.delete", GoCDDelete{})
 }
 
-type GoCD struct{}
+type GoCDChange struct{}
 
 /*
-plugin for manifest section "gocd"
+plugin for manifest section "gocd.change"
 section structure:
 
-gocd:
+gocd.change:
 	login: LOGIN
 	password: PASSWORD
 	url: GOCD_URL
-	delete: true or false
 	data:
 		group: GROUP
 		pipeline:
 			according to the description: https://api.go.cd/current/#the-pipeline-config-object
 
  */
-func (p GoCD) Run(data manifest.Manifest) error {
+func (p GoCDChange) Run(data manifest.Manifest) error {
 	fmt.Println("--> ", data)
+
 	var headers map[string]string
-	var name, url, del string
+	var name, url string
 	body := ""
 	cmd := "GET"
 
@@ -43,31 +44,11 @@ func (p GoCD) Run(data manifest.Manifest) error {
 		return errors.New("GoCD url ot found")
 	}
 
-	if del = data.GetString("delete"); del == "" {
-		del = "false"
-	}
-
 	if name = data.GetString("data.pipeline.name"); name == "" {
 		return errors.New("GoCD pipeline name not found")
 	}
 
-	if del == "true"{
-		fmt.Println("delete pipeline: ", url)
-
-		cmd = "DELETE"
-		if resp, err := p.request(cmd, url, body, headers, login, password); err != nil {
-			return err
-		} else {
-			if resp.StatusCode == http.StatusOK {
-				return nil
-			} else {
-				errors.New("delete pipeline error: " + resp.Status)
-			}
-			return nil
-		}
-	}
-
-	if resp, err := p.request(cmd, url + "/" + name, body, headers, login, password); err != nil {
+	if resp, err := request(cmd, url + "/" + name, body, headers, login, password); err != nil {
 		return err
 	} else {
 		body = data.String("data")
@@ -87,7 +68,7 @@ func (p GoCD) Run(data manifest.Manifest) error {
 		}
 	}
 
-	if resp, err := p.request(cmd, url, body, headers, login, password); err != nil {
+	if resp, err := request(cmd, url, body, headers, login, password); err != nil {
 		return err
 	} else {
 		if resp.StatusCode != http.StatusOK {
@@ -97,7 +78,50 @@ func (p GoCD) Run(data manifest.Manifest) error {
 	}
 }
 
-func (p GoCD) request(	method string,
+type GoCDDelete struct{}
+
+/*
+plugin for manifest section "gocd.delete"
+section structure:
+
+gocd.delete:
+	login: LOGIN
+	password: PASSWORD
+	url: GOCD_URL
+	data:
+		group: GROUP
+		pipeline:
+			name: NAME
+
+ */
+func (p GoCDDelete) Run(data manifest.Manifest) error {
+	fmt.Println("--> ", data)
+	var name, url string
+
+	login := data.GetString("login")
+	password := data.GetString("password")
+
+	if url = data.GetString("url"); url == "" {
+		return errors.New("GoCD url ot found")
+	}
+
+	if name = data.GetString("data.pipeline.name"); name == "" {
+		return errors.New("GoCD pipeline name not found")
+	}
+
+	if resp, err := request("DELETE", url + "/" + name, "", map[string]string{}, login, password); err != nil {
+		return err
+	} else {
+		if resp.StatusCode == http.StatusOK {
+			return nil
+		} else {
+			errors.New("delete pipeline error: " + resp.Status)
+		}
+		return nil
+	}
+}
+
+func request(	method string,
 			resource string,
 			body string,
 			headers map[string]string,
