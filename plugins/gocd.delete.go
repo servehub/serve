@@ -28,12 +28,16 @@ gocd.delete:
 			name: NAME
 
  */
+
+
 func (p GoCDDelete) Run(data manifest.Manifest) error {
 	fmt.Println("--> ", data)
 	var name, url string
 
-	login := data.GetString("login")
-	password := data.GetString("password")
+	login, password, err := getAcessInfo()
+	if err != nil {
+		return errors.New("GoCD file acesss not found")
+	}
 
 	if url = data.GetString("url"); url == "" {
 		return errors.New("GoCD url ot found")

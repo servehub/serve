@@ -6,6 +6,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"os"
+	"log"
+	"bufio"
 )
 
 func init() {
@@ -36,8 +39,10 @@ func (p GoCDChange) Run(data manifest.Manifest) error {
 	body := ""
 	cmd := "GET"
 
-	login := data.GetString("login")
-	password := data.GetString("password")
+	login, password, err := getAcessInfo()
+	if err != nil {
+		return errors.New("GoCD file acesss not found")
+	}
 
 	if url = data.GetString("url"); url == "" {
 		return errors.New("GoCD url ot found")
@@ -77,7 +82,7 @@ func (p GoCDChange) Run(data manifest.Manifest) error {
 	}
 }
 
-func request(	method string,
+func request(method string,
 			resource string,
 			body string,
 			headers map[string]string,
@@ -97,4 +102,34 @@ func request(	method string,
 	req.SetBasicAuth(login, password)
 
 	return http.DefaultClient.Do(req)
+}
+
+func getAcessInfo(optional ... string) (string, string, error){
+	var path string
+	if len(optional) == 0{
+		path = "/etc/gocd_access"
+	} else if len(optional) == 1{
+		path = optional[0]
+	} else {
+		return "", "", errors.New("file name not found")
+	}
+
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	reader := bufio.NewScanner(file)
+
+	if reader.Scan(){
+		login := reader.Text()
+		if reader.Scan() {
+			return login, reader.Text(), nil
+		} else {
+			return "", "", errors.New("error")
+		}
+	} else {
+		return "", "", errors.New("error")
+	}
 }
