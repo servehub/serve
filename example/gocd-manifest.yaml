@@ -1,8 +1,9 @@
 ---
   gocd:
     config:
-      login: {{ vars.login }}
-      password: {{ vars.password }}
+      &config
+      login: "{{ vars.login }}"
+      password: "{{ vars.password }}"
       url: https://go.inn.ru/go/api/admin/pipelines
       data:
         group: other
@@ -10,18 +11,10 @@
           name: gocd_test
 
     delete:
-      login: {{ vars.login }}
-      password: {{ vars.password }}
-      url: https://go.inn.ru/go/api/admin/pipelines
-      data:
-        group: other
-        pipeline:
-          name: gocd_test
+        *config
 
     change:
-      login: {{ vars.login }}
-      password: {{ vars.password }}
-      url: https://go.inn.ru/go/api/admin/pipelines
+      <<: *config
       data:
         group: other
         pipeline:
