@@ -15,14 +15,11 @@ func init() {
  * plugin for manifest section "gocd.delete"
  * section structure:
  *
- * gocd.pipeline.create:
+ * gocd.delete:
  * 	login: LOGIN
  * 	password: PASSWORD
  * 	url: GOCD_URL
- * 	data:
- * 		group: GROUP
- * 		pipeline:
- * 			name: NAME
+ *  pipeline_name: NAME
  */
 type GoCdPipelineDelete struct{}
 

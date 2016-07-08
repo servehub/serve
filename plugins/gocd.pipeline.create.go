@@ -17,14 +17,15 @@ func init() {
 }
 
 /**
- * plugin for manifest section "gocd.change"
+ * plugin for manifest section "gocd.pipeline.create"
  * section structure:
  *
  * gocd.pipeline.create:
  * 	login: LOGIN
  * 	password: PASSWORD
  * 	url: GOCD_URL
- * 	data:
+ *  pipeline_name: NAME
+ * 	pipeline:
  * 		group: GROUP
  * 		pipeline:
  * 			according to the description: https://api.go.cd/current/#the-pipeline-config-object
@@ -35,7 +36,7 @@ func (p GoCdPipelineCreate) Run(data manifest.Manifest) error {
 	url := data.GetString("url") + "/" + data.GetString("pipeline_name")
 	body := data.GetTree("pipeline").String()
 
-	resp, err := gocdRequest("GET", data.GetString("url")+"/"+data.GetString("pipeline_name"), "", nil)
+	resp, err := gocdRequest("GET", url, "", nil)
 	if err != nil {
 		return err
 	}
@@ -43,7 +44,7 @@ func (p GoCdPipelineCreate) Run(data manifest.Manifest) error {
 	if resp.StatusCode == http.StatusOK {
 		resp, err = gocdRequest("PUT", url, body, map[string]string{"If-Match": resp.Header.Get("ETag")})
 	} else if resp.StatusCode == http.StatusNotFound {
-		resp, err = gocdRequest("POST", url, body, nil)
+		resp, err = gocdRequest("POST", data.GetString("url"), body, nil)
 	} else {
 		return errors.New("Operation error: " + resp.Status)
 	}
@@ -79,7 +80,7 @@ func gocdRequest(method string, resource string, body string, headers map[string
 
 	req.SetBasicAuth(creds.Login, creds.Password)
 
-	log.Printf(" --> %s %s:\n%s", method, resource, body)
+	log.Printf(" --> %s %s:\n%s\n", method, resource, body)
 
 	return http.DefaultClient.Do(req)
 }

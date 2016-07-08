@@ -3,4 +3,5 @@
 /project/
 /target/
 serve
-.idea/*
+.idea/
+gocd_credentials
