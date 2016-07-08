@@ -9,7 +9,7 @@ import (
 	"net/http"
 
 	"github.com/InnovaCo/serve/manifest"
-	"github.com/labstack/gommon/log"
+	//"github.com/labstack/gommon/log"
 )
 
 func init() {
@@ -80,7 +80,7 @@ func gocdRequest(method string, resource string, body string, headers map[string
 
 	req.SetBasicAuth(creds.Login, creds.Password)
 
-	log.Printf(" --> %s %s:\n%s\n", method, resource, body)
+	//log.Printf(" --> %s %s:\n%s\n", method, resource, body)
 
 	return http.DefaultClient.Do(req)
 }

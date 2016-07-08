@@ -11,4 +11,4 @@ import:
   - package: github.com/fatih/color
   - package: github.com/cenk/backoff
   - package: github.com/docker/engine-api
-  - package: github.com/labstack/gommon/log
+#  - package: github.com/labstack/gommon/log
