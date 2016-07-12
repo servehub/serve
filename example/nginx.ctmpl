@@ -19,9 +19,9 @@ server {
   location {{$location}} {
     set $proxy_pass_upstream '{{$ups.live}}';
 
-    {{- if $ups.stage}}
-      if ($staging = "stage") {
-        set $proxy_pass_upstream '{{$ups.stage}}';
+    {{- if $ups.staging}}
+      if ($stage = "staging") {
+        set $proxy_pass_upstream '{{$ups.staging}}';
       }
     {{- end}}
 

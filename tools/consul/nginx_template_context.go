@@ -68,9 +68,9 @@ func NginxTemplateContextCommand() cli.Command {
 						location = "/"
 					}
 
-					staging, ok := route["staging"]
+					stage, ok := route["stage"]
 					if !ok {
-						staging = "live"
+						stage = "live"
 					}
 
 					if _, ok := servers[route["host"]]; !ok {
@@ -82,8 +82,8 @@ func NginxTemplateContextCommand() cli.Command {
 						servers[route["host"]][location]["service"] = name // todo: backward compatibility for inn-ci-tools, remove after
 					}
 
-					if _, ok := servers[route["host"]][location][staging]; !ok {
-						servers[route["host"]][location][staging] = upstream
+					if _, ok := servers[route["host"]][location][stage]; !ok {
+						servers[route["host"]][location][stage] = upstream
 					}
 				}
 			}
