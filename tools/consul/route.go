@@ -57,7 +57,7 @@ func RouteCommand() cli.Command {
 				return err
 			}
 
-			log.Println(color.GreenString("Updated routes for `%s`: %s", name, string(routes)))
+			log.Println(color.GreenString("Updated routes for `%s`: %s", name, routes))
 
 			return nil
 		},
