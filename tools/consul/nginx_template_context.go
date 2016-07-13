@@ -18,48 +18,54 @@ func NginxTemplateContextCommand() cli.Command {
 		Name:  "nginx-template-context",
 		Usage: "Collect and return data for consul-template",
 		Action: func(c *cli.Context) error {
-			consul, _ := api.NewClient(api.DefaultConfig())
+			conf := api.DefaultConfig()
+			conf.Address = "mesos1-q.qa.inn.ru:8500"
+			consul, _ := api.NewClient(conf)
 
 			upstreams := make(map[string][]map[string]interface{})
-			servers := make(map[string]map[string]map[string]string)
+			services := make(map[string]map[string]map[string]map[string]string)
 
 			allRoutes, _, err := consul.KV().List("services/routes/", nil)
 			if err != nil {
-				return err
+				return fmt.Errorf("Error on load routes: %s", err)
 			}
 
 			for _, kv := range allRoutes {
 				name := strings.TrimPrefix(kv.Key, "services/routes/")
-				upstream := upstreamNameRegex.ReplaceAllString("serve_"+name, "_")
+				upstream := ""
 
 				routes := make([]map[string]string, 0)
 				if err := json.Unmarshal(kv.Value, &routes); err != nil {
-					return err
+					return fmt.Errorf("Error on parse route json: %s. Serive `%s`, json: %s", err, name, string(kv.Value))
 				}
 
 				instances, _, err := consul.Health().Service(name, "", true, nil)
 				if err != nil {
-					panic(err)
+					return fmt.Errorf("Error on get service `%s` health: %s", name, err)
 				}
 
 				if len(instances) == 0 {
 					break
 				}
 
-				if _, ok := upstreams[upstream]; !ok {
-					upstreams[upstream] = make([]map[string]interface{}, 0)
-				}
-
 				for _, inst := range instances {
-					address := inst.Node.Address
-					if inst.Service.Address != "" {
-						address = inst.Service.Address
-					}
+					if inst.Service.Port != 0 {
+						upstream = upstreamNameRegex.ReplaceAllString("serve_"+name, "_")
 
-					upstreams[upstream] = append(upstreams[upstream], map[string]interface{}{
-						"address": address,
-						"port":    inst.Service.Port,
-					})
+						if _, ok := upstreams[upstream]; !ok {
+							upstreams[upstream] = make([]map[string]interface{}, 0)
+						}
+
+						address := inst.Node.Address
+						if inst.Service.Address != "" {
+							address = inst.Service.Address
+						}
+
+						upstreams[upstream] = append(upstreams[upstream], map[string]interface{}{
+							"address": address,
+							"port":    inst.Service.Port,
+						})
+					}
 				}
 
 				for _, route := range routes {
@@ -73,24 +79,26 @@ func NginxTemplateContextCommand() cli.Command {
 						stage = "live"
 					}
 
-					if _, ok := servers[route["host"]]; !ok {
-						servers[route["host"]] = make(map[string]map[string]string, 0)
+					if _, ok := services[route["host"]]; !ok {
+						services[route["host"]] = make(map[string]map[string]map[string]string, 0)
 					}
 
-					if _, ok := servers[route["host"]][location]; !ok {
-						servers[route["host"]][location] = make(map[string]string, 0)
-						servers[route["host"]][location]["service"] = name // todo: backward compatibility for inn-ci-tools, remove after
+					if _, ok := services[route["host"]][location]; !ok {
+						services[route["host"]][location] = make(map[string]map[string]string, 0)
 					}
 
-					if _, ok := servers[route["host"]][location][stage]; !ok {
-						servers[route["host"]][location][stage] = upstream
+					if _, ok := services[route["host"]][location][stage]; !ok {
+						services[route["host"]][location][stage] = map[string]string{
+							"upstream": upstream,
+							"service": name,
+						}
 					}
 				}
 			}
 
 			out, _ := json.MarshalIndent(map[string]interface{}{
 				"upstreams": upstreams,
-				"servers":   servers,
+				"services":  services,
 			}, "", "  ")
 
 			fmt.Fprintln(os.Stdout, string(out))
