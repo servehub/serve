@@ -8,6 +8,7 @@ import (
 
 	"github.com/InnovaCo/serve/manifest/loader"
 	"github.com/InnovaCo/serve/utils/mergemap"
+	"log"
 )
 
 const (
@@ -26,7 +27,7 @@ func (in Include) Process(tree *gabs.Container) (*gabs.Container, error) {
 			}
 		}
 	}
-	// ToDo optimize
+	// ToDo: merge with yml
 	if files, err := filepath.Glob(ConfdPath + "/*.yaml"); err == nil {
 		for _, file := range files {
 			if err := includeFile(file, tree); err != nil {
@@ -64,6 +65,8 @@ func includeFile(file string, tree *gabs.Container) error {
 	if err != nil {
 		return err
 	}
+
+	log.Println("merge: ", file)
 
 	merged, err := mergemap.Merge(loaded.Data().(map[string]interface{}), tree.Data().(map[string]interface{}))
 	if err != nil {
