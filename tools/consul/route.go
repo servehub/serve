@@ -1,13 +1,14 @@
 package consul
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 
+	"github.com/cenk/backoff"
 	"github.com/codegangsta/cli"
 	"github.com/fatih/color"
 	"github.com/hashicorp/consul/api"
-	"github.com/cenk/backoff"
 )
 
 func RouteCommand() cli.Command {
@@ -23,7 +24,7 @@ func RouteCommand() cli.Command {
 
 			name := c.String("service")
 
-			err := backoff.Retry(func() error {
+			if err := backoff.Retry(func() error {
 				services, _, err := consul.Health().Service(name, "", true, nil)
 				if err != nil {
 					log.Println(color.RedString("Error in check health in consul: %v", err))
@@ -37,27 +38,28 @@ func RouteCommand() cli.Command {
 					log.Printf("Service `%s` started with %v instances.", name, len(services))
 					return nil
 				}
-			}, backoff.NewExponentialBackOff())
-
-			if err != nil {
+			}, backoff.NewExponentialBackOff()); err != nil {
 				return err
 			}
 
-			routes := c.String("routes")
-
-			if err != nil {
+			routes := make([]map[string]interface{}, 0)
+			if err := json.Unmarshal([]byte(c.String("routes")), &routes); err != nil {
+				log.Println(color.RedString("Error parse routes json: %v, %s", err, c.String("routes")))
 				return err
 			}
+
+			routesJson, _ := json.MarshalIndent(routes, "", "  ")
 
 			// write routes to consul kv
 			if _, err := consul.KV().Put(&api.KVPair{
 				Key:   fmt.Sprintf("services/routes/%s", name),
-				Value: []byte(routes),
+				Value: routesJson,
 			}, nil); err != nil {
+				log.Println(color.RedString("Error save routes to consul: %v", err))
 				return err
 			}
 
-			log.Println(color.GreenString("Updated routes for `%s`: %s", name, routes))
+			log.Println(color.GreenString("Updated routes for `%s`: %s", name, string(routesJson)))
 
 			return nil
 		},
