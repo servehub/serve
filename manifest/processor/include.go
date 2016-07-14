@@ -26,6 +26,14 @@ func (in Include) Process(tree *gabs.Container) (*gabs.Container, error) {
 			}
 		}
 	}
+	// ToDo optimize
+	if files, err := filepath.Glob(ConfdPath + "/*.yaml"); err == nil {
+		for _, file := range files {
+			if err := includeFile(file, tree); err != nil {
+				return nil, err
+			}
+		}
+	}
 
 	return ProcessAll(tree, func(ktype string, output *gabs.Container, value interface{}, key interface{}) error {
 		if ktype == "map" && key == "include" {
