@@ -19,24 +19,7 @@ const (
 type Include struct{}
 
 func (in Include) Process(tree *gabs.Container) (*gabs.Container, error) {
-	// include all base configs
-	if files, err := filepath.Glob(ConfdPath + "/*.yml"); err == nil {
-		for _, file := range files {
-			if err := includeFile(file, tree); err != nil {
-				return nil, err
-			}
-		}
-	}
-	// ToDo: merge with yml
-	if files, err := filepath.Glob(ConfdPath + "/*.yaml"); err == nil {
-		for _, file := range files {
-			if err := includeFile(file, tree); err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	return ProcessAll(tree, func(ktype string, output *gabs.Container, value interface{}, key interface{}) error {
+	tree, err := ProcessAll(tree, func(ktype string, output *gabs.Container, value interface{}, key interface{}) error {
 		if ktype == "map" && key == "include" {
 			items, err := output.Path("include").Children()
 			if err != nil {
@@ -58,6 +41,21 @@ func (in Include) Process(tree *gabs.Container) (*gabs.Container, error) {
 
 		return nil
 	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	// include all base configs
+	if files, err := filepath.Glob(ConfdPath + "/*.yml"); err == nil {
+		for _, file := range files {
+			if err := includeFile(file, tree); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return tree, nil
 }
 
 func includeFile(file string, tree *gabs.Container) error {
