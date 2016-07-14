@@ -18,9 +18,7 @@ func NginxTemplateContextCommand() cli.Command {
 		Name:  "nginx-template-context",
 		Usage: "Collect and return data for consul-template",
 		Action: func(c *cli.Context) error {
-			conf := api.DefaultConfig()
-			conf.Address = "mesos1-q.qa.inn.ru:8500"
-			consul, _ := api.NewClient(conf)
+			consul, _ := api.NewClient(api.DefaultConfig())
 
 			upstreams := make(map[string][]map[string]interface{})
 			services := make(map[string]map[string]map[string]map[string]string)
