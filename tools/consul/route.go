@@ -24,7 +24,7 @@ func RouteCommand() cli.Command {
 
 			name := c.String("service")
 
-			err := backoff.Retry(func() error {
+			if err := backoff.Retry(func() error {
 				services, _, err := consul.Health().Service(name, "", true, nil)
 				if err != nil {
 					log.Println(color.RedString("Error in check health in consul: %v", err))
@@ -38,9 +38,7 @@ func RouteCommand() cli.Command {
 					log.Printf("Service `%s` started with %v instances.", name, len(services))
 					return nil
 				}
-			}, backoff.NewExponentialBackOff())
-
-			if err != nil {
+			}, backoff.NewExponentialBackOff()); err != nil {
 				return err
 			}
 
@@ -57,6 +55,7 @@ func RouteCommand() cli.Command {
 				Key:   fmt.Sprintf("services/routes/%s", name),
 				Value: routesJson,
 			}, nil); err != nil {
+				log.Println(color.RedString("Error save routes to consul: %v", err))
 				return err
 			}
 
