@@ -20,7 +20,7 @@ type Manifest struct {
 }
 
 func (m Manifest) String() string {
-	return m.tree.String()
+	return m.tree.StringIndent("", "  ")
 }
 
 func (m Manifest) Unwrap() interface{} {
