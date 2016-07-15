@@ -9,7 +9,8 @@ import (
 	"net/http"
 
 	"github.com/InnovaCo/serve/manifest"
-	//"github.com/labstack/gommon/log"
+	"regexp"
+	"log"
 )
 
 func init() {
@@ -35,9 +36,27 @@ type GoCdPipelineCreate struct{}
 func (p GoCdPipelineCreate) Run(data manifest.Manifest) error {
 	url := data.GetString("url") + "/" + data.GetString("pipeline_name")
 	body := data.GetTree("pipeline").String()
+	branch := data.GetString("branch")
+
+	m := false
+	for _, b := range data.GetArray("allowed_branches") {
+		re := b.Unwrap().(string)
+		if re == branch {
+			m = true
+			break
+		} else if m, _ = regexp.MatchString(re, branch); m {
+			break
+		}
+	}
+
+	if !m {
+		log.Println("branch ", branch, " not in ", data.GetString("allowed_branches"))
+		return errors.New("branch " + branch + " not in " + data.GetString("allowed_branches"))
+	}
 
 	resp, err := gocdRequest("GET", url, "", nil)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 
@@ -46,14 +65,17 @@ func (p GoCdPipelineCreate) Run(data manifest.Manifest) error {
 	} else if resp.StatusCode == http.StatusNotFound {
 		resp, err = gocdRequest("POST", data.GetString("url"), body, nil)
 	} else {
+		log.Println("Operation error: " + resp.Status)
 		return errors.New("Operation error: " + resp.Status)
 	}
 
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 
 	if resp.StatusCode != http.StatusOK {
+		log.Println("Operation error: " + resp.Status)
 		return errors.New("Operation error: " + resp.Status)
 	}
 
@@ -80,7 +102,7 @@ func gocdRequest(method string, resource string, body string, headers map[string
 
 	req.SetBasicAuth(creds.Login, creds.Password)
 
-	//log.Printf(" --> %s %s:\n%s\n", method, resource, body)
+	log.Printf(" --> %s %s:\n%s\n", method, resource, body)
 
 	return http.DefaultClient.Do(req)
 }

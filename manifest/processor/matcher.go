@@ -28,11 +28,8 @@ func (m Matcher) Process(tree *gabs.Container) (*gabs.Container, error) {
 				for k, v := range valmap {
 					if k == targetKey {
 						matched = true
-					} else if k != "*" && strings.Contains(k, "*") {
-						matched, err = regexp.MatchString(strings.Replace(k, "*", ".*", -1), targetKey)
-						if err != nil {
-							return err
-						}
+					} else if matched, err = regexp.MatchString(k, targetKey); err != nil {
+						return err
 					}
 
 					if matched {
