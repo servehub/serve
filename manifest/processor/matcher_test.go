@@ -44,7 +44,7 @@ func TestMatcherRegexpValue(t *testing.T) {
 			},
 			"deploy": {
 				"host ? {{ vars.env }}": {
-					"qa-*": "qa-host.com",
+					"qa-.*": "qa-host.com",
 					"live": "live-host.com"
 				}
 			}
@@ -74,7 +74,7 @@ func TestMatcherWithDefaultValue(t *testing.T) {
 			},
 			"deploy": {
 				"host ? {{ vars.env }}": {
-					"qa-*": "qa-host.com",
+					"qa-.*": "qa-host.com",
 					"live": "live-host.com",
 					"*": "other"
 				}

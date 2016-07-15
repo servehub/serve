@@ -23,22 +23,21 @@ func (m Matcher) Process(tree *gabs.Container) (*gabs.Container, error) {
 				newKey := strings.TrimSpace(parts[0])
 
 				output.Delete(key.(string))
+				output.Set(nil, newKey)
 
-				matched := false
+				if v, ok := valmap[targetKey]; ok {
+					output.Set(v, newKey)
+					return nil
+				}
+
 				for k, v := range valmap {
-					if k == targetKey {
-						matched = true
-					} else if matched, err = regexp.MatchString(k, targetKey); err != nil {
-						return err
-					}
-
-					if matched {
+					if ok, _ = regexp.MatchString("^" + strings.Trim(k, "^$") + "$", targetKey); ok {
 						output.Set(v, newKey)
-						break
+						return nil
 					}
 				}
 
-				if v, ok := valmap["*"]; ok && !matched {
+				if v, ok := valmap["*"]; ok {
 					output.Set(v, newKey)
 				}
 			}
