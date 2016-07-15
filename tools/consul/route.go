@@ -9,6 +9,8 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/fatih/color"
 	"github.com/hashicorp/consul/api"
+	"github.com/InnovaCo/serve/utils"
+	"strings"
 )
 
 func RouteCommand() cli.Command {
@@ -42,13 +44,19 @@ func RouteCommand() cli.Command {
 				return err
 			}
 
-			routes := make([]map[string]interface{}, 0)
+			routes := make([]map[string]string, 0)
 			if err := json.Unmarshal([]byte(c.String("routes")), &routes); err != nil {
 				log.Println(color.RedString("Error parse routes json: %v, %s", err, c.String("routes")))
 				return err
 			}
 
 			routesJson, _ := json.MarshalIndent(routes, "", "  ")
+
+			// find old services with this routes
+			routesData, _, err := consul.KV().List("services/routes/", nil)
+			if err != nil {
+				return  err
+			}
 
 			// write routes to consul kv
 			if _, err := consul.KV().Put(&api.KVPair{
@@ -57,6 +65,28 @@ func RouteCommand() cli.Command {
 			}, nil); err != nil {
 				log.Println(color.RedString("Error save routes to consul: %v", err))
 				return err
+			}
+
+			log.Println(color.RedString("routesData = `%s`", routesData))
+			for _, existRoute := range routesData {
+				if !strings.Contains(existRoute.Key, name) {
+					oldRoutes := make([]map[string]string, 0)
+					if err := json.Unmarshal(existRoute.Value, &oldRoutes); err != nil {
+						return err
+					}
+
+					for _, route := range routes {
+						for _, oldRoute := range oldRoutes {
+							if utils.MapsEqual(route, oldRoute) {
+								oldName := strings.TrimPrefix(existRoute.Key, "services/routes/")
+								log.Printf("Found %s with routes %v. Remove it!", oldName, oldRoute)
+								if _, err := consul.KV().Delete(existRoute.Key, nil); err != nil {
+									return err
+								}
+							}
+						}
+					}
+				}
 			}
 
 			log.Println(color.GreenString("Updated routes for `%s`: %s", name, string(routesJson)))
