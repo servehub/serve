@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/cenk/backoff"
 	"github.com/codegangsta/cli"
 	"github.com/fatih/color"
 	"github.com/hashicorp/consul/api"
+
 	"github.com/InnovaCo/serve/utils"
-	"strings"
 )
 
 func RouteCommand() cli.Command {
@@ -26,6 +27,7 @@ func RouteCommand() cli.Command {
 
 			name := c.String("service")
 
+			// check service is healthy
 			if err := backoff.Retry(func() error {
 				services, _, err := consul.Health().Service(name, "", true, nil)
 				if err != nil {
@@ -52,12 +54,6 @@ func RouteCommand() cli.Command {
 
 			routesJson, _ := json.MarshalIndent(routes, "", "  ")
 
-			// find old services with this routes
-			routesData, _, err := consul.KV().List("services/routes/", nil)
-			if err != nil {
-				return  err
-			}
-
 			// write routes to consul kv
 			if _, err := consul.KV().Put(&api.KVPair{
 				Key:   fmt.Sprintf("services/routes/%s", name),
@@ -67,20 +63,26 @@ func RouteCommand() cli.Command {
 				return err
 			}
 
-			log.Println(color.RedString("routesData = `%s`", routesData))
-			for _, existRoute := range routesData {
-				if !strings.Contains(existRoute.Key, name) {
+			log.Println(color.GreenString("Updated routes for `%s`: %s", name, string(routesJson)))
+
+			// find old services with the same routes
+			existsRoutes, _, err := consul.KV().List("services/routes/", nil)
+			if err != nil {
+				return err
+			}
+
+			for _, existsRoute := range existsRoutes {
+				if existsRoute.Key != fmt.Sprintf("services/routes/%s", name) { // skip current service
 					oldRoutes := make([]map[string]string, 0)
-					if err := json.Unmarshal(existRoute.Value, &oldRoutes); err != nil {
+					if err := json.Unmarshal(existsRoute.Value, &oldRoutes); err != nil {
 						return err
 					}
 
 					for _, route := range routes {
 						for _, oldRoute := range oldRoutes {
 							if utils.MapsEqual(route, oldRoute) {
-								oldName := strings.TrimPrefix(existRoute.Key, "services/routes/")
-								log.Printf("Found %s with routes %v. Remove it!", oldName, oldRoute)
-								if _, err := consul.KV().Delete(existRoute.Key, nil); err != nil {
+								log.Println(color.GreenString("Found %s with same routes %v. Remove it!", strings.TrimPrefix(existsRoute.Key, "services/routes/"), string(existsRoute.Value)))
+								if _, err := consul.KV().Delete(existsRoute.Key, nil); err != nil {
 									return err
 								}
 							}
@@ -88,8 +90,6 @@ func RouteCommand() cli.Command {
 					}
 				}
 			}
-
-			log.Println(color.GreenString("Updated routes for `%s`: %s", name, string(routesJson)))
 
 			return nil
 		},
