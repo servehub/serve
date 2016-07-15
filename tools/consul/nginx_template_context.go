@@ -67,28 +67,39 @@ func NginxTemplateContextCommand() cli.Command {
 				}
 
 				for _, route := range routes {
+					host, ok := route["host"]
+					if !ok {
+						return fmt.Errorf("Host is required for routing! Service `%s`", name)
+					}
+
 					location, ok := route["location"]
 					if !ok {
 						location = "/"
 					}
 
-					stage, ok := route["stage"]
-					if !ok {
-						stage = "live"
+					delete(route, "host")
+					delete(route, "location")
+
+					if _, ok := services[host]; !ok {
+						services[host] = make(map[string]map[string]map[string]string, 0)
 					}
 
-					if _, ok := services[route["host"]]; !ok {
-						services[route["host"]] = make(map[string]map[string]map[string]string, 0)
+					if _, ok := services[host][location]; !ok {
+						services[host][location] = make(map[string]map[string]string, 0)
 					}
 
-					if _, ok := services[route["host"]][location]; !ok {
-						services[route["host"]][location] = make(map[string]map[string]string, 0)
+					routeKeys := "-"
+					routeValues := "-"
+					for k, v := range route {
+						routeKeys += "${" + k + "}-"
+						routeValues += v + "-"
 					}
 
-					if _, ok := services[route["host"]][location][stage]; !ok {
-						services[route["host"]][location][stage] = map[string]string{
-							"upstream": upstream,
-							"service": name,
+					if _, ok := services[host][location][routeValues]; !ok {
+						services[host][location][routeValues] = map[string]string{
+							"upstream":  upstream,
+							"package":   name,
+							"routeKeys": routeKeys,
 						}
 					}
 				}

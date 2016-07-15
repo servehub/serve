@@ -41,3 +41,27 @@ func TestTemplater(t *testing.T) {
 		t.Fatal("Unexpected result!")
 	}
 }
+
+func TestNonScalarVars(t *testing.T) {
+	jsonData := []byte(`
+		{
+			"items": ["1", "2", "3"],
+			"output": "{{ items.0 }}"
+		}
+	`)
+
+	tree, _ := gabs.ParseJSON(jsonData)
+
+	proc := Templater{}
+
+	updated, err := proc.Process(tree)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if updated.String() != `{"items":["1","2","3"],"output":"1"}` {
+		t.Log(updated)
+		t.Fatal("Unexpected result!")
+	}
+}
