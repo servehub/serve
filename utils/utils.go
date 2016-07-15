@@ -63,3 +63,9 @@ func MapsEqual(a, b map[string]string) bool {
 
 	return true
 }
+
+type BySortIndex []map[string]string
+
+func (a BySortIndex) Len() int           { return len(a) }
+func (a BySortIndex) Less(i, j int) bool { return a[i]["sortIndex"] < a[j]["sortIndex"] }
+func (a BySortIndex) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
