@@ -78,13 +78,14 @@ func RouteCommand() cli.Command {
 						return err
 					}
 
-					for _, route := range routes {
+					OuterLoop: for _, route := range routes {
 						for _, oldRoute := range oldRoutes {
 							if utils.MapsEqual(route, oldRoute) {
 								log.Println(color.GreenString("Found %s with same routes %v. Remove it!", strings.TrimPrefix(existsRoute.Key, "services/routes/"), string(existsRoute.Value)))
 								if _, err := consul.KV().Delete(existsRoute.Key, nil); err != nil {
 									return err
 								}
+								break OuterLoop
 							}
 						}
 					}
