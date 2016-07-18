@@ -16,7 +16,7 @@ func LoadFile(path string) (*gabs.Container, error) {
 	}
 
 	if jsonData, err := yaml.YAMLToJSON(data); err != nil {
-		return nil, errors.New(color.RedString("Error on parse manifest: %v!", err))
+		return nil, errors.New(color.RedString("Error on parse manifest %s: %v!", path, err))
 	} else {
 		return gabs.ParseJSON(jsonData)
 	}
