@@ -27,6 +27,7 @@ func NginxTemplateContextCommand() cli.Command {
 
 			upstreams := make(map[string][]map[string]interface{})
 			services := make(map[string]map[string][]map[string]string)
+			localServers := make(map[string]map[string]string)
 			duplicates := make(map[string]string)
 
 			allRoutes, _, err := consul.KV().List("services/routes/", nil)
@@ -83,8 +84,20 @@ func NginxTemplateContextCommand() cli.Command {
 						location = "/"
 					}
 
+					routeUpstream := upstream
+					if ups, ok := route["upstream"]; ok && ups == "local" { // so far support only "local" custom upstream
+						routeUpstream = ""
+					}
+
+					if routeUpstream == "" {
+						localServers[name] = map[string]string{
+							"package": name,
+						}
+					}
+
 					delete(route, "host")
 					delete(route, "location")
+					delete(route, "upstream")
 
 					if _, ok := services[host]; !ok {
 						services[host] = make(map[string][]map[string]string, 0)
@@ -109,7 +122,7 @@ func NginxTemplateContextCommand() cli.Command {
 					}
 
 					services[host][location] = append(services[host][location], map[string]string{
-						"upstream":    upstream,
+						"upstream":    routeUpstream,
 						"package":     name,
 						"routeKeys":   routeKeys,
 						"routeValues": routeValues,
@@ -121,13 +134,14 @@ func NginxTemplateContextCommand() cli.Command {
 			// sort routes by sort index
 			for _, hh := range services {
 				for _, ll := range hh {
-					sort.Sort(utils.BySortIndex(ll))
+					sort.Sort(sort.Reverse(utils.BySortIndex(ll)))
 				}
 			}
 
 			out, _ := json.MarshalIndent(map[string]interface{}{
-				"upstreams": upstreams,
-				"services":  services,
+				"upstreams":    upstreams,
+				"services":     services,
+				"localServers": localServers,
 			}, "", "  ")
 
 			fmt.Fprintln(os.Stdout, string(out))
