@@ -134,7 +134,7 @@ func NginxTemplateContextCommand() cli.Command {
 			// sort routes by sort index
 			for _, hh := range services {
 				for _, ll := range hh {
-					sort.Sort(sort.Reverse(utils.BySortIndex(ll)))
+					sort.Sort(utils.BySortIndex(ll))
 				}
 			}
 
