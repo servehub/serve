@@ -27,6 +27,10 @@ func (m Manifest) Unwrap() interface{} {
 	return m.tree.Data()
 }
 
+func (m Manifest) Has(path string) bool {
+	return m.tree.ExistsP(path)
+}
+
 func (m Manifest) GetString(path string) string {
 	return fmt.Sprintf("%v", m.tree.Path(path).Data())
 }

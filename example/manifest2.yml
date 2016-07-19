@@ -1,11 +1,11 @@
 info:
-  name: forgame-api2
-  description: 4game REST API v2
-  version: "2.1"
-  category: services/facade
+  name: test-package
+  description: Test package
+  version: "1.0"
+  category: facade
   owner:
-    name: Dmitry Kulikov
-    email: kulikov.dm@gmail.com
+    name: Boltnev Dmitriy
+    email: dmitriy.boltnev@inn.ru
 
 include:
   - file: samza-task.yml
@@ -24,14 +24,11 @@ test: &some_test
     live: Dima-Live
     dev: Dima-Dev
 
-deploy:
-  marathon:
-    instances: 3
-    mem: 512
-    cpu: 1
-    cmd: "bin/mesos-start"
-    constraints: "kidz:true"
-
+consul:
+  host ? {{ vars.env }}:
+    qa: localhost
+    live: localhost
+ 
 release:
   routes:
     - host ? {{vars.branch}}-{{vars.env}}:

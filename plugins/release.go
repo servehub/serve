@@ -93,19 +93,21 @@ func (p Release) Run(data manifest.Manifest) error {
 							return err
 						}
 
-						log.Printf("Delete %s from marathon after 3 minutes...", oldName)
+						if (data.Has("marathon")) {
+							log.Printf("Delete %s from marathon after 3 minutes...", oldName)
 
-						<-time.NewTimer(time.Minute * 3).C
-						log.Printf("Delete %s from marathon", oldName)
+							<-time.NewTimer(time.Minute * 3).C
+							log.Printf("Delete %s from marathon", oldName)
 
-						marathonApi, err := MarathonClient(data.GetString("marathon_host"))
-						if err != nil {
-							return err
-						}
+							marathonApi, err := MarathonClient(data.GetString("marathon_host"))
+							if err != nil {
+								return err
+							}
 
-						if _, err := marathonApi.DeleteApplication(oldName, true); err != nil {
-							log.Println(color.RedString("Error on delete old instance: %v", err))
-							return err
+							if _, err := marathonApi.DeleteApplication(oldName, true); err != nil {
+								log.Println(color.RedString("Error on delete old instance: %v", err))
+								return err
+							}
 						}
 
 						return nil
