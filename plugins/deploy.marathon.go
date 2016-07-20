@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -20,17 +19,15 @@ func init() {
 	manifest.PluginRegestry.Add("deploy.marathon", DeployMarathon{})
 }
 
-var nameEscapeRegex = regexp.MustCompile(`[^\w\-/_]+`)
-
 type DeployMarathon struct{}
 
 func (p DeployMarathon) Run(data manifest.Manifest) error {
-	marathonApi, err := MarathonClient(data.GetString("marathon_host"))
+	marathonApi, err := MarathonClient(data.GetString("marathon-host"))
 	if err != nil {
 		return err
 	}
 
-	fullName := nameEscapeRegex.ReplaceAllString(data.GetString("app_name"), "-")
+	fullName := data.GetString("app-name")
 
 	bs, bf, bmax := 1.0, 2.0, 30.0
 	app := &marathon.Application{
@@ -58,7 +55,7 @@ func (p DeployMarathon) Run(data manifest.Manifest) error {
 		app.AddEnv(k, fmt.Sprintf("%s", v.Unwrap()))
 	}
 
-	app.AddUris(data.GetString("package_uri"))
+	app.AddUris(data.GetString("package-uri"))
 
 	if _, err := marathonApi.UpdateApplication(app, false); err != nil {
 		color.Yellow("marathon <- %s", app)
@@ -67,7 +64,7 @@ func (p DeployMarathon) Run(data manifest.Manifest) error {
 
 	color.Green("marathon <- %s", app)
 
-	consulApi, err := ConsulClient(data.GetString("consul_host"))
+	consulApi, err := ConsulClient(data.GetString("consul-host"))
 	if err != nil {
 		return err
 	}

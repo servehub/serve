@@ -16,9 +16,5 @@ func (p MarathonBuild) Run(data manifest.Manifest) error {
 		return err
 	}
 
-	if err := utils.RunCmdf("curl -vsSf -XPUT -T marathon.tar.gz %s", data.GetString("registry_url")); err != nil {
-		return err
-	}
-
-	return nil
+	return utils.RunCmdf("curl -vsSf -XPUT -T marathon.tar.gz %s", data.GetString("registry-url"))
 }

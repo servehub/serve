@@ -21,13 +21,13 @@ func init() {
 type Release struct{}
 
 func (p Release) Run(data manifest.Manifest) error {
-	consulApi, err := ConsulClient(data.GetString("consul_host"))
+	consulApi, err := ConsulClient(data.GetString("consul-host"))
 	if err != nil {
 		return err
 	}
 
 	// check current service is alive
-	fullName := nameEscapeRegex.ReplaceAllString(data.GetString("full_name_version"), "-")
+	fullName := data.GetString("full-name-version")
 	services, _, err := consulApi.Health().Service(fullName, "", true, nil)
 	if err != nil {
 		return err
@@ -71,7 +71,7 @@ func (p Release) Run(data manifest.Manifest) error {
 	log.Println(color.GreenString("Service `%s` released with routes: %s", fullName, string(routesJson)))
 
 	// find old services with this routes
-	routesData, _, err := consulApi.KV().List(fmt.Sprintf("services/routes/%s-v", nameEscapeRegex.ReplaceAllString(data.GetString("full_name"), "-")), nil)
+	routesData, _, err := consulApi.KV().List(fmt.Sprintf("services/routes/%s-v", data.GetString("full-name")), nil)
 	if err != nil {
 		return err
 	}
@@ -98,7 +98,7 @@ func (p Release) Run(data manifest.Manifest) error {
 						<-time.NewTimer(time.Minute * 3).C
 						log.Printf("Delete %s from marathon", oldName)
 
-						marathonApi, err := MarathonClient(data.GetString("marathon_host"))
+						marathonApi, err := MarathonClient(data.GetString("marathon-host"))
 						if err != nil {
 							return err
 						}

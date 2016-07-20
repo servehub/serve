@@ -3,7 +3,7 @@ package manifest
 import (
 	"fmt"
 	"log"
-	"regexp"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -11,10 +11,7 @@ import (
 
 	"github.com/InnovaCo/serve/manifest/loader"
 	"github.com/InnovaCo/serve/manifest/processor"
-	"reflect"
 )
-
-var varsFilterRegexp = regexp.MustCompile("[^A-z0-9_\\.]")
 
 type Manifest struct {
 	tree *gabs.Container
@@ -79,8 +76,6 @@ func (m Manifest) GetTree(path string) Manifest {
 }
 
 func (m Manifest) FindPlugins(plugin string) ([]PluginPair, error) {
-	plugin = varsFilterRegexp.ReplaceAllString(plugin, "_")
-
 	tree := m.tree.Path(plugin)
 	result := make([]PluginPair, 0)
 
@@ -114,7 +109,7 @@ func Load(path string, vars map[string]string) *Manifest {
 	}
 
 	for k, v := range vars {
-		tree.Set(v, "vars", varsFilterRegexp.ReplaceAllString(k, "_"))
+		tree.Set(v, "vars", k)
 	}
 
 	for _, proc := range processor.GetAll() {
@@ -123,8 +118,6 @@ func Load(path string, vars map[string]string) *Manifest {
 			log.Fatalf("Error in processor '%v': %v", reflect.ValueOf(proc).Type().Name(), err)
 		}
 	}
-
-	println(tree.StringIndent("", "  "))
 
 	return &Manifest{tree: tree}
 }
