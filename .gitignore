@@ -4,3 +4,4 @@
 serve
 .idea/
 gocd_credentials
+/vendor/**/.git
