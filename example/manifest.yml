@@ -1,8 +1,8 @@
 info:
-  name: forgame-api2
-  description: 4game REST API v2
+  name: forgame-test
+  description: 4game Test
   version: "2.1"
-  category: services/facade
+  category: facade
   owner:
     name: Dmitry Kulikov
     email: kulikov.dm@gmail.com
@@ -11,10 +11,28 @@ include:
   - file: samza-task.yml
 
 build:
-  - sh: "mkdir -p target/pack && touch target/pack/index.txt"
-  - sbt_pack: {}
-  - marathon: {}
-  - sh: "echo 'Hello, World!'"
+  marathon:
+    - sh: "mkdir -p target/pack && touch target/pack/index.txt"
+    - sbt_pack: {}
+    - marathon: {}
+    - sh: "echo 'Hello, World!'"
+  debian:
+    install_root: "/local/innova/www-versions"
+    maintainer_name: "Continuous Integration"
+    maintainer_email: "bamboo@inn.ru"
+    section: "tools"
+    description: "{{info.description}}"
+    daemon_args: "echo Start"
+    service_owner: "innova"
+    daemon_user: "innova"
+    daemon: "no"
+    daemon_port:
+    make_pidfile: "false"
+    depends:
+    section: "{{info.category}}"
+    init: "debian-way"
+    category: "{{info.category}}"
+
 
 test: &some_test
   hello: a {{ vars.hello }}

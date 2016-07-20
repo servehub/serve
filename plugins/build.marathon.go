@@ -11,7 +11,7 @@ func init() {
 
 type MarathonBuild struct{}
 
-func (p MarathonBuild) Run(data manifest.Manifest) error {
+func (p MarathonBuild) Run(data manifest.Manifest, vars map[string]string) error {
 	if err := utils.RunCmdf("tar -zcf marathon.tar.gz -C %s/ .", data.GetString("source")); err != nil {
 		return err
 	}

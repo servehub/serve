@@ -24,7 +24,7 @@ var nameEscapeRegex = regexp.MustCompile(`[^\w\-/_]+`)
 
 type DeployMarathon struct{}
 
-func (p DeployMarathon) Run(data manifest.Manifest) error {
+func (p DeployMarathon) Run(data manifest.Manifest, vars map[string]string) error {
 	marathonApi, err := MarathonClient(data.GetString("marathon_host"))
 	if err != nil {
 		return err

@@ -33,7 +33,7 @@ func init() {
  */
 type GoCdPipelineCreate struct{}
 
-func (p GoCdPipelineCreate) Run(data manifest.Manifest) error {
+func (p GoCdPipelineCreate) Run(data manifest.Manifest, vars map[string]string) error {
 	url := data.GetString("url") + "/" + data.GetString("pipeline_name")
 	body := data.GetTree("pipeline").String()
 	branch := data.GetString("branch")

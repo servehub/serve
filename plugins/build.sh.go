@@ -11,6 +11,6 @@ func init() {
 
 type ShBuild struct{}
 
-func (p ShBuild) Run(data manifest.Manifest) error {
+func (p ShBuild) Run(data manifest.Manifest, vars map[string]string) error {
 	return utils.RunCmd(data.GetString("sh"))
 }
