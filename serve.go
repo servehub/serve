@@ -11,6 +11,10 @@ import (
 	_ "github.com/InnovaCo/serve/plugins"
 )
 
+func init() {
+	color.NoColor = false
+}
+
 func main() {
 	manifestFile := kingpin.Flag("manifest", "Path to manifest.yml file.").Default("manifest.yml").String()
 	plugin       := kingpin.Arg("plugin", "Plugin name for run.").String()
