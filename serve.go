@@ -11,6 +11,8 @@ import (
 	_ "github.com/InnovaCo/serve/plugins"
 )
 
+var version = "1.3"
+
 func init() {
 	color.NoColor = false
 }
@@ -21,11 +23,12 @@ func main() {
 	vars         := *kingpin.Flag("var", "key=value pairs with manifest vars.").StringMap()
 	dryRun 	 	 := kingpin.Flag("dry-run", "Show manifest section only").Bool()
 
+	kingpin.Version(version)
 	kingpin.Parse()
 
 	mnf := manifest.Load(*manifestFile, vars)
 
-	if (*plugin == "") && *dryRun {
+	if *plugin == "" && *dryRun {
 		fmt.Println(mnf)
 		return
 	}
