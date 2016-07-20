@@ -25,14 +25,14 @@ func TestSimpleMatcher(t *testing.T) {
 
 	proc := Matcher{}
 
-	updated, err := proc.Process(tree)
+	err := proc.Process(tree)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if updated.String() != `{"deploy":{"host":"qa-host.com"},"vars":{"env":"qa"}}` {
-		t.Fatal("Unexpected result!", updated)
+	if tree.String() != `{"deploy":{"host":"qa-host.com"},"vars":{"env":"qa"}}` {
+		t.Fatal("Unexpected result!", tree)
 	}
 }
 
@@ -55,14 +55,14 @@ func TestMatcherRegexpValue(t *testing.T) {
 
 	proc := Matcher{}
 
-	updated, err := proc.Process(tree)
+	err := proc.Process(tree)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if updated.String() != `{"deploy":{"host":"qa-host.com"},"vars":{"env":"qa-ru"}}` {
-		t.Fatal("Unexpected result!", updated)
+	if tree.String() != `{"deploy":{"host":"qa-host.com"},"vars":{"env":"qa-ru"}}` {
+		t.Fatal("Unexpected result!", tree)
 	}
 }
 
@@ -86,14 +86,14 @@ func TestMatcherWithDefaultValue(t *testing.T) {
 
 	proc := Matcher{}
 
-	updated, err := proc.Process(tree)
+	err := proc.Process(tree)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if updated.String() != `{"deploy":{"host":"other"},"vars":{"env":"live-ru"}}` {
-		t.Fatal("Unexpected result!", updated)
+	if tree.String() != `{"deploy":{"host":"other"},"vars":{"env":"live-ru"}}` {
+		t.Fatal("Unexpected result!", tree)
 	}
 }
 
@@ -116,14 +116,14 @@ func TestMatcherReordering(t *testing.T) {
 
 	proc := Matcher{}
 
-	updated, err := proc.Process(tree)
+	err := proc.Process(tree)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if updated.String() != `{"deploy":{"host":"live-host.com"},"vars":{"env":"live"}}` {
-		t.Fatal("Unexpected result!", updated)
+	if tree.String() != `{"deploy":{"host":"live-host.com"},"vars":{"env":"live"}}` {
+		t.Fatal("Unexpected result!", tree)
 	}
 }
 
@@ -146,13 +146,13 @@ func TestMatcherReordering2(t *testing.T) {
 
 	proc := Matcher{}
 
-	updated, err := proc.Process(tree)
+	err := proc.Process(tree)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if updated.String() != `{"deploy":{"host":"live-host.com"},"vars":{"env":"live"}}` {
-		t.Fatal("Unexpected result!", updated)
+	if tree.String() != `{"deploy":{"host":"live-host.com"},"vars":{"env":"live"}}` {
+		t.Fatal("Unexpected result!", tree)
 	}
 }

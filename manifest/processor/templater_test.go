@@ -31,14 +31,14 @@ func TestTemplater(t *testing.T) {
 
 	proc := Templater{}
 
-	updated, err := proc.Process(tree)
+	err := proc.Process(tree)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if updated.String() != `{"builds":[{"full-name":"Kulikov Dmitry","name":"Kulikov"}],"info":{"descr ? qa":"my supa proj","name":"Hello, World!11-name"},"test":{"non-exists-var":"hi!","super_peper_key":"hi!"},"vars":{"env":"qa","hello":"Hello, World!11"}}` {
-		t.Log(updated)
+	if tree.String() != `{"builds":[{"full-name":"Kulikov Dmitry","name":"Kulikov"}],"info":{"descr ? qa":"my supa proj","name":"Hello, World!11-name"},"test":{"non-exists-var":"hi!","super_peper_key":"hi!"},"vars":{"env":"qa","hello":"Hello, World!11"}}` {
+		t.Log(tree)
 		t.Fatal("Unexpected result!")
 	}
 }
@@ -55,14 +55,14 @@ func TestNonScalarVars(t *testing.T) {
 
 	proc := Templater{}
 
-	updated, err := proc.Process(tree)
+	err := proc.Process(tree)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if updated.String() != `{"items":["1","2","3"],"output":"1"}` {
-		t.Log(updated)
+	if tree.String() != `{"items":["1","2","3"],"output":"1"}` {
+		t.Log(tree)
 		t.Fatal("Unexpected result!")
 	}
 }
