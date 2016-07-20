@@ -20,19 +20,35 @@ func (m Matcher) Process(tree *gabs.Container) error {
 
 				parts := strings.SplitN(skey, "?", 2)
 				if valmap, ok := value.(map[string]interface{}); ok && len(parts) > 1 {
-					matchedValue := strings.TrimSpace(parts[1])
+					matchValue := strings.TrimSpace(parts[1])
 					newKey := strings.TrimSpace(parts[0])
 
 					output.Delete(key.(string))
 					output.Delete(newKey)
 
-					if v, ok := valmap[matchedValue]; ok {
+					if v, ok := valmap[matchValue]; ok {
 						output.Set(v, newKey)
 						return nil
 					}
 
 					for k, v := range valmap {
-						if ok, _ = regexp.MatchString("^" + strings.Trim(k, "^$") + "$", matchedValue); ok && k != "*" {
+						if k == "*" { continue }
+
+						re, err := regexp.Compile("^" + strings.Trim(k, "^$") + "$")
+						if err != nil {
+							return err
+						}
+
+						matches := re.FindStringSubmatch(matchValue)
+						groups := re.SubexpNames()
+
+						if len(matches) > 0 {
+							for i, group := range groups {
+								if group != "" {
+									tree.Set(matches[i], "match", group)
+								}
+							}
+
 							output.Set(v, newKey)
 							return nil
 						}

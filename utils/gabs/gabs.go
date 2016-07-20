@@ -119,6 +119,8 @@ func (g *Container) Search(hierarchy ...string) *Container {
 				}
 				if len(tmpArray) == 0 {
 					return &Container{nil}
+				} else if len(tmpArray) == 1 {
+					return &Container{tmpArray[0]}
 				}
 				return &Container{tmpArray}
 			}
