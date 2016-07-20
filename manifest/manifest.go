@@ -25,6 +25,11 @@ func (m Manifest) Unwrap() interface{} {
 	return m.tree.Data()
 }
 
+func (m Manifest) Has(path string) bool {
+	v := m.tree.Path(path).Data()
+	return v != nil && v != ""
+}
+
 func (m Manifest) GetString(path string) string {
 	return fmt.Sprintf("%v", m.tree.Path(path).Data())
 }
@@ -113,9 +118,8 @@ func Load(path string, vars map[string]string) *Manifest {
 	}
 
 	for _, proc := range processor.GetAll() {
-		tree, err = proc.Process(tree)
-		if err != nil {
-			log.Fatalf("Error in processor '%v': %v", reflect.ValueOf(proc).Type().Name(), err)
+		if err := proc.Process(tree); err != nil {
+			log.Fatalf("Error in processor '%v': %v. \n\nManifest: %s", reflect.ValueOf(proc).Type().Name(), err, tree.StringIndent("", "  "))
 		}
 	}
 

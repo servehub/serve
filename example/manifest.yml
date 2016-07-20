@@ -34,7 +34,11 @@ deploy:
 
 release:
   routes:
-    - host ? {{ vars.env }}: { qa: api2.kidzite.qa, live: api2.kidzite.space }
+    - host ? {{vars.branch}}-{{vars.env}}:
+        "-live": "~^(.+\\.)?kidzite.space$;"
+        "-qa": "~^(.+\\.)?kidzite.qa$;"
+        "*": "{{vars.branch}}.kidzite.qa"
+      location: /
 
 result:
   << : *some_test

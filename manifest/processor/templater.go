@@ -8,13 +8,9 @@ import (
 
 type Templater struct{}
 
-func (t Templater) Process(tree *gabs.Container) (*gabs.Container, error) {
-	var resp *gabs.Container
-	var err error
-
-	// magic: repeat N times for resolving all circular references
-	for i := 1; i <= 3; i++ {
-		resp, err = ProcessAll(tree, func (ktype string, output *gabs.Container, value interface{}, key interface{}) error {
+func (t Templater) Process(tree *gabs.Container) error {
+	return Repeat(3, func() error {
+		return ProcessAll(tree, func (ktype string, output *gabs.Container, value interface{}, key interface{}) error {
 			switch ktype {
 			case "map":
 				newKey, err := template(key.(string), tree)
@@ -39,7 +35,5 @@ func (t Templater) Process(tree *gabs.Container) (*gabs.Container, error) {
 
 			return nil
 		})
-	}
-
-	return resp, err
+	})
 }

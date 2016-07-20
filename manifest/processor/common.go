@@ -22,41 +22,47 @@ func GetAll() []Processor {
 }
 
 type Processor interface {
-	Process(tree *gabs.Container) (*gabs.Container, error)
+	Process(tree *gabs.Container) error
 }
 
-func ProcessAll(tree *gabs.Container, visitor func(string, *gabs.Container, interface{}, interface{}) error) (*gabs.Container, error) {
+func ProcessAll(tree *gabs.Container, visitor func(string, *gabs.Container, interface{}, interface{}) error) error {
+	errors := make([]string, 0)
+
 	if _, ok := tree.Data().(map[string]interface{}); ok {
 		mmap, _ := tree.ChildrenMap()
 		for k, v := range mmap {
-			upd, err := ProcessAll(v, visitor)
-			if err != nil {
-				return nil, err
+			if err := ProcessAll(v, visitor); err != nil {
+				errors = append(errors, err.Error())
+				continue
 			}
 
-			if err := visitor("map", tree, upd.Data(), k); err != nil {
-				return nil, err
+			if err := visitor("map", tree, v.Data(), k); err != nil {
+				errors = append(errors, err.Error())
 			}
 		}
 	} else if _, ok := tree.Data().([]interface{}); ok {
 		marray, _ := tree.Children()
 		for i, v := range marray {
-			upd, err := ProcessAll(v, visitor)
-			if err != nil {
-				return nil, err
+			if err := ProcessAll(v, visitor); err != nil {
+				errors = append(errors, err.Error())
+				continue
 			}
 
-			if err := visitor("array", tree, upd.Data(), i); err != nil {
-				return nil, err
+			if err := visitor("array", tree, v.Data(), i); err != nil {
+				errors = append(errors, err.Error())
 			}
 		}
 	} else {
 		if err := visitor("other", tree, tree.Data(), nil); err != nil {
-			return nil, err
+			errors = append(errors, err.Error())
 		}
 	}
 
-	return tree, nil
+	if (len(errors) == 0) {
+		return nil
+	} else {
+		return fmt.Errorf(strings.Join(errors, "\n"))
+	}
 }
 
 var bytesBufferPool = sync.Pool{New: func() interface{} {
@@ -89,4 +95,15 @@ func template(s string, context *gabs.Container) (string, error) {
 	bytesBufferPool.Put(w)
 
 	return out, nil
+}
+
+/**
+ * magic: repeat N times for resolving all circular references
+ */
+func Repeat(n int, f func() error) error {
+	var err error
+	for i := 0; i < n; i++ {
+		err = f()
+	}
+	return err
 }
