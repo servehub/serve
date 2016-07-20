@@ -1,8 +1,15 @@
 package processor
 
 import (
-	"github.com/Jeffail/gabs"
-	"gopkg.in/flosch/pongo2.v3"
+	"bytes"
+	"io"
+	"sync"
+	"fmt"
+	"strings"
+
+	"github.com/valyala/fasttemplate"
+
+	"github.com/InnovaCo/serve/utils/gabs"
 )
 
 func GetAll() []Processor {
@@ -52,22 +59,34 @@ func ProcessAll(tree *gabs.Container, visitor func(string, *gabs.Container, inte
 	return tree, nil
 }
 
-func template(s string, context interface{}) (string, error) {
-	tpl, err := pongo2.FromString(s)
+var bytesBufferPool = sync.Pool{New: func() interface{} {
+	return &bytes.Buffer{}
+}}
+
+func template(s string, context *gabs.Container) (string, error) {
+	t, err := fasttemplate.NewTemplate(s, "{{", "}}")
 	if err != nil {
 		return "", err
 	}
 
-	ctx := pongo2.Context{}
-	if m, ok := context.(map[string]interface{}); ok {
-		ctx = m
-	}
+	w := bytesBufferPool.Get().(*bytes.Buffer)
 
-	out, err := tpl.Execute(ctx)
-
-	if err != nil {
+	if _, err := t.ExecuteFunc(w, func(w io.Writer, tag string) (int, error) {
+		path := strings.TrimSpace(tag)
+		if value := context.Path(path).Data(); value != nil {
+			return w.Write([]byte(fmt.Sprintf("%v", value)))
+		} else if strings.HasPrefix(path, "vars.") || context.ExistsP(path) {
+			return 0, nil
+		} else {
+			return 0, fmt.Errorf("Undefined template variable: '%s'", path)
+		}
+	}); err != nil {
 		return "", err
 	}
+
+	out := string(w.Bytes())
+	w.Reset()
+	bytesBufferPool.Put(w)
 
 	return out, nil
 }

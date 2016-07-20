@@ -1,5 +1,5 @@
-hash: 23ebe2e3f9c00fc6a907c8cc95fc084d714fb9c391baffb5014c7242f1839d4d
-updated: 2016-07-06T19:31:05.901964907+03:00
+hash: 306e00ca9318b8c19c462e07e79a919eb331ff9c18871753b908fdcb1eb4a1da
+updated: 2016-07-20T10:18:33.967289455+03:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -46,6 +46,8 @@ imports:
   version: 56b76bdf51f7708750eac80fa38b952bb9f32639
 - name: github.com/urfave/cli
   version: 1efa31f08b9333f1bd4882d61f9d668a70cd902e
+- name: github.com/valyala/fasttemplate
+  version: 3b874956e03f1636d171bda64b130f9135f42cff
 - name: golang.org/x/sys
   version: 20457ee8ea8546920d3f4e19e405da45250dc5a5
   subpackages:

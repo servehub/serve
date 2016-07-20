@@ -2,7 +2,8 @@ package processor
 
 import (
 	"testing"
-	"github.com/Jeffail/gabs"
+
+	"github.com/InnovaCo/serve/utils/gabs"
 )
 
 func TestTemplater(t *testing.T) {

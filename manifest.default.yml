@@ -22,7 +22,7 @@ consul:
   host: consul.example.com
 
 build:
-  sbt_pack:
+  sbt-pack:
     version: "{{ info.build_version }}"
 
   marathon:

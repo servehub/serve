@@ -1,7 +1,7 @@
 package processor
 
 import (
-	"github.com/Jeffail/gabs"
+	"github.com/InnovaCo/serve/utils/gabs"
 )
 
 type AnchorMerger struct{}

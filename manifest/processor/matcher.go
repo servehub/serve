@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/Jeffail/gabs"
+	"github.com/InnovaCo/serve/utils/gabs"
 )
 
 type Matcher struct{}
@@ -12,7 +12,7 @@ type Matcher struct{}
 func (m Matcher) Process(tree *gabs.Container) (*gabs.Container, error) {
 	return ProcessAll(tree, func(ktype string, output *gabs.Container, value interface{}, key interface{}) error {
 		if ktype == "map" {
-			skey, err := template(key.(string), tree.Data())
+			skey, err := template(key.(string), tree)
 			if err != nil {
 				return err
 			}
@@ -23,7 +23,7 @@ func (m Matcher) Process(tree *gabs.Container) (*gabs.Container, error) {
 				newKey := strings.TrimSpace(parts[0])
 
 				output.Delete(key.(string))
-				output.Set(nil, newKey)
+				output.Delete(newKey)
 
 				if v, ok := valmap[targetKey]; ok {
 					output.Set(v, newKey)

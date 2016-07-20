@@ -3,12 +3,11 @@ package processor
 import (
 	"path/filepath"
 	"strings"
+	"log"
 
-	"github.com/Jeffail/gabs"
-
+	"github.com/InnovaCo/serve/utils/gabs"
 	"github.com/InnovaCo/serve/manifest/loader"
 	"github.com/InnovaCo/serve/utils/mergemap"
-	"log"
 )
 
 const (

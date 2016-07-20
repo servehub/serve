@@ -4,9 +4,10 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"github.com/Jeffail/gabs"
 	"github.com/fatih/color"
 	"github.com/ghodss/yaml"
+
+	"github.com/InnovaCo/serve/utils/gabs"
 )
 
 func LoadFile(path string) (*gabs.Container, error) {

@@ -7,10 +7,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Jeffail/gabs"
+	"github.com/InnovaCo/serve/utils/gabs"
 
 	"github.com/InnovaCo/serve/manifest/loader"
 	"github.com/InnovaCo/serve/manifest/processor"
+	"reflect"
 )
 
 var varsFilterRegexp = regexp.MustCompile("[^A-z0-9_\\.]")
@@ -116,12 +117,14 @@ func Load(path string, vars map[string]string) *Manifest {
 		tree.Set(v, "vars", varsFilterRegexp.ReplaceAllString(k, "_"))
 	}
 
-	for name, proc := range processor.GetAll() {
+	for _, proc := range processor.GetAll() {
 		tree, err = proc.Process(tree)
 		if err != nil {
-			log.Fatalf("Error in processor '%s': %v", name, err)
+			log.Fatalf("Error in processor '%v': %v", reflect.ValueOf(proc).Type().Name(), err)
 		}
 	}
+
+	println(tree.StringIndent("", "  "))
 
 	return &Manifest{tree: tree}
 }
