@@ -1,8 +1,15 @@
 package processor
 
 import (
-	"github.com/Jeffail/gabs"
-	"gopkg.in/flosch/pongo2.v3"
+	"bytes"
+	"io"
+	"sync"
+	"fmt"
+	"strings"
+
+	"github.com/valyala/fasttemplate"
+
+	"github.com/InnovaCo/serve/utils/gabs"
 )
 
 func GetAll() []Processor {
@@ -15,59 +22,88 @@ func GetAll() []Processor {
 }
 
 type Processor interface {
-	Process(tree *gabs.Container) (*gabs.Container, error)
+	Process(tree *gabs.Container) error
 }
 
-func ProcessAll(tree *gabs.Container, visitor func(string, *gabs.Container, interface{}, interface{}) error) (*gabs.Container, error) {
+func ProcessAll(tree *gabs.Container, visitor func(string, *gabs.Container, interface{}, interface{}) error) error {
+	errors := make([]string, 0)
+
 	if _, ok := tree.Data().(map[string]interface{}); ok {
 		mmap, _ := tree.ChildrenMap()
 		for k, v := range mmap {
-			upd, err := ProcessAll(v, visitor)
-			if err != nil {
-				return nil, err
+			if err := ProcessAll(v, visitor); err != nil {
+				errors = append(errors, err.Error())
+				continue
 			}
 
-			if err := visitor("map", tree, upd.Data(), k); err != nil {
-				return nil, err
+			if err := visitor("map", tree, v.Data(), k); err != nil {
+				errors = append(errors, err.Error())
 			}
 		}
 	} else if _, ok := tree.Data().([]interface{}); ok {
 		marray, _ := tree.Children()
 		for i, v := range marray {
-			upd, err := ProcessAll(v, visitor)
-			if err != nil {
-				return nil, err
+			if err := ProcessAll(v, visitor); err != nil {
+				errors = append(errors, err.Error())
+				continue
 			}
 
-			if err := visitor("array", tree, upd.Data(), i); err != nil {
-				return nil, err
+			if err := visitor("array", tree, v.Data(), i); err != nil {
+				errors = append(errors, err.Error())
 			}
 		}
 	} else {
 		if err := visitor("other", tree, tree.Data(), nil); err != nil {
-			return nil, err
+			errors = append(errors, err.Error())
 		}
 	}
 
-	return tree, nil
+	if (len(errors) == 0) {
+		return nil
+	} else {
+		return fmt.Errorf(strings.Join(errors, "\n"))
+	}
 }
 
-func template(s string, context interface{}) (string, error) {
-	tpl, err := pongo2.FromString(s)
+var bytesBufferPool = sync.Pool{New: func() interface{} {
+	return &bytes.Buffer{}
+}}
+
+func template(s string, context *gabs.Container) (string, error) {
+	t, err := fasttemplate.NewTemplate(s, "{{", "}}")
 	if err != nil {
 		return "", err
 	}
 
-	ctx := pongo2.Context{}
-	if m, ok := context.(map[string]interface{}); ok {
-		ctx = m
-	}
+	w := bytesBufferPool.Get().(*bytes.Buffer)
 
-	out, err := tpl.Execute(ctx)
-
-	if err != nil {
+	if _, err := t.ExecuteFunc(w, func(w io.Writer, tag string) (int, error) {
+		path := strings.TrimSpace(tag)
+		if value := context.Path(path).Data(); value != nil {
+			return w.Write([]byte(fmt.Sprintf("%v", value)))
+		} else if strings.HasPrefix(path, "vars.") || context.ExistsP(path) {
+			return 0, nil
+		} else {
+			return 0, fmt.Errorf("Undefined template variable: '%s'", path)
+		}
+	}); err != nil {
 		return "", err
 	}
+
+	out := string(w.Bytes())
+	w.Reset()
+	bytesBufferPool.Put(w)
 
 	return out, nil
+}
+
+/**
+ * magic: repeat N times for resolving all circular references
+ */
+func Repeat(n int, f func() error) error {
+	var err error
+	for i := 0; i < n; i++ {
+		err = f()
+	}
+	return err
 }

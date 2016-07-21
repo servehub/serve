@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	manifest.PluginRegestry.Add("build.sbt_pack", SbtPackBuild{})
+	manifest.PluginRegestry.Add("build.sbt-pack", SbtPackBuild{})
 }
 
 type SbtPackBuild struct{}

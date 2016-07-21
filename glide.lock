@@ -1,5 +1,5 @@
-hash: 23ebe2e3f9c00fc6a907c8cc95fc084d714fb9c391baffb5014c7242f1839d4d
-updated: 2016-07-06T19:31:05.901964907+03:00
+hash: ac291e99c20d1dbb47b1f872cbffe913d14196347afde99262d1b395443d6f3a
+updated: 2016-07-20T19:12:30.757248123+03:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -12,9 +12,9 @@ imports:
 - name: github.com/cloudfoundry-incubator/candiedyaml
   version: 99c3df83b51532e3615f851d8c2dbb638f5313bf
 - name: github.com/codegangsta/cli
-  version: 1efa31f08b9333f1bd4882d61f9d668a70cd902e
+  version: 11c134509d89c2018675f369955218a180dc7428
 - name: github.com/docker/engine-api
-  version: 139c221fcbe6e67dfac3c8807870e7136884a45b
+  version: 55fc2a3c372dd40020d511a64926027a3051c677
 - name: github.com/donovanhide/eventsource
   version: fd1de70867126402be23c306e1ce32828455d85b
 - name: github.com/fatih/color
@@ -28,7 +28,7 @@ imports:
   subpackages:
   - query
 - name: github.com/hashicorp/consul
-  version: 6e061b2d580d80347b7c5c4dfc8730de7403a145
+  version: 95a6263a3bf66e191099608cce824596a35d477c
   subpackages:
   - api
 - name: github.com/hashicorp/go-cleanhttp
@@ -38,22 +38,18 @@ imports:
   subpackages:
   - coordinate
   - serf
-- name: github.com/Jeffail/gabs
-  version: c28ac41b517d24bf381d39d5a294fac6536d81fa
 - name: github.com/mattn/go-colorable
   version: 9056b7a9f2d1f2d96498d6d146acd1f9d5ed3d59
 - name: github.com/mattn/go-isatty
   version: 56b76bdf51f7708750eac80fa38b952bb9f32639
 - name: github.com/urfave/cli
-  version: 1efa31f08b9333f1bd4882d61f9d668a70cd902e
+  version: 11c134509d89c2018675f369955218a180dc7428
+- name: github.com/valyala/fasttemplate
+  version: 3b874956e03f1636d171bda64b130f9135f42cff
 - name: golang.org/x/sys
   version: 20457ee8ea8546920d3f4e19e405da45250dc5a5
   subpackages:
   - unix
 - name: gopkg.in/alecthomas/kingpin.v2
-  version: 8cccfa8eb2e3183254457fb1749b2667fbc364c7
-- name: gopkg.in/flosch/pongo2.v3
-  version: 5e81b817a0c48c1c57cdf1a9056cf76bdee02ca9
-- name: gopkg.in/yaml.v2
-  version: a83829b6f1293c91addabc89d0571c246397bbf4
-devImports: []
+  version: 92b2733684bc5f1971162349ce098fe0d070e2a9
+testImports: []

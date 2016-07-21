@@ -3,21 +3,17 @@ package processor
 import (
 	"fmt"
 
-	"github.com/Jeffail/gabs"
+	"github.com/InnovaCo/serve/utils/gabs"
 )
 
 type Templater struct{}
 
-func (t Templater) Process(tree *gabs.Container) (*gabs.Container, error) {
-	var resp *gabs.Container
-	var err error
-
-	// magic: repeat N times for resolving all circular references
-	for i := 1; i <= 3; i++ {
-		resp, err = ProcessAll(tree, func (ktype string, output *gabs.Container, value interface{}, key interface{}) error {
+func (t Templater) Process(tree *gabs.Container) error {
+	return Repeat(3, func() error {
+		return ProcessAll(tree, func (ktype string, output *gabs.Container, value interface{}, key interface{}) error {
 			switch ktype {
 			case "map":
-				newKey, err := template(key.(string), tree.Data())
+				newKey, err := template(key.(string), tree)
 				if err != nil {
 					return err
 				}
@@ -29,7 +25,7 @@ func (t Templater) Process(tree *gabs.Container) (*gabs.Container, error) {
 				output.SetIndex(value, key.(int))
 
 			default:
-				newValue, err := template(fmt.Sprintf("%v", value), tree.Data())
+				newValue, err := template(fmt.Sprintf("%v", value), tree)
 				if err != nil {
 					return err
 				}
@@ -39,7 +35,5 @@ func (t Templater) Process(tree *gabs.Container) (*gabs.Container, error) {
 
 			return nil
 		})
-	}
-
-	return resp, err
+	})
 }

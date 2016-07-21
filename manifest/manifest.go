@@ -3,17 +3,15 @@ package manifest
 import (
 	"fmt"
 	"log"
-	"regexp"
+	"reflect"
 	"strconv"
 	"strings"
 
-	"github.com/Jeffail/gabs"
+	"github.com/InnovaCo/serve/utils/gabs"
 
 	"github.com/InnovaCo/serve/manifest/loader"
 	"github.com/InnovaCo/serve/manifest/processor"
 )
-
-var varsFilterRegexp = regexp.MustCompile("[^A-z0-9_\\.]")
 
 type Manifest struct {
 	tree *gabs.Container
@@ -25,6 +23,11 @@ func (m Manifest) String() string {
 
 func (m Manifest) Unwrap() interface{} {
 	return m.tree.Data()
+}
+
+func (m Manifest) Has(path string) bool {
+	v := m.tree.Path(path).Data()
+	return v != nil && v != ""
 }
 
 func (m Manifest) GetString(path string) string {
@@ -78,8 +81,6 @@ func (m Manifest) GetTree(path string) Manifest {
 }
 
 func (m Manifest) FindPlugins(plugin string) ([]PluginPair, error) {
-	plugin = varsFilterRegexp.ReplaceAllString(plugin, "_")
-
 	tree := m.tree.Path(plugin)
 	result := make([]PluginPair, 0)
 
@@ -113,13 +114,12 @@ func Load(path string, vars map[string]string) *Manifest {
 	}
 
 	for k, v := range vars {
-		tree.Set(v, "vars", varsFilterRegexp.ReplaceAllString(k, "_"))
+		tree.Set(v, "vars", k)
 	}
 
-	for name, proc := range processor.GetAll() {
-		tree, err = proc.Process(tree)
-		if err != nil {
-			log.Fatalf("Error in processor '%s': %v", name, err)
+	for _, proc := range processor.GetAll() {
+		if err := proc.Process(tree); err != nil {
+			log.Fatalf("Error in processor '%v': %v. \n\nManifest: %s", reflect.ValueOf(proc).Type().Name(), err, tree.StringIndent("", "  "))
 		}
 	}
 

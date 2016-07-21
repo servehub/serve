@@ -11,11 +11,10 @@ include:
   - file: samza-task.yml
 
 build:
-  marathon:
-    - sh: "mkdir -p target/pack && touch target/pack/index.txt"
-    - sbt_pack: {}
-    - marathon: {}
-    - sh: "echo 'Hello, World!'"
+  - sh: "mkdir -p target/pack && touch target/pack/index.txt"
+  - sbt-pack: {}
+  - marathon: {}
+  - sh: "echo 'Hello, World!'"
   debian:
     install_root: "/local/innova/www-versions"
     maintainer_name: "Continuous Integration"
@@ -33,6 +32,10 @@ build:
     init: "debian-way"
     category: "{{info.category}}"
 
+  - sh: "mkdir -p target/pack && touch target/pack/index.txt"
+  - sbt-pack: {}
+  - marathon: {}
+  - sh: "echo 'Hello, World!'"
 
 test: &some_test
   hello: a {{ vars.hello }}
@@ -52,7 +55,11 @@ deploy:
 
 release:
   routes:
-    - host ? {{ vars.env }}: { qa: api2.kidzite.qa, live: api2.kidzite.space }
+    - host ? {{vars.branch}}-{{vars.env}}:
+        "-live": "~^(.+\\.)?kidzite.space$;"
+        "-qa": "~^(.+\\.)?kidzite.qa$;"
+        "*": "{{vars.branch}}.kidzite.qa"
+      location: /
 
 result:
   << : *some_test

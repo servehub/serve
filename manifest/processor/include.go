@@ -3,12 +3,11 @@ package processor
 import (
 	"path/filepath"
 	"strings"
+	"log"
 
-	"github.com/Jeffail/gabs"
-
+	"github.com/InnovaCo/serve/utils/gabs"
 	"github.com/InnovaCo/serve/manifest/loader"
 	"github.com/InnovaCo/serve/utils/mergemap"
-	"log"
 )
 
 const (
@@ -18,44 +17,36 @@ const (
 
 type Include struct{}
 
-func (in Include) Process(tree *gabs.Container) (*gabs.Container, error) {
-	tree, err := ProcessAll(tree, func(ktype string, output *gabs.Container, value interface{}, key interface{}) error {
-		if ktype == "map" && key == "include" {
-			items, err := output.Path("include").Children()
-			if err != nil {
-				return err
-			}
+func (in Include) Process(tree *gabs.Container) error {
+	if tree.ExistsP("include") {
+		items, err := tree.Path("include").Children()
+		if err != nil {
+			return err
+		}
 
-			for _, inc := range items {
-				if file, ok := inc.Search("file").Data().(string); ok {
-					if !strings.HasPrefix(file, "/") {
-						file = IncludedPath + "/" + file
-					}
+		for _, inc := range items {
+			if file, ok := inc.Search("file").Data().(string); ok {
+				if !strings.HasPrefix(file, "/") {
+					file = IncludedPath + "/" + file
+				}
 
-					if err := includeFile(file, output); err != nil {
-						return err
-					}
+				if err := includeFile(file, tree); err != nil {
+					return err
 				}
 			}
 		}
-
-		return nil
-	})
-
-	if err != nil {
-		return nil, err
 	}
 
 	// include all base configs
 	if files, err := filepath.Glob(ConfdPath + "/*.yml"); err == nil {
 		for _, file := range files {
 			if err := includeFile(file, tree); err != nil {
-				return nil, err
+				return err
 			}
 		}
 	}
 
-	return tree, nil
+	return nil
 }
 
 func includeFile(file string, tree *gabs.Container) error {
@@ -64,7 +55,7 @@ func includeFile(file string, tree *gabs.Container) error {
 		return err
 	}
 
-	log.Println("merge: ", file)
+	log.Println("include: ", file)
 
 	merged, err := mergemap.Merge(loaded.Data().(map[string]interface{}), tree.Data().(map[string]interface{}))
 	if err != nil {

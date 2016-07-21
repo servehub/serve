@@ -1,6 +1,7 @@
 package consul
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -37,7 +38,7 @@ func SupervisorCommand() cli.Command {
 
 					consul, _ := api.NewClient(api.DefaultConfig())
 
-					serviceId := c.GlobalString("service") + ":" + c.GlobalString("port")
+					serviceId := fmt.Sprintf("%s-%d:%s", c.GlobalString("service"), time.Now().UnixNano() / int64(time.Millisecond), c.GlobalString("port"))
 
 					// wait for child process compelete and unregister it from consul
 					go func() {
