@@ -1,158 +1,126 @@
 package processor
 
-import (
-	"testing"
+import "testing"
 
-	"github.com/InnovaCo/serve/utils/gabs"
-)
-
-func TestSimpleMatcher(t *testing.T) {
-	jsonData := []byte(`
-		{
-			"vars": {
-				"env": "qa"
-			},
-			"deploy": {
-				"host ? {{ vars.env }}": {
-					"qa": "qa-host.com",
-					"live": "live-host.com"
+func TestMatcher(t *testing.T) {
+	runAllProcessorTests(t, func() Processor { return Matcher{} }, map[string]processorTestCase{
+		"simple match": {
+			in: `
+				{
+					"vars": {
+						"env": "qa"
+					},
+					"deploy": {
+						"host ? {{ vars.env }}": {
+							"qa": "qa-host.com",
+							"live": "live-host.com"
+						}
+					}
 				}
-			}
-		}
-	`)
+			`,
+			expect: `{"deploy":{"host":"qa-host.com"},"vars":{"env":"qa"}}`,
+		},
 
-	tree, _ := gabs.ParseJSON(jsonData)
-
-	proc := Matcher{}
-
-	err := proc.Process(tree)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if tree.String() != `{"deploy":{"host":"qa-host.com"},"vars":{"env":"qa"}}` {
-		t.Fatal("Unexpected result!", tree)
-	}
-}
-
-func TestMatcherRegexpValue(t *testing.T) {
-	jsonData := []byte(`
-		{
-			"vars": {
-				"env": "qa-ru"
-			},
-			"deploy": {
-				"host ? {{ vars.env }}": {
-					"qa-.*": "qa-host.com",
-					"live": "live-host.com"
+		"regexp value": {
+			in: `
+				{
+					"vars": {
+						"env": "qa-ru"
+					},
+					"deploy": {
+						"host ? {{ vars.env }}": {
+							"qa-.*": "qa-host.com",
+							"live": "live-host.com"
+						}
+					}
 				}
-			}
-		}
-	`)
+			`,
+			expect: `{"deploy":{"host":"qa-host.com"},"vars":{"env":"qa-ru"}}`,
+		},
 
-	tree, _ := gabs.ParseJSON(jsonData)
-
-	proc := Matcher{}
-
-	err := proc.Process(tree)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if tree.String() != `{"deploy":{"host":"qa-host.com"},"vars":{"env":"qa-ru"}}` {
-		t.Fatal("Unexpected result!", tree)
-	}
-}
-
-func TestMatcherWithDefaultValue(t *testing.T) {
-	jsonData := []byte(`
-		{
-			"vars": {
-				"env": "live-ru"
-			},
-			"deploy": {
-				"host ? {{ vars.env }}": {
-					"qa-.*": "qa-host.com",
-					"live": "live-host.com",
-					"*": "other"
+		"default value": {
+			in: `
+				{
+					"vars": {
+						"env": "live-ru"
+					},
+					"deploy": {
+						"host ? {{ vars.env }}": {
+							"qa-.*": "qa-host.com",
+							"live": "live-host.com",
+							"*": "other"
+						}
+					}
 				}
-			}
-		}
-	`)
+			`,
+			expect: `{"deploy":{"host":"other"},"vars":{"env":"live-ru"}}`,
+		},
 
-	tree, _ := gabs.ParseJSON(jsonData)
-
-	proc := Matcher{}
-
-	err := proc.Process(tree)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if tree.String() != `{"deploy":{"host":"other"},"vars":{"env":"live-ru"}}` {
-		t.Fatal("Unexpected result!", tree)
-	}
-}
-
-func TestMatcherReordering(t *testing.T) {
-	jsonData := []byte(`
-		{
-			"vars": {
-				"env": "live"
-			},
-			"deploy": {
-				"host ? {{ vars.env }}": {
-					"*": "other",
-					"live": "live-host.com"
+		"reordering": {
+			in: `
+				{
+					"vars": {
+						"env": "live"
+					},
+					"deploy": {
+						"host ? {{ vars.env }}": {
+							"*": "other",
+							"live": "live-host.com"
+						}
+					}
 				}
-			}
-		}
-	`)
+			`,
+			expect: `{"deploy":{"host":"live-host.com"},"vars":{"env":"live"}}`,
+		},
 
-	tree, _ := gabs.ParseJSON(jsonData)
-
-	proc := Matcher{}
-
-	err := proc.Process(tree)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if tree.String() != `{"deploy":{"host":"live-host.com"},"vars":{"env":"live"}}` {
-		t.Fatal("Unexpected result!", tree)
-	}
-}
-
-func TestMatcherReordering2(t *testing.T) {
-	jsonData := []byte(`
-		{
-			"vars": {
-				"env": "live"
-			},
-			"deploy": {
-				"host ? {{ vars.env }}": {
-					"live": "live-host.com",
-					"*": "other"
+		"reordering 2": {
+			in: `
+				{
+					"vars": {
+						"env": "live"
+					},
+					"deploy": {
+						"host ? {{ vars.env }}": {
+							"live": "live-host.com",
+							"*": "other"
+						}
+					}
 				}
-			}
-		}
-	`)
+			`,
+			expect: `{"deploy":{"host":"live-host.com"},"vars":{"env":"live"}}`,
+		},
 
-	tree, _ := gabs.ParseJSON(jsonData)
+		"ignore quotes": {
+			in: `
+				{
+					"vars": {
+						"env": "live"
+					},
+					"deploy": {
+						"host ? \"{{ vars.env }}\"": {
+							"live": "live-host.com"
+						}
+					}
+				}
+			`,
+			expect: `{"deploy":{"host":"live-host.com"},"vars":{"env":"live"}}`,
+		},
 
-	proc := Matcher{}
-
-	err := proc.Process(tree)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if tree.String() != `{"deploy":{"host":"live-host.com"},"vars":{"env":"live"}}` {
-		t.Fatal("Unexpected result!", tree)
-	}
+		"not found": {
+			in: `
+				{
+					"vars": {
+						"env": "live"
+					},
+					"deploy": {
+						"host ? {{ vars.env }}": {
+							"qa": "qa-host.com",
+							"dev": "dev-host.com"
+						}
+					}
+				}
+			`,
+			expect: `{"deploy":{},"vars":{"env":"live"}}`,
+		},
+	})
 }

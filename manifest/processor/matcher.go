@@ -20,7 +20,7 @@ func (m Matcher) Process(tree *gabs.Container) error {
 
 				parts := strings.SplitN(skey, "?", 2)
 				if valmap, ok := value.(map[string]interface{}); ok && len(parts) > 1 {
-					matchValue := strings.TrimSpace(parts[1])
+					matchValue := strings.Trim(strings.TrimSpace(parts[1]), "\"'")
 					newKey := strings.TrimSpace(parts[0])
 
 					output.Delete(key.(string))

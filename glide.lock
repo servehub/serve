@@ -1,5 +1,5 @@
 hash: ac291e99c20d1dbb47b1f872cbffe913d14196347afde99262d1b395443d6f3a
-updated: 2016-07-20T19:12:30.757248123+03:00
+updated: 2016-07-21T14:23:33.622929945+03:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -14,7 +14,7 @@ imports:
 - name: github.com/codegangsta/cli
   version: 11c134509d89c2018675f369955218a180dc7428
 - name: github.com/docker/engine-api
-  version: 55fc2a3c372dd40020d511a64926027a3051c677
+  version: c977588a28fa81fbbb06c295e936853cef37cf27
 - name: github.com/donovanhide/eventsource
   version: fd1de70867126402be23c306e1ce32828455d85b
 - name: github.com/fatih/color
@@ -28,7 +28,7 @@ imports:
   subpackages:
   - query
 - name: github.com/hashicorp/consul
-  version: 95a6263a3bf66e191099608cce824596a35d477c
+  version: fce7d75609a04eeb9d4bf41c8dc592aac18fc97d
   subpackages:
   - api
 - name: github.com/hashicorp/go-cleanhttp
