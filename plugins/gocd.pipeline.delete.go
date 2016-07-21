@@ -1,8 +1,8 @@
 package plugins
 
 import (
-	"errors"
-	"net/http"
+	//"errors"
+	//"net/http"
 	"github.com/InnovaCo/serve/manifest"
 	"log"
 )
@@ -20,20 +20,24 @@ func init() {
  * 	password: PASSWORD
  * 	url: GOCD_URL
  *  pipeline_name: NAME
+ *  environment: ENV
  */
 type GoCdPipelineDelete struct{}
 
 func (p GoCdPipelineDelete) Run(data manifest.Manifest) error {
-	resp, err := gocdRequest("DELETE", data.GetString("url")+"/"+data.GetString("pipeline_name"), "", nil)
+	//resp, err := gocdRequest("DELETE", data.GetString("url")+"/"+data.GetString("pipeline_name"), "", nil)
+
+	err := goCdDelete(data.GetString("pipeline_name"), data.GetString("environment"),  data.GetString("url"), "", nil)
+
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		log.Println("Operation error: " + resp.Status)
-		return errors.New("Operation error: " + resp.Status)
-	}
+	//if resp.StatusCode != http.StatusOK {
+	//	log.Println("Operation error: " + resp.Status)
+	//	return errors.New("Operation error: " + resp.Status)
+	//}
 
 	return nil
 }

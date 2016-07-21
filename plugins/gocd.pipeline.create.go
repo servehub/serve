@@ -7,34 +7,37 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
 	"github.com/InnovaCo/serve/manifest"
 	"regexp"
 	"log"
+	//"net/url"
 )
 
 func init() {
-	manifest.PluginRegestry.Add("gocd.pipeline.create", GoCdPipelineCreate{})
+	manifest.PluginRegestry.Add("gocd.pipeline.create", goCdPipelineCreate{})
 }
 
 /**
- * plugin for manifest section "gocd.pipeline.create"
+ * plugin for manifest section "goCd.pipeline.create"
  * section structure:
  *
- * gocd.pipeline.create:
+ * goCd.pipeline.create:
  * 	login: LOGIN
  * 	password: PASSWORD
- * 	url: GOCD_URL
+ * 	url: goCd_URL
  *  pipeline_name: NAME
+ *  environment: ENV
+ *  allowed_branches: [BRANCH, ...]
  * 	pipeline:
  * 		group: GROUP
  * 		pipeline:
  * 			according to the description: https://api.go.cd/current/#the-pipeline-config-object
  */
-type GoCdPipelineCreate struct{}
+type goCdPipelineCreate struct{}
 
-func (p GoCdPipelineCreate) Run(data manifest.Manifest) error {
-	url := data.GetString("url") + "/" + data.GetString("pipeline_name")
+func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
+	name := data.GetString("pipeline_name")
+	url := data.GetString("url")
 	body := data.GetTree("pipeline").String()
 	branch := data.GetString("branch")
 
@@ -54,16 +57,16 @@ func (p GoCdPipelineCreate) Run(data manifest.Manifest) error {
 		return errors.New("branch " + branch + " not in " + data.GetString("allowed_branches"))
 	}
 
-	resp, err := gocdRequest("GET", url, "", nil)
+	resp, err := goCdRequest("GET", url + "/pipelines/" + name, "", nil)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		resp, err = gocdRequest("PUT", url, body, map[string]string{"If-Match": resp.Header.Get("ETag")})
+		err = goCdUpdate(name, data.GetString("environment"), url, body, map[string]string{"If-Match": resp.Header.Get("ETag")})
 	} else if resp.StatusCode == http.StatusNotFound {
-		resp, err = gocdRequest("POST", data.GetString("url"), body, nil)
+		err = goCdCreate(name, data.GetString("environment"), url, body, nil)
 	} else {
 		log.Println("Operation error: " + resp.Status)
 		return errors.New("Operation error: " + resp.Status)
@@ -74,15 +77,49 @@ func (p GoCdPipelineCreate) Run(data manifest.Manifest) error {
 		return err
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		log.Println("Operation error: " + resp.Status)
+	return nil
+}
+
+func goCdCreate(name string, env string, resource string, body string, headers map[string]string) error {
+	if resp, err := goCdRequest("POST", resource + "/pipelines", body, nil); err != nil {
+		return err
+	} else if resp.StatusCode != http.StatusOK {
+		return errors.New("Operation error: " + resp.Status)
+	}
+
+	//val := url.Values{}
+	//val.Add("pipelines", name)
+	//
+	//if resp, err := goCdRequest("PATH", resource + "/environments/" + env , val.Encode(), headers); err != nil {
+	//	return err
+	//} else if resp.StatusCode != http.StatusOK {
+	//	return errors.New("Operation error: " + resp.Status)
+	//}
+
+	return nil
+}
+
+func goCdUpdate(name string, env string, resource string, body string, headers map[string]string) error {
+	if resp, err := goCdRequest("PUT", resource + "/pipelines/" + name , body, headers); err != nil {
+		return err
+	} else if resp.StatusCode != http.StatusOK {
 		return errors.New("Operation error: " + resp.Status)
 	}
 
 	return nil
 }
 
-func gocdRequest(method string, resource string, body string, headers map[string]string) (*http.Response, error) {
+func goCdDelete(name string, env string, resource string, body string, headers map[string]string) error {
+	if resp, err := goCdRequest("DELETE", resource + "/pipeline/" + name, "", nil); err != nil {
+		return err
+	} else if resp.StatusCode != http.StatusOK {
+		return errors.New("Operation error: " + resp.Status)
+	}
+
+	return nil
+}
+
+func goCdRequest(method string, resource string, body string, headers map[string]string) (*http.Response, error) {
 	req, _ := http.NewRequest(method, resource, bytes.NewReader([]byte(body)))
 
 	for k, v := range headers {
