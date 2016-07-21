@@ -15,27 +15,21 @@ build:
   - sbt-pack: {}
   - marathon: {}
   - sh: "echo 'Hello, World!'"
-  debian:
-    install_root: "/local/innova/www-versions"
-    maintainer_name: "Continuous Integration"
-    maintainer_email: "bamboo@inn.ru"
-    section: "tools"
-    description: "{{info.description}}"
-    daemon_args: "echo Start"
-    service_owner: "innova"
-    daemon_user: "innova"
-    daemon: "no"
-    daemon_port:
-    make_pidfile: "false"
-    depends:
-    section: "{{info.category}}"
-    init: "debian-way"
-    category: "{{info.category}}"
-
-  - sh: "mkdir -p target/pack && touch target/pack/index.txt"
-  - sbt-pack: {}
-  - marathon: {}
-  - sh: "echo 'Hello, World!'"
+  - debian:
+      install-root: "/local/innova/www-versions"
+      maintainer-name: "Continuous Integration"
+      maintainer-email: "bamboo@inn.ru"
+      section: "tools"
+      description: "{{info.description}}"
+      daemon-args: "echo Start"
+      service-owner: "innova"
+      daemon-user: "innova"
+      daemon: "no"
+      daemon-port:
+      make-pidfile: "false"
+      section: "{{info.category}}"
+      init: "debian-way"
+      category: "{{info.category}}"
 
 test: &some_test
   hello: a {{ vars.hello }}

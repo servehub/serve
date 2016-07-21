@@ -3,8 +3,10 @@ package plugins
 import (
 	"github.com/InnovaCo/serve/manifest"
 	"fmt"
-	"strings"
-	"os/exec"
+	"github.com/fatih/color"
+	"os"
+	"log"
+	"github.com/InnovaCo/serve/utils"
 )
 
 const ciToolsPath = "/var/go/inn-ci-tools"
@@ -16,65 +18,60 @@ func init() {
 type BuildDebian struct {}
 
 func(p BuildDebian) Run(data manifest.Manifest, vars map[string]string) error {
-	nameWithVersion := data.GetString("name_version")
-	name := data.GetString("name")
-	daemonArgs := data.GetString("daemon_args")
-	serviceOwner := data.GetString("service_owner")
-	daemonUser := data.GetString("daemon_user")
-	daemon := data.GetString("daemon")
-	daemonPort := data.GetString("daemon_port")
-	makePidfile := data.GetString("make_pidfile")
-	installRoot := data.GetString("install_root")
-	depends := data.GetString("depends")
-	version := data.GetString("version")
-	maintainerName := data.GetString("maintainer_name")
-	maintainerEmail := data.GetString("maintainer_email")
-	section := data.GetString("section")
-	description := data.GetString("description")
-	category := data.GetString("category")
-	init := data.GetString("init")
-	cron := data.GetString("cron")
+	log.Println(color.GreenString("Start build.debian plugin"))
+	var exports map[string]string = make(map[string]string)
+
+	nameVersion, name, version, category, installRoot, maintainerName, maintainerEmail,
+	section, daemonArgs, serviceOwner, daemonUser, daemon, daemonPort, makePidfile,
+	depends, description, init, cron :=
+		data.GetString("name-version"),
+		data.GetString("name"),
+		data.GetString("version"),
+		data.GetString("category"),
+		data.GetString("install-root"),
+		data.GetString("maintainer-name"),
+		data.GetString("maintainer-email"),
+		data.GetString("section"),
+		data.GetString("daemon-args"),
+		data.GetString("service-owner"),
+		data.GetString("daemon-user"),
+		data.GetString("daemon"),
+		data.GetString("daemon-port"),
+		data.GetString("make-pidfile"),
+		data.GetString("depends"),
+		data.GetString("description"),
+		data.GetString("init"),
+		data.GetString("cron")
+
+	// required fields
+	exports["MANIFEST_PACKAGE"] = nameVersion
+	exports["MANIFEST_INFO_NAME"] = name
+	exports["MANIFEST_INFO_VERSION"] = version
+	exports["MANIFEST_BUILD_DEBIAN_SECTION"] = section
+	exports["MANIFEST_INFO_CATEGORY"] = category
+	exports["MANIFEST_BUILD_DEBIAN_MAINTAINER_NAME"] = maintainerName
+	exports["MANIFEST_BUILD_DEBIAN_MAINTAINER_EMAIL"] = maintainerEmail
+	exports["MANIFEST_BUILD_DEBIAN_INSTALL_ROOT"] = installRoot
+	// optional fields
+	exports["MANIFEST_BUILD_DEBIAN_DAEMON_ARGS"] = daemonArgs
+	exports["MANIFEST_BUILD_DEBIAN_SERVICE_OWNER"] = serviceOwner
+	exports["MANIFEST_BUILD_DEBIAN_DAEMON_USER"] = daemonUser
+	exports["MANIFEST_BUILD_DEBIAN_DAEMON"] = daemon
+	exports["MANIFEST_BUILD_DEBIAN_DAEMON_PORT"] = daemonPort
+	exports["MANIFEST_BUILD_DEBIAN_MAKE_PIDFILE"] = makePidfile
+	exports["MANIFEST_BUILD_DEBIAN_DEPENDS"] = depends
+	exports["MANIFEST_BUILD_DEBIAN_DESCRIPTION"] = description
+	exports["MANIFEST_BUILD_DEBIAN_INIT"] = init
+	exports["MANIFEST_BUILD_DEBIAN_CRON"] = cron
 
 	distribution := vars["distribution"]
 
-	// execute debian-way/prepare-package.sh from inn-ci-tools
-	commands := []string{
-		fmt.Sprintf("export MANIFEST_PACKAGE=%s", nameWithVersion),
-		fmt.Sprintf("export MANIFEST_INFO_VERSION=%s", version),
-		fmt.Sprintf("export PARAM_DISTRIBUTION=%s", distribution),
-		fmt.Sprintf("export MANIFEST_INFO_NAME=%s", name),
-		fmt.Sprintf("export MANIFEST_BUILD_DEBIAN_DAEMON_ARGS=%s", daemonArgs),
-		fmt.Sprintf("export MANIFEST_BUILD_DEBIAN_SERVICE_OWNER=%s", serviceOwner),
-		fmt.Sprintf("export MANIFEST_BUILD_DEBIAN_DAEMON_USER=%s", daemonUser),
-		fmt.Sprintf("export MANIFEST_BUILD_DEBIAN_DAEMON=%s", daemon),
-		fmt.Sprintf("export MANIFEST_BUILD_DEBIAN_DAEMON_PORT=%s", daemonPort),
-		fmt.Sprintf("export MANIFEST_BUILD_DEBIAN_MAKE_PIDFILE=%s", makePidfile),
-		fmt.Sprintf("export MANIFEST_BUILD_DEBIAN_INSTALL_ROOT=%s", installRoot),
-		fmt.Sprintf("export MANIFEST_BUILD_DEBIAN_MAINTAINER_NAME=%s", maintainerName),
-		fmt.Sprintf("export MANIFEST_BUILD_DEBIAN_MAINTAINER_EMAIL=%s", maintainerEmail),
-		fmt.Sprintf("export MANIFEST_BUILD_DEBIAN_DEPENDS=%s", depends),
-		fmt.Sprintf("export MANIFEST_BUILD_DEBIAN_SECTION=%s", section),
-		fmt.Sprintf("export MANIFEST_BUILD_DEBIAN_DESCRIPTION=%s", description),
-		fmt.Sprintf("export MANIFEST_INFO_CATEGORY=%s", category),
-		fmt.Sprintf("export MANIFEST_BUILD_DEBIAN_INIT=%s", init),
-		fmt.Sprintf("export MANIFEST_BUILD_DEBIAN_CRON=%s", cron),
-		fmt.Sprintf("%s/go/debian-build.sh --distribution=%s", ciToolsPath, distribution),
+	fmt.Println(color.GreenString("Start exporting vars"))
+	for key, val := range exports {
+		fmt.Println(color.GreenString("export %s=%s", key, val))
+		os.Setenv(key, val)
 	}
-	for _, cmd := range commands {
-		ExecSh(cmd)
-		//fmt.Println(color.GreenString(cmd))
-	}
-
-	return nil
-}
-
-func ExecSh(cmd string) {
-	fmt.Println(cmd)
-	parts := strings.Fields(cmd)
-	out, err := exec.Command(parts[0],parts[1]).Output()
-	if err != nil {
-		fmt.Println("error occured")
-		fmt.Printf("%s", err)
-	}
-	fmt.Printf("%s", out)
+	// call debian-build.sh from inn-ci-tools
+	return utils.RunCmd(
+		fmt.Sprintf("%s/go/debian-build.sh --distribution=%s", ciToolsPath, distribution))
 }
