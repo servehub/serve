@@ -9,7 +9,7 @@ import (
 	"github.com/InnovaCo/serve/utils"
 )
 
-const ciToolsPath = "/var/go/inn-ci-tools"
+const ciToolsGoPath = "/var/go/inn-ci-tools"
 
 func init() {
 	manifest.PluginRegestry.Add("build.debian", BuildDebian{})
@@ -22,8 +22,8 @@ func(p BuildDebian) Run(data manifest.Manifest, vars map[string]string) error {
 	var exports map[string]string = make(map[string]string)
 
 	nameVersion, name, version, category, installRoot, maintainerName, maintainerEmail,
-	section, daemonArgs, serviceOwner, daemonUser, daemon, daemonPort, makePidfile,
-	depends, description, init, cron :=
+	daemonArgs, serviceOwner, daemonUser, daemon, daemonPort, makePidfile, depends,
+	description, init, cron :=
 		data.GetString("name-version"),
 		data.GetString("name"),
 		data.GetString("version"),
@@ -31,7 +31,6 @@ func(p BuildDebian) Run(data manifest.Manifest, vars map[string]string) error {
 		data.GetString("install-root"),
 		data.GetString("maintainer-name"),
 		data.GetString("maintainer-email"),
-		data.GetString("section"),
 		data.GetString("daemon-args"),
 		data.GetString("service-owner"),
 		data.GetString("daemon-user"),
@@ -47,7 +46,7 @@ func(p BuildDebian) Run(data manifest.Manifest, vars map[string]string) error {
 	exports["MANIFEST_PACKAGE"] = nameVersion
 	exports["MANIFEST_INFO_NAME"] = name
 	exports["MANIFEST_INFO_VERSION"] = version
-	exports["MANIFEST_BUILD_DEBIAN_SECTION"] = section
+	exports["MANIFEST_BUILD_DEBIAN_SECTION"] = category
 	exports["MANIFEST_INFO_CATEGORY"] = category
 	exports["MANIFEST_BUILD_DEBIAN_MAINTAINER_NAME"] = maintainerName
 	exports["MANIFEST_BUILD_DEBIAN_MAINTAINER_EMAIL"] = maintainerEmail
@@ -66,12 +65,12 @@ func(p BuildDebian) Run(data manifest.Manifest, vars map[string]string) error {
 
 	distribution := vars["distribution"]
 
-	fmt.Println(color.GreenString("Start exporting vars"))
+	log.Println(color.GreenString("Start exporting vars"))
 	for key, val := range exports {
 		fmt.Println(color.GreenString("export %s=%s", key, val))
 		os.Setenv(key, val)
 	}
 	// call debian-build.sh from inn-ci-tools
 	return utils.RunCmd(
-		fmt.Sprintf("%s/go/debian-build.sh --distribution=%s", ciToolsPath, distribution))
+		fmt.Sprintf("%s/go/debian-build.sh --distribution=%s", ciToolsGoPath, distribution))
 }

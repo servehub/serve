@@ -17,19 +17,12 @@ build:
   - sh: "echo 'Hello, World!'"
   - debian:
       install-root: "/local/innova/www-versions"
-      maintainer-name: "Continuous Integration"
-      maintainer-email: "bamboo@inn.ru"
-      section: "tools"
-      description: "{{info.description}}"
       daemon-args: "echo Start"
       service-owner: "innova"
       daemon-user: "innova"
       daemon: "no"
       daemon-port:
       make-pidfile: "false"
-      section: "{{info.category}}"
-      init: "debian-way"
-      category: "{{info.category}}"
 
 test: &some_test
   hello: a {{ vars.hello }}
@@ -46,6 +39,10 @@ deploy:
     cpu: 1
     cmd: "bin/mesos-start"
     constraints: "kidz:true"
+  debian:
+    cluster ? {{ vars.env }}:
+      qa: cpb-new.qa.inn.ru
+      live: cpb.lux.inn.eu
 
 release:
   routes:
