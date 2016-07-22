@@ -22,8 +22,7 @@ func init() {
 type Release struct{}
 
 func (p Release) Run(data manifest.Manifest) error {
-	log.Println(color.BlueString("data = %s", data))
-	consulApi, err := ConsulClient(data.GetString("consul_host"))
+	consulApi, err := ConsulClient(data.GetString("consul-host"))
 	if err != nil {
 		return err
 	}
