@@ -3,7 +3,7 @@ package manifest
 import "log"
 
 type Plugin interface {
-	Run(data Manifest, vars map[string]string) error
+	Run(data Manifest) error
 }
 
 type PluginPair struct {

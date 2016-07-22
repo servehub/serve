@@ -23,7 +23,7 @@ func init() {
  */
 type GoCdPipelineDelete struct{}
 
-func (p GoCdPipelineDelete) Run(data manifest.Manifest, vars map[string]string) error {
+func (p GoCdPipelineDelete) Run(data manifest.Manifest) error {
 	resp, err := gocdRequest("DELETE", data.GetString("url")+"/"+data.GetString("pipeline_name"), "", nil)
 	if err != nil {
 		log.Println(err)

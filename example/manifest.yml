@@ -23,6 +23,7 @@ build:
       daemon: "no"
       daemon-port:
       make-pidfile: "false"
+      distribution: "unstable"
 
 test: &some_test
   hello: a {{ vars.hello }}
@@ -39,6 +40,7 @@ deploy:
     cpu: 1
     cmd: "bin/mesos-start"
     constraints: "kidz:true"
+
   debian:
     cluster ? {{ vars.env }}:
       qa: cpb-new.qa.inn.ru

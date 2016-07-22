@@ -21,7 +21,7 @@ func init() {
 
 type DeployMarathon struct{}
 
-func (p DeployMarathon) Run(data manifest.Manifest, vars map[string]string) error {
+func (p DeployMarathon) Run(data manifest.Manifest) error {
 	marathonApi, err := MarathonClient(data.GetString("marathon_host"))
 	if err != nil {
 		return err
