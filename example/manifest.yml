@@ -1,8 +1,8 @@
 info:
-  name: forgame-api2
-  description: 4game REST API v2
+  name: forgame-test
+  description: 4game Test
   version: "2.1"
-  category: services/facade
+  category: facade
   owner:
     name: Dmitry Kulikov
     email: kulikov.dm@gmail.com
@@ -15,6 +15,15 @@ build:
   - sbt-pack: {}
   - marathon: {}
   - sh: "echo 'Hello, World!'"
+  - debian:
+      install-root: "/local/innova/www-versions"
+      daemon-args: "echo Start"
+      service-owner: "innova"
+      daemon-user: "innova"
+      daemon: "no"
+      daemon-port:
+      make-pidfile: "false"
+      distribution: "unstable"
 
 test: &some_test
   hello: a {{ vars.hello }}
@@ -31,6 +40,11 @@ deploy:
     cpu: 1
     cmd: "bin/mesos-start"
     constraints: "kidz:true"
+
+  debian:
+    cluster ? {{ vars.env }}:
+      qa: cpb-new.qa.inn.ru
+      live: cpb.lux.inn.eu
 
 release:
   routes:
