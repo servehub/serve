@@ -2,7 +2,6 @@ package plugins
 
 import (
 	"github.com/InnovaCo/serve/manifest"
-	"log"
 )
 
 func init() {
@@ -12,6 +11,5 @@ func init() {
 type Test struct{}
 
 func (p Test) Run(data manifest.Manifest) error {
-	log.Println(data.String())
 	return nil
 }

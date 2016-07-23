@@ -16,14 +16,9 @@ build:
   - marathon: {}
   - sh: "echo 'Hello, World!'"
   - debian:
-      install-root: "/local/innova/www-versions"
-      daemon-args: "echo Start"
-      service-owner: "innova"
-      daemon-user: "innova"
-      daemon: "no"
-      daemon-port:
-      make-pidfile: "false"
-      distribution: "unstable"
+      daemon: "$APPLICATION_PATH/bin/start"
+      daemon-args: "--port=$PORT1 --env=${ENV_NAME}"
+      daemon-port: 9040
 
 test: &some_test
   hello: a {{ vars.hello }}
@@ -34,17 +29,17 @@ test: &some_test
     dev: Dima-Dev
 
 deploy:
-  marathon:
-    instances: 3
-    mem: 512
-    cpu: 1
-    cmd: "bin/mesos-start"
-    constraints: "kidz:true"
+  - marathon:
+      instances: 3
+      mem: 512
+      cpu: 1
+      cmd: "bin/mesos-start"
+      constraints: "kidz:true"
 
-  debian:
-    cluster ? {{ vars.env }}:
-      qa: cpb-new.qa.inn.ru
-      live: cpb.lux.inn.eu
+  - debian:
+      cluster ? {{ vars.env }}:
+        qa: cpb-new.qa.inn.ru
+        live: cpb.lux.inn.eu
 
 release:
   routes:

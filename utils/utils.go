@@ -38,11 +38,9 @@ func MergeMaps(maps ...map[string]string) map[string]string {
 	return out
 }
 
-func RunCmdf(cmdline string, a ...interface{}) error {
-	return RunCmd(fmt.Sprintf(cmdline, a...))
-}
+func RunCmd(cmdline string, a ...interface{}) error {
+	cmdline = fmt.Sprintf(cmdline, a...)
 
-func RunCmd(cmdline string) error {
 	log.Println(color.YellowString("> %s", cmdline))
 	cmd := exec.Command("/bin/bash", "-c", cmdline)
 	cmd.Stdout = os.Stdout

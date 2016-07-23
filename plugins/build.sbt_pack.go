@@ -12,9 +12,5 @@ func init() {
 type SbtPackBuild struct{}
 
 func (p SbtPackBuild) Run(data manifest.Manifest) error {
-	if err := utils.RunCmdf("sbt ';set version := \"%s\"' clean test pack", data.GetString("version")); err != nil {
-		return err
-	}
-
-	return nil
+	return utils.RunCmd(`sbt ';set version := "%s"' clean test pack`, data.GetString("version"))
 }

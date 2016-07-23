@@ -59,7 +59,7 @@ func runAllProcessorTests(t *testing.T, processor func() Processor, cases map[st
 
 		if tree.String() != test.expect {
 			color.Red("\n\nTest `%s` failed!", name)
-			color.Yellow("\n\nexpected:  %s\n\nbut given: %s\n\n", test.expect, tree.String())
+			color.Yellow("\n\nexpected:  %s\n\ngiven: %s\n\n", test.expect, tree.String())
 			t.Fail()
 		} else {
 			color.Green("\n%s: OK\n", name)

@@ -1,11 +1,10 @@
 package plugins
 
 import (
-	"github.com/InnovaCo/serve/manifest"
 	"fmt"
-	"github.com/fatih/color"
 	"os"
-	"log"
+
+	"github.com/InnovaCo/serve/manifest"
 	"github.com/InnovaCo/serve/utils"
 )
 
@@ -13,43 +12,58 @@ func init() {
 	manifest.PluginRegestry.Add("build.debian", BuildDebian{})
 }
 
-type BuildDebian struct {}
+type BuildDebian struct{}
 
-func(p BuildDebian) Run(data manifest.Manifest) error {
-	var exports map[string]string = make(map[string]string)
+func (p BuildDebian) Run(data manifest.Manifest) error {
+	env := make(map[string]string)
+
 	// required fields
-	category := data.GetString("category")
+	env["MANIFEST_PACKAGE"] = data.GetString("package")
+	env["MANIFEST_INFO_NAME"] = data.GetString("name")
+	env["MANIFEST_INFO_VERSION"] = data.GetString("version")
+	env["MANIFEST_BUILD_DEBIAN_SECTION"] = data.GetString("category")
+	env["MANIFEST_INFO_CATEGORY"] = data.GetString("category")
+	env["MANIFEST_BUILD_DEBIAN_MAINTAINER_NAME"] = data.GetString("maintainer-name")
+	env["MANIFEST_BUILD_DEBIAN_MAINTAINER_EMAIL"] = data.GetString("maintainer-email")
+	env["MANIFEST_BUILD_DEBIAN_INSTALL_ROOT"] = data.GetString("install-root")
 
-	exports["MANIFEST_PACKAGE"] = data.GetString("name-version")
-	exports["MANIFEST_INFO_NAME"] = data.GetString("name")
-	exports["MANIFEST_INFO_VERSION"] = data.GetString("version")
-	exports["MANIFEST_BUILD_DEBIAN_SECTION"] = category
-	exports["MANIFEST_INFO_CATEGORY"] = category
-	exports["MANIFEST_BUILD_DEBIAN_MAINTAINER_NAME"] = data.GetString("maintainer-name")
-	exports["MANIFEST_BUILD_DEBIAN_MAINTAINER_EMAIL"] = data.GetString("maintainer-email")
-	exports["MANIFEST_BUILD_DEBIAN_INSTALL_ROOT"] = data.GetString("install-root")
-	// optional fields
-	exports["MANIFEST_BUILD_DEBIAN_DAEMON_ARGS"] = data.GetString("daemon-args")
-	exports["MANIFEST_BUILD_DEBIAN_SERVICE_OWNER"] = data.GetString("service-owner")
-	exports["MANIFEST_BUILD_DEBIAN_DAEMON_USER"] = data.GetString("daemon-user")
-	exports["MANIFEST_BUILD_DEBIAN_DAEMON"] = data.GetString("daemon")
-	exports["MANIFEST_BUILD_DEBIAN_DAEMON_PORT"] = data.GetString("daemon-port")
-	exports["MANIFEST_BUILD_DEBIAN_MAKE_PIDFILE"] = data.GetString("make-pidfile")
-	exports["MANIFEST_BUILD_DEBIAN_DEPENDS"] = data.GetString("depends")
-	exports["MANIFEST_BUILD_DEBIAN_DESCRIPTION"] = data.GetString("description")
-	exports["MANIFEST_BUILD_DEBIAN_INIT"] = data.GetString("init")
-	exports["MANIFEST_BUILD_DEBIAN_CRON"] = data.GetString("cron")
-	exports["GO_STAGE_COUNTER"] = data.GetString("stage-counter")
+	daemon := data.GetString("daemon")
+	daemonArgs := data.GetString("daemon-args")
 
-	distribution := data.GetString("distribution")
-	ciToolsPath := data.GetString("ci-tools-path")
+	if daemon != "" {
+		daemonArgs = fmt.Sprintf(
+			"consul supervisor --service '%s' --port $PORT1 start %s %s",
+			data.GetString("package"),
+			daemon,
+			daemonArgs,
+		)
 
-	log.Println(color.GreenString("Start exporting vars"))
-	for key, val := range exports {
-		fmt.Println(color.GreenString("export %s=%s", key, val))
-		os.Setenv(key, val)
+		daemon = "/usr/local/bin/serve-tools"
 	}
-	// call debian-build.sh from inn-ci-tools
+
+	// optional fields
+	env["MANIFEST_BUILD_DEBIAN_DAEMON"] = daemon
+	env["MANIFEST_BUILD_DEBIAN_DAEMON_ARGS"] = daemonArgs
+	env["MANIFEST_BUILD_DEBIAN_SERVICE_OWNER"] = data.GetString("service-owner")
+	env["MANIFEST_BUILD_DEBIAN_DAEMON_USER"] = data.GetString("daemon-user")
+	env["MANIFEST_BUILD_DEBIAN_DAEMON_PORT"] = data.GetString("daemon-port")
+	env["MANIFEST_BUILD_DEBIAN_MAKE_PIDFILE"] = data.GetString("make-pidfile")
+	env["MANIFEST_BUILD_DEBIAN_DEPENDS"] = data.GetString("depends")
+	env["MANIFEST_BUILD_DEBIAN_DESCRIPTION"] = data.GetString("description")
+	env["MANIFEST_BUILD_DEBIAN_INIT"] = data.GetString("init")
+	env["MANIFEST_BUILD_DEBIAN_CRON"] = data.GetString("cron")
+
+	env["GO_PIPELINE_LABEL"] = data.GetString("build-number")
+	env["GO_STAGE_COUNTER"] = data.GetString("stage-counter")
+
+	for k, v := range env {
+		fmt.Printf("export %s=\"%s\"\n", k, v)
+		os.Setenv(k, v)
+	}
+
 	return utils.RunCmd(
-		fmt.Sprintf("%s/go/debian-build.sh --distribution=%s", ciToolsPath, distribution))
+		"%s/go/debian-build.sh --distribution=%s",
+		data.GetString("ci-tools-path"),
+		data.GetString("distribution"),
+	)
 }
