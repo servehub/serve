@@ -89,9 +89,14 @@ func NginxTemplateContextCommand() cli.Command {
 						routeUpstream = ""
 					}
 
+					parts := strings.Split(name, "/")
+					category := strings.Join(parts[0:len(parts)-1], "/")
+					packageName := parts[len(parts)-1]
+
 					if routeUpstream == "" {
 						localServers[name] = map[string]string{
-							"package": name,
+							"category": category,
+							"package":  packageName,
 						}
 					}
 
@@ -123,7 +128,8 @@ func NginxTemplateContextCommand() cli.Command {
 
 					services[host][location] = append(services[host][location], map[string]string{
 						"upstream":    routeUpstream,
-						"package":     name,
+						"category":    category,
+						"package":     packageName,
 						"routeKeys":   routeKeys,
 						"routeValues": routeValues,
 						"sortIndex":   strconv.Itoa(len(route)),
