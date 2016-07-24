@@ -6,11 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"regexp"
+
 	"github.com/InnovaCo/serve/manifest"
 	"github.com/InnovaCo/serve/utils/gabs"
-	"regexp"
-	"log"
 )
 
 func init() {
@@ -22,16 +23,14 @@ func init() {
  * section structure:
  *
  * goCd.pipeline.create:
- * 	login: LOGIN
- * 	password: PASSWORD
- * 	url: goCd_URL
- *  pipeline_name: NAME
- *  environment: ENV
- *  allowed_branches: [BRANCH, ...]
- * 	pipeline:
- * 		group: GROUP
- * 		pipeline:
- * 			according to the description: https://api.go.cd/current/#the-pipeline-config-object
+ *   api-url: goCd_URL
+ *   environment: ENV
+ *   branch: BRANCH
+ *   allowed-branches: [BRANCH, ...]
+ *   pipeline:
+ *     group: GROUP
+ *     pipeline:
+ *       according to the description: https://api.go.cd/current/#the-pipeline-config-object
  */
 
 type goCdCredents struct {
@@ -42,13 +41,13 @@ type goCdCredents struct {
 type goCdPipelineCreate struct{}
 
 func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
-	name := data.GetString("pipeline_name")
-	url := data.GetString("url")
+	name := data.GetString("pipeline.pipeline.name")
+	url := data.GetString("api-url")
 	body := data.GetTree("pipeline").String()
 	branch := data.GetString("branch")
 
 	m := false
-	for _, b := range data.GetArray("allowed_branches") {
+	for _, b := range data.GetArray("allowed-branches") {
 		re := b.Unwrap().(string)
 		if re == branch {
 			m = true
@@ -59,13 +58,12 @@ func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 	}
 
 	if !m {
-		log.Println("branch ", branch, " not in ", data.GetString("allowed_branches"))
-		return errors.New("branch " + branch + " not in " + data.GetString("allowed_branches"))
+		log.Println("branch ", branch, " not in ", data.GetString("allowed-branches"))
+		return nil
 	}
 
-	resp, err := goCdRequest("GET", url + "/pipelines/" + name, "", nil)
+	resp, err := goCdRequest("GET", url+"/pipelines/"+name, "", nil)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 
@@ -87,7 +85,7 @@ func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 }
 
 func goCdCreate(name string, env string, resource string, body string, headers map[string]string) error {
-	if resp, err := goCdRequest("POST", resource + "/pipelines", body, nil); err != nil {
+	if resp, err := goCdRequest("POST", resource+"/pipelines", body, nil); err != nil {
 		log.Println(err)
 		return err
 	} else if resp.StatusCode != http.StatusOK {
@@ -101,7 +99,7 @@ func goCdCreate(name string, env string, resource string, body string, headers m
 
 	log.Println(data)
 
-	if resp, err := goCdRequest("PUT", resource + "/environments/" + env , data, map[string]string{"If-Match": tag}); err != nil {
+	if resp, err := goCdRequest("PUT", resource+"/environments/"+env, data, map[string]string{"If-Match": tag}); err != nil {
 		log.Println(err)
 		return err
 	} else if resp.StatusCode != http.StatusOK {
@@ -113,7 +111,7 @@ func goCdCreate(name string, env string, resource string, body string, headers m
 }
 
 func goCdUpdate(name string, env string, resource string, body string, headers map[string]string) error {
-	if resp, err := goCdRequest("PUT", resource + "/pipelines/" + name , body, headers); err != nil {
+	if resp, err := goCdRequest("PUT", resource+"/pipelines/"+name, body, headers); err != nil {
 		log.Println(err)
 		return err
 	} else if resp.StatusCode != http.StatusOK {
@@ -121,13 +119,13 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 		return errors.New("Operation error: " + resp.Status)
 	}
 
-	c_env, err := goCdFindEnv(resource, name)
+	cEnv, err := goCdFindEnv(resource, name)
 	if err != nil {
 		return err
 	}
 
-	if env != c_env {
-		data, tag, err := goCdChangeEnv(resource, c_env, "", name)
+	if env != cEnv {
+		data, tag, err := goCdChangeEnv(resource, cEnv, "", name)
 		if err != nil {
 			log.Println(err)
 			return err
@@ -135,7 +133,7 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 
 		log.Println(data)
 
-		if resp, err := goCdRequest("PUT", resource + "/environments/" + c_env , data, map[string]string{"If-Match": tag}); err != nil {
+		if resp, err := goCdRequest("PUT", resource+"/environments/"+cEnv, data, map[string]string{"If-Match": tag}); err != nil {
 			log.Println(err)
 			return err
 		} else if resp.StatusCode != http.StatusOK {
@@ -151,7 +149,7 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 
 		log.Println(data)
 
-		if resp, err := goCdRequest("PUT", resource + "/environments/" + env , data, map[string]string{"If-Match": tag}); err != nil {
+		if resp, err := goCdRequest("PUT", resource+"/environments/"+env, data, map[string]string{"If-Match": tag}); err != nil {
 			log.Println(err)
 			return err
 		} else if resp.StatusCode != http.StatusOK {
@@ -172,7 +170,7 @@ func goCdDelete(name string, env string, resource string) error {
 
 	log.Println(data)
 
-	if resp, err := goCdRequest("PUT", resource + "/environments/" + env , data, map[string]string{"If-Match": tag}); err != nil {
+	if resp, err := goCdRequest("PUT", resource+"/environments/"+env, data, map[string]string{"If-Match": tag}); err != nil {
 		log.Println(err)
 		return err
 	} else if resp.StatusCode != http.StatusOK {
@@ -180,7 +178,7 @@ func goCdDelete(name string, env string, resource string) error {
 		return errors.New("Operation error: " + resp.Status)
 	}
 
-	if resp, err := goCdRequest("DELETE", resource + "/pipelines/" + name, "", nil); err != nil {
+	if resp, err := goCdRequest("DELETE", resource+"/pipelines/"+name, "", nil); err != nil {
 		log.Println(err)
 		return err
 	} else if resp.StatusCode != http.StatusOK {
@@ -191,14 +189,14 @@ func goCdDelete(name string, env string, resource string) error {
 	return nil
 }
 
-func goCdChangeEnv(resource string, env string, add_pipeline string, del_pipeline string) (string, string, error) {
-	resp, err := goCdRequest("GET", resource + "/environments/" + env, "", nil)
+func goCdChangeEnv(resource string, env string, addPipeline string, delPipeline string) (string, string, error) {
+	resp, err := goCdRequest("GET", resource+"/environments/"+env, "", nil)
 	if err != nil {
 		log.Println(err)
 		return "", "", err
 	}
 
-	data, err := ChangeJSON(resp, add_pipeline, del_pipeline)
+	data, err := ChangeJSON(resp, addPipeline, delPipeline)
 	if err != nil {
 		log.Println(err)
 		return "", "", err
@@ -207,9 +205,8 @@ func goCdChangeEnv(resource string, env string, add_pipeline string, del_pipelin
 	return data, resp.Header.Get("ETag"), nil
 }
 
-
 func goCdFindEnv(resource string, pipeline string) (string, error) {
-	resp, err := goCdRequest("GET", resource + "/environments", "", nil)
+	resp, err := goCdRequest("GET", resource+"/environments", "", nil)
 	if err != nil {
 		log.Println(err)
 		return "", err
@@ -228,11 +225,11 @@ func goCdFindEnv(resource string, pipeline string) (string, error) {
 
 	envs, _ := tree.Path("_embedded.environments").Children()
 	for _, env := range envs {
-		env_name := env.Path("name").Data().(string)
+		envName := env.Path("name").Data().(string)
 		pipelines, _ := env.Path("pipelines").Children()
 		for _, pline := range pipelines {
 			if pline.Path("name").Data().(string) == pipeline {
-				return env_name, nil
+				return envName, nil
 			}
 		}
 	}
@@ -265,7 +262,7 @@ func goCdRequest(method string, resource string, body string, headers map[string
 	return http.DefaultClient.Do(req)
 }
 
-func ChangeJSON(resp *http.Response, add_pipeline string, del_pipeline string) (string, error) {
+func ChangeJSON(resp *http.Response, addPipeline string, delPipeline string) (string, error) {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 
@@ -285,22 +282,22 @@ func ChangeJSON(resp *http.Response, add_pipeline string, del_pipeline string) (
 	vals := []map[string]string{}
 	for _, m := range children {
 		name := m.Path("name").Data().(string)
-		if (del_pipeline != "") && (name == del_pipeline) {
+		if (delPipeline != "") && (name == delPipeline) {
 			continue
 		}
-		if (add_pipeline != "") && (name == add_pipeline) {
-			add_pipeline = ""
+		if (addPipeline != "") && (name == addPipeline) {
+			addPipeline = ""
 		}
 		vals = append(vals, map[string]string{"name": name})
 	}
-	if add_pipeline != "" {
-		vals = append(vals, map[string]string{"name": add_pipeline})
+	if addPipeline != "" {
+		vals = append(vals, map[string]string{"name": addPipeline})
 	}
 	result.Set(vals, "pipelines")
 
 	children, _ = tree.S("agents").Children()
 	vals = []map[string]string{}
-	for _, m := range children{
+	for _, m := range children {
 		vals = append(vals, map[string]string{"uuid": m.Path("uuid").Data().(string)})
 	}
 	result.Set(vals, "agents")
