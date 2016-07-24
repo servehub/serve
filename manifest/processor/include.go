@@ -10,10 +10,7 @@ import (
 	"github.com/InnovaCo/serve/utils/mergemap"
 )
 
-const (
-	ConfdPath    string = "/etc/serve/conf.d"
-	IncludedPath string = "/etc/serve/include.d"
-)
+const ConfigPath = "/etc/serve"
 
 type Include struct{}
 
@@ -27,7 +24,7 @@ func (in Include) Process(tree *gabs.Container) error {
 		for _, inc := range items {
 			if file, ok := inc.Search("file").Data().(string); ok {
 				if !strings.HasPrefix(file, "/") {
-					file = IncludedPath + "/" + file
+					file = ConfigPath + "/" + file
 				}
 
 				if err := includeFile(file, tree); err != nil {
@@ -38,7 +35,7 @@ func (in Include) Process(tree *gabs.Container) error {
 	}
 
 	// include all base configs
-	if files, err := filepath.Glob(ConfdPath + "/*.yml"); err == nil {
+	if files, err := filepath.Glob(ConfigPath + "/conf.d/*.yml"); err == nil {
 		for _, file := range files {
 			if err := includeFile(file, tree); err != nil {
 				return err
