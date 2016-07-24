@@ -32,7 +32,8 @@ func (p BuildDebian) Run(data manifest.Manifest) error {
 
 	if daemon != "" {
 		daemonArgs = fmt.Sprintf(
-			"consul supervisor --service '%s' --port $PORT1 start %s %s",
+			"consul supervisor --service '%s/%s' --port $PORT1 start %s %s",
+			data.GetString("category"),
 			data.GetString("package"),
 			daemon,
 			daemonArgs,
