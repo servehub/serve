@@ -28,7 +28,7 @@ func (p DeployDebian) Run(data manifest.Manifest) error {
 		return err
 	}
 
-	if err := setKey(consulApi, "/plugins/" + data.GetString("package") + "/deploy.marathon", data.String()); err != nil {
+	if err := setKey(consulApi, "/plugins/" + data.GetString("package") + "/deploy.debian", data.String()); err != nil {
 		return err
 	}
 
