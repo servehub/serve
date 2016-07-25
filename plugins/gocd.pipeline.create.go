@@ -49,7 +49,7 @@ func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 	m := false
 	for _, b := range data.GetArray("allowed-branches") {
 		re := b.Unwrap().(string)
-		if re == branch {
+		if re == "*" || re == branch {
 			m = true
 			break
 		} else if m, _ = regexp.MatchString(re, branch); m {
@@ -140,7 +140,7 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 		} else if resp.StatusCode != http.StatusOK {
 			return errors.New("Operation error: " + resp.Status)
 		}
-		
+
 		data, tag, err = goCdChangeEnv(resource, env, name, "")
 		if err != nil {
 			return err
