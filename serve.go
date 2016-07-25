@@ -47,6 +47,8 @@ func main() {
 			if err := pair.Plugin.Run(pair.Data); err != nil {
 				fmt.Println("")
 				log.Fatalln(color.RedString("Error on run plugin `%s`: %v", pair.PluginName, err))
+			} else {
+				log.Println(color.GreenString("<<< %s: OK", pair.PluginName))
 			}
 		}
 	}

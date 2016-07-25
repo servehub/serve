@@ -137,6 +137,7 @@ func delKey(client *consul.Client, key string) error {
 }
 
 func registerPluginData(plugin string, packageName string, data string, consulHost string) error {
+	log.Println(color.YellowString("Register %s for %s package in consul", plugin, packageName))
 	consulApi, err := ConsulClient(consulHost)
 	if err != nil {
 		return err
@@ -146,6 +147,7 @@ func registerPluginData(plugin string, packageName string, data string, consulHo
 }
 
 func deletePluginData(plugin string, packageName string, consulHost string) error {
+	log.Println(color.YellowString("Delete %s for %s package in consul", plugin, packageName))
 	consulApi, err := ConsulClient(consulHost)
 	if err != nil {
 		return err

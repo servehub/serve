@@ -1,6 +1,8 @@
 package plugins
 
 import (
+	"fmt"
+
 	"github.com/InnovaCo/serve/manifest"
 	"github.com/InnovaCo/serve/utils"
 )
@@ -21,12 +23,10 @@ func (p DeployDebian) Run(data manifest.Manifest) error {
 
 
 func (p DeployDebian) Install(data manifest.Manifest) error {
-	if err := utils.RunCmd(
-		`dig +short %s | sort | uniq | parallel -j 1 ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no %s@{} "sudo %s/debian-way/deploy.sh --package=%s"`,
+	if err := runSshCmd(
 		data.GetString("cluster"),
 		data.GetString("ssh-user"),
-		data.GetString("ci-tools-path"),
-		data.GetString("package"),
+		fmt.Sprintf("sudo %s/debian-way/deploy.sh --package=%s", data.GetString("ci-tools-path"), data.GetString("package")),
 	); err != nil {
 		return err
 	}
@@ -35,15 +35,22 @@ func (p DeployDebian) Install(data manifest.Manifest) error {
 }
 
 func (p DeployDebian) Uninstall(data manifest.Manifest) error {
-	if err := utils.RunCmd(
-		`dig +short %s | sort | uniq | parallel -j 1 ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no %s@{} "sudo apt-get purge %s"`,
+	if err := runSshCmd(
 		data.GetString("cluster"),
 		data.GetString("ssh-user"),
-		data.GetString("ci-tools-path"),
-		data.GetString("package"),
+		fmt.Sprintf("sudo apt-get purge %s", data.GetString("package")),
 	); err != nil {
 		return err
 	}
 
 	return deletePluginData("deploy.debian", data.GetString("package"), data.GetString("consul-host"))
+}
+
+func runSshCmd(cluster, sshUser, cmd string) error {
+	return utils.RunCmd(
+		`dig +short %s | sort | uniq | parallel -j 1 ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no %s@{} "%s"`,
+		cluster,
+		sshUser,
+		cmd,
+	)
 }
