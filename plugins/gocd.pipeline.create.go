@@ -244,7 +244,7 @@ func goCdRequest(method string, resource string, body string, headers map[string
 		req.Header.Set(k, v)
 	}
 
-	req.Header.Set("Accept", "application/vnd.go.cd.v1+json")
+	req.Header.Set("Accept", "application/vnd.go.cd.v2+json")
 	req.Header.Set("Content-Type", "application/json")
 
 	data, err := ioutil.ReadFile("/etc/serve/gocd_credentials")
