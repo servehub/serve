@@ -127,12 +127,12 @@ func ConsulClient(consulHost string) (*consul.Client, error) {
 }
 
 func setKey(client *consul.Client, key string, value string) error {
-	_, err := client.KV().Put(&consul.KVPair{Key: key, Value: []byte(value)}, nil)
+	_, err := client.KV().Put(&consul.KVPair{Key: strings.TrimPrefix(key, "/"), Value: []byte(value)}, nil)
 	return err
 }
 
 func delKey(client *consul.Client, key string) error {
-	_, err := client.KV().Delete(key, nil)
+	_, err := client.KV().Delete(strings.TrimPrefix(key, "/"), nil)
 	return err
 }
 
@@ -143,7 +143,7 @@ func registerPluginData(plugin string, packageName string, data string, consulHo
 		return err
 	}
 
-	return setKey(consulApi, "/plugins/" + packageName + "/" + plugin, data)
+	return setKey(consulApi, "services/data/" + packageName + "/" + plugin, data)
 }
 
 func deletePluginData(plugin string, packageName string, consulHost string) error {
@@ -153,5 +153,5 @@ func deletePluginData(plugin string, packageName string, consulHost string) erro
 		return err
 	}
 
-	return delKey(consulApi, "/plugins/" + packageName + "/" + plugin)
+	return delKey(consulApi, "services/data/" + packageName + "/" + plugin)
 }

@@ -21,7 +21,6 @@ func (p DeployDebian) Run(data manifest.Manifest) error {
 	}
 }
 
-
 func (p DeployDebian) Install(data manifest.Manifest) error {
 	if err := runSshCmd(
 		data.GetString("cluster"),
