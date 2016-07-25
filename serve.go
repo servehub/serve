@@ -22,18 +22,23 @@ func main() {
 	plugin       := kingpin.Arg("plugin", "Plugin name for run.").String()
 	vars         := *kingpin.Flag("var", "key=value pairs with manifest vars.").StringMap()
 	dryRun 	 	 := kingpin.Flag("dry-run", "Show manifest section only").Bool()
+	pluginData 	 := kingpin.Flag("plugin-data", "Data for plugin").String()
 
 	kingpin.Version(version)
 	kingpin.Parse()
 
-	mnf := manifest.Load(*manifestFile, vars)
-
-	if *plugin == "" && *dryRun {
-		fmt.Println(mnf)
-		return
+	var mnf *manifest.Manifest
+	var plugins []manifest.PluginPair
+	var err error
+	if pluginData == nil {
+		mnf = manifest.Load(*manifestFile, vars)
+		plugins, err = mnf.FindPlugins(*plugin)
+	} else {
+		fmt.Println(*pluginData)
+		mnf = manifest.LoadJSON(*pluginData)
+		plugins = append(plugins, mnf.GetPluginWithData(*plugin))
 	}
 
-	plugins, err := mnf.FindPlugins(*plugin)
 	if err != nil {
 		log.Fatalf("Error find plugins for '%s': %v", *plugin, err)
 	}
