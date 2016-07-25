@@ -107,7 +107,7 @@ func (m Manifest) FindPlugins(plugin string) ([]PluginPair, error) {
 	return result, nil
 }
 
-func (m Manifest) GetPluginWithData(plugin string) (PluginPair) {
+func (m Manifest) GetPluginWithData(plugin string) PluginPair {
 	return makePluginPair(plugin, m.tree)
 }
 

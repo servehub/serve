@@ -21,22 +21,19 @@ func main() {
 	manifestFile := kingpin.Flag("manifest", "Path to manifest.yml file.").Default("manifest.yml").String()
 	plugin       := kingpin.Arg("plugin", "Plugin name for run.").String()
 	vars         := *kingpin.Flag("var", "key=value pairs with manifest vars.").StringMap()
-	dryRun 	 	 := kingpin.Flag("dry-run", "Show manifest section only").Bool()
-	pluginData 	 := kingpin.Flag("plugin-data", "Data for plugin").String()
+	dryRun       := kingpin.Flag("dry-run", "Show manifest section only").Bool()
+	pluginData   := kingpin.Flag("plugin-data", "Data for plugin").String()
 
 	kingpin.Version(version)
 	kingpin.Parse()
 
-	var mnf *manifest.Manifest
 	var plugins []manifest.PluginPair
 	var err error
-	if pluginData == nil {
-		mnf = manifest.Load(*manifestFile, vars)
-		plugins, err = mnf.FindPlugins(*plugin)
+
+	if pluginData != nil {
+		plugins = []manifest.PluginPair{manifest.LoadJSON(*pluginData).GetPluginWithData(*plugin)}
 	} else {
-		fmt.Println(*pluginData)
-		mnf = manifest.LoadJSON(*pluginData)
-		plugins = append(plugins, mnf.GetPluginWithData(*plugin))
+		plugins, err = manifest.Load(*manifestFile, vars).FindPlugins(*plugin)
 	}
 
 	if err != nil {
@@ -44,7 +41,7 @@ func main() {
 	}
 
 	for _, pair := range plugins {
-		log.Println(color.GreenString("%v:\n", pair.PluginName), pair.Data)
+		log.Printf("%s\n%s\n\n", color.GreenString(">>> %s:", pair.PluginName), pair.Data)
 
 		if !*dryRun {
 			if err := pair.Plugin.Run(pair.Data); err != nil {
