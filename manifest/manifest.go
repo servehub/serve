@@ -107,6 +107,10 @@ func (m Manifest) FindPlugins(plugin string) ([]PluginPair, error) {
 	return result, nil
 }
 
+func (m Manifest) GetPluginWithData(plugin string) (PluginPair) {
+	return makePluginPair(plugin, m.tree)
+}
+
 func Load(path string, vars map[string]string) *Manifest {
 	tree, err := loader.LoadFile(path)
 	if err != nil {
@@ -121,6 +125,15 @@ func Load(path string, vars map[string]string) *Manifest {
 		if err := proc.Process(tree); err != nil {
 			log.Fatalf("Error in processor '%v': %v. \n\nManifest: %s", reflect.ValueOf(proc).Type().Name(), err, tree.StringIndent("", "  "))
 		}
+	}
+
+	return &Manifest{tree: tree}
+}
+
+func LoadJSON(json string) *Manifest {
+	tree, err := gabs.ParseJSON([]byte(json))
+	if err != nil {
+		log.Fatalln(err)
 	}
 
 	return &Manifest{tree: tree}
