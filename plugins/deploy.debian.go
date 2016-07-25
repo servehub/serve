@@ -42,7 +42,16 @@ func (p DeployDebian) Install(data manifest.Manifest) error {
 }
 
 func (p DeployDebian) Uninstall(data manifest.Manifest) error {
-	//ToDo: Uninstall a package here
+	err := utils.RunCmd(
+		`dig +short %s | sort | uniq | parallel -j 1 ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no %s@{} "sudo apt-get purge %s"`,
+		data.GetString("cluster"),
+		data.GetString("ssh-user"),
+		data.GetString("ci-tools-path"),
+		data.GetString("package"),
+	)
+	if err != nil {
+		return err
+	}
 
 	consulApi, err := ConsulClient(data.GetString("consul-host"))
 	if err != nil {
