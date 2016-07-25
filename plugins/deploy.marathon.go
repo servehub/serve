@@ -77,7 +77,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		return err
 	}
 
-	if err := setKey(consulApi, "/plugins/" + data.GetString("app-name") + "/deploy.marathon", data.String()); err != nil {
+	if err := registerPluginData("deploy.marathon", data.GetString("app-name"), data.String(), data.GetString("consul-host")); err != nil {
 		return err
 	}
 
@@ -100,17 +100,18 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 }
 
 func (p DeployMarathon) Uninstall(data manifest.Manifest) error {
-	//ToDo: Uninstall app here
-
-	consulApi, err := ConsulClient(data.GetString("consul-host"))
+	marathonApi, err := MarathonClient(data.GetString("marathon-host"))
 	if err != nil {
 		return err
 	}
-	if err := delKey(consulApi, "/plugins/" + data.GetString("app-name") + "/deploy.marathon"); err != nil {
+
+	if _, err := marathonApi.DeleteApplication(data.GetString("app-name"), false); err != nil {
 		return err
 	}
-	return nil
+
+	return deletePluginData("deploy.marathon", data.GetString("app-name"), data.GetString("consul-host"))
 }
+
 
 func MarathonClient(marathonHost string) (marathon.Marathon, error) {
 	conf := marathon.NewDefaultConfig()
@@ -126,18 +127,29 @@ func ConsulClient(consulHost string) (*consul.Client, error) {
 }
 
 func setKey(client *consul.Client, key string, value string) error {
-	kv := client.KV()
-	p := &consul.KVPair{Key: key, Value: []byte(value)}
-	if _, err := kv.Put(p, nil); err != nil {
-		return err
-	}
-	return nil
+	_, err := client.KV().Put(&consul.KVPair{Key: key, Value: []byte(value)}, nil)
+	return err
 }
 
 func delKey(client *consul.Client, key string) error {
-	kv := client.KV()
-	if _, err := kv.Delete(key, nil); err != nil {
+	_, err := client.KV().Delete(key, nil)
+	return err
+}
+
+func registerPluginData(plugin string, packageName string, data string, consulHost string) error {
+	consulApi, err := ConsulClient(consulHost)
+	if err != nil {
 		return err
 	}
-	return nil
+
+	return setKey(consulApi, "/plugins/" + packageName + "/" + plugin, data)
+}
+
+func deletePluginData(plugin string, packageName string, consulHost string) error {
+	consulApi, err := ConsulClient(consulHost)
+	if err != nil {
+		return err
+	}
+
+	return delKey(consulApi, "/plugins/" + packageName + "/" + plugin)
 }

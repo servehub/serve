@@ -109,22 +109,9 @@ func (p Release) Run(data manifest.Manifest) error {
 							return err
 						}
 
-						if data.Has("outdated.marathon") {
-							delay := data.GetInt("outdated.marathon.delay-minutes")
-							log.Printf("Delete %s from marathon after %s minutes...", outdated, delay)
-
-							marathonApi, err := MarathonClient(data.GetString("outdated.marathon.marathon-host"))
-							if err != nil {
-								return err
-							}
-
-							<-time.NewTimer(time.Duration(delay) * time.Minute).C
-							log.Printf("Delete %s from marathon", outdated)
-
-							if _, err := marathonApi.DeleteApplication(outdated, true); err != nil {
-								log.Println(color.RedString("Error on delete old instance: %v", err))
-								return err
-							}
+						outdatedJson := fmt.Sprintf(`{"endOfLife":%d}`, time.Now().UnixNano() / int64(time.Millisecond))
+						if _, err := consulApi.KV().Put(&consul.KVPair{Key: "services/outdated/" + fullName, Value: []byte(outdatedJson)}, nil); err != nil {
+							return err
 						}
 
 						break OuterLoop
