@@ -30,7 +30,7 @@ func main() {
 	var plugins []manifest.PluginPair
 	var err error
 
-	if pluginData != nil {
+	if *pluginData != "" {
 		plugins = []manifest.PluginPair{manifest.LoadJSON(*pluginData).GetPluginWithData(*plugin)}
 	} else {
 		plugins, err = manifest.Load(*manifestFile, vars).FindPlugins(*plugin)

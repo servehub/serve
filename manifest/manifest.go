@@ -114,7 +114,7 @@ func (m Manifest) GetPluginWithData(plugin string) PluginPair {
 func Load(path string, vars map[string]string) *Manifest {
 	tree, err := loader.LoadFile(path)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Error on load file:", err)
 	}
 
 	for k, v := range vars {
@@ -133,7 +133,7 @@ func Load(path string, vars map[string]string) *Manifest {
 func LoadJSON(json string) *Manifest {
 	tree, err := gabs.ParseJSON([]byte(json))
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("Error on parse json '%s': %v\n", json, err)
 	}
 
 	return &Manifest{tree: tree}
