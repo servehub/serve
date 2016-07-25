@@ -86,7 +86,6 @@ func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 
 func goCdCreate(name string, env string, resource string, body string, headers map[string]string) error {
 	if resp, err := goCdRequest("POST", resource+"/pipelines", body, nil); err != nil {
-		log.Println(err)
 		return err
 	} else if resp.StatusCode != http.StatusOK {
 		return errors.New("Operation error: " + resp.Status)
@@ -100,10 +99,14 @@ func goCdCreate(name string, env string, resource string, body string, headers m
 	log.Println(data)
 
 	if resp, err := goCdRequest("PUT", resource+"/environments/"+env, data, map[string]string{"If-Match": tag}); err != nil {
-		log.Println(err)
 		return err
 	} else if resp.StatusCode != http.StatusOK {
-		log.Println("Operation error: " + resp.Status)
+		return errors.New("Operation error: " + resp.Status)
+	}
+
+	if resp, err := goCdRequest("POST", resource+"/pipelines/"+name+"/unpause", body, map[string]string{"Confirm": "true"}); err != nil {
+		return err
+	} else if resp.StatusCode != http.StatusOK {
 		return errors.New("Operation error: " + resp.Status)
 	}
 
@@ -127,35 +130,35 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 	if env != cEnv {
 		data, tag, err := goCdChangeEnv(resource, cEnv, "", name)
 		if err != nil {
-			log.Println(err)
 			return err
 		}
 
 		log.Println(data)
 
 		if resp, err := goCdRequest("PUT", resource+"/environments/"+cEnv, data, map[string]string{"If-Match": tag}); err != nil {
-			log.Println(err)
 			return err
 		} else if resp.StatusCode != http.StatusOK {
-			log.Println("Operation error: " + resp.Status)
 			return errors.New("Operation error: " + resp.Status)
 		}
-		//
+		
 		data, tag, err = goCdChangeEnv(resource, env, name, "")
 		if err != nil {
-			log.Println(err)
 			return err
 		}
 
 		log.Println(data)
 
 		if resp, err := goCdRequest("PUT", resource+"/environments/"+env, data, map[string]string{"If-Match": tag}); err != nil {
-			log.Println(err)
 			return err
 		} else if resp.StatusCode != http.StatusOK {
-			log.Println("Operation error: " + resp.Status)
 			return errors.New("Operation error: " + resp.Status)
 		}
+	}
+
+	if resp, err := goCdRequest("POST", resource+"/pipelines/"+name+"/unpause", body, map[string]string{"Confirm": "true"}); err != nil {
+		return err
+	} else if resp.StatusCode != http.StatusOK {
+		return errors.New("Operation error: " + resp.Status)
 	}
 
 	return nil
@@ -164,25 +167,20 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 func goCdDelete(name string, env string, resource string) error {
 	data, tag, err := goCdChangeEnv(resource, env, "", name)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 
 	log.Println(data)
 
 	if resp, err := goCdRequest("PUT", resource+"/environments/"+env, data, map[string]string{"If-Match": tag}); err != nil {
-		log.Println(err)
 		return err
 	} else if resp.StatusCode != http.StatusOK {
-		log.Println("Operation error: " + resp.Status)
 		return errors.New("Operation error: " + resp.Status)
 	}
 
 	if resp, err := goCdRequest("DELETE", resource+"/pipelines/"+name, "", nil); err != nil {
-		log.Println(err)
 		return err
 	} else if resp.StatusCode != http.StatusOK {
-		log.Println("Operation error: " + resp.Status)
 		return errors.New("Operation error: " + resp.Status)
 	}
 
@@ -192,13 +190,11 @@ func goCdDelete(name string, env string, resource string) error {
 func goCdChangeEnv(resource string, env string, addPipeline string, delPipeline string) (string, string, error) {
 	resp, err := goCdRequest("GET", resource+"/environments/"+env, "", nil)
 	if err != nil {
-		log.Println(err)
 		return "", "", err
 	}
 
 	data, err := ChangeJSON(resp, addPipeline, delPipeline)
 	if err != nil {
-		log.Println(err)
 		return "", "", err
 	}
 
@@ -208,7 +204,6 @@ func goCdChangeEnv(resource string, env string, addPipeline string, delPipeline 
 func goCdFindEnv(resource string, pipeline string) (string, error) {
 	resp, err := goCdRequest("GET", resource+"/environments", "", nil)
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 
