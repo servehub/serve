@@ -42,6 +42,18 @@ func TestTemplater(t *testing.T) {
 			`,
 			expect: `{"items":["1","2","3"],"output":"1"}`,
 		},
+
+		"parse types": {
+			in: `
+				{
+					"ok": true,
+					"nil": null,
+					"int": 13,
+					"float": 5.6
+				}
+			`,
+			expect: `{"float":5.6,"int":13,"nil":null,"ok":true}`,
+		},
 	})
 }
 

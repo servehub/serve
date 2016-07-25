@@ -25,12 +25,23 @@ func (t Templater) Process(tree *gabs.Container) error {
 				output.SetIndex(value, key.(int))
 
 			default:
-				newValue, err := template(fmt.Sprintf("%v", value), tree)
-				if err != nil {
-					return err
-				}
+				switch value.(type) {
+				case bool:
+				case int:
+				case int32:
+				case int64:
+				case float32:
+				case float64:
+				case nil:
+					output.Set(value)
+				default:
+					newValue, err := template(fmt.Sprintf("%v", value), tree)
+					if err != nil {
+						return err
+					}
 
-				output.Set(newValue)
+					output.Set(newValue)
+				}
 			}
 
 			return nil
