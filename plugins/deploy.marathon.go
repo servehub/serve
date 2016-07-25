@@ -105,8 +105,6 @@ func ConsulClient(consulHost string) (*consul.Client, error) {
 	return consul.NewClient(conf)
 }
 
-type ConsulSetData struct {}
-
 func setKey(client *consul.Client, key string, value string) error {
 	kv := client.KV()
 	p := &consul.KVPair{Key: key, Value: []byte(value)}
