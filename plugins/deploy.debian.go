@@ -12,6 +12,15 @@ func init() {
 type DeployDebian struct{}
 
 func (p DeployDebian) Run(data manifest.Manifest) error {
+	if data.GetBool("purge") {
+		return p.Uninstall(data)
+	} else {
+		return p.Install(data)
+	}
+}
+
+
+func (p DeployDebian) Install(data manifest.Manifest) error {
 	err := utils.RunCmd(
 		`dig +short %s | sort | uniq | parallel -j 1 ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no %s@{} "sudo %s/debian-way/deploy.sh --package=%s"`,
 		data.GetString("cluster"),
@@ -22,15 +31,25 @@ func (p DeployDebian) Run(data manifest.Manifest) error {
 	if err != nil {
 		return err
 	}
+	consulApi, err := ConsulClient(data.GetString("consul-host"))
+	if err != nil {
+		return err
+	}
+	if err := setKey(consulApi, "/plugins/" + data.GetString("package") + "/deploy.debian", data.String()); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p DeployDebian) Uninstall(data manifest.Manifest) error {
+	//ToDo: Uninstall a package here
 
 	consulApi, err := ConsulClient(data.GetString("consul-host"))
 	if err != nil {
 		return err
 	}
-
-	if err := setKey(consulApi, "/plugins/" + data.GetString("package") + "/deploy.debian", data.String()); err != nil {
+	if err := delKey(consulApi, "/plugins/" + data.GetString("package") + "/deploy.debian"); err != nil {
 		return err
 	}
-
 	return nil
 }

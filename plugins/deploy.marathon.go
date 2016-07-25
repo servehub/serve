@@ -22,6 +22,14 @@ func init() {
 type DeployMarathon struct{}
 
 func (p DeployMarathon) Run(data manifest.Manifest) error {
+	if data.GetBool("purge") {
+		return p.Uninstall(data)
+	} else {
+		return p.Install(data)
+	}
+}
+
+func (p DeployMarathon) Install(data manifest.Manifest) error {
 	marathonApi, err := MarathonClient(data.GetString("marathon-host"))
 	if err != nil {
 		return err
@@ -91,6 +99,19 @@ func (p DeployMarathon) Run(data manifest.Manifest) error {
 	}, backoff.NewExponentialBackOff())
 }
 
+func (p DeployMarathon) Uninstall(data manifest.Manifest) error {
+	//ToDo: Uninstall app here
+
+	consulApi, err := ConsulClient(data.GetString("consul-host"))
+	if err != nil {
+		return err
+	}
+	if err := delKey(consulApi, "/plugins/" + data.GetString("app-name") + "/deploy.marathon"); err != nil {
+		return err
+	}
+	return nil
+}
+
 func MarathonClient(marathonHost string) (marathon.Marathon, error) {
 	conf := marathon.NewDefaultConfig()
 	conf.URL = fmt.Sprintf("http://%s:8080", marathonHost)
@@ -108,6 +129,14 @@ func setKey(client *consul.Client, key string, value string) error {
 	kv := client.KV()
 	p := &consul.KVPair{Key: key, Value: []byte(value)}
 	if _, err := kv.Put(p, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func delKey(client *consul.Client, key string) error {
+	kv := client.KV()
+	if _, err := kv.Delete(key, nil); err != nil {
 		return err
 	}
 	return nil
