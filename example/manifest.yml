@@ -7,9 +7,6 @@ info:
     name: Dmitry Kulikov
     email: kulikov.dm@gmail.com
 
-include:
-  - file: samza-task.yml
-
 build:
   - sh: "mkdir -p target/pack && touch target/pack/index.txt"
   - sbt-pack: {}
