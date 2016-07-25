@@ -19,7 +19,8 @@ func init() {
 	manifest.PluginRegestry.Add("deploy.marathon", DeployMarathon{})
 }
 
-type DeployMarathon struct{}
+type DeployMarathon struct{
+}
 
 func (p DeployMarathon) Run(data manifest.Manifest) error {
 	marathonApi, err := MarathonClient(data.GetString("marathon-host"))
@@ -69,6 +70,10 @@ func (p DeployMarathon) Run(data manifest.Manifest) error {
 		return err
 	}
 
+	if err := setKey(consulApi, "/plugins/" + data.GetString("app-name") + "/deploy.marathon", data.String()); err != nil {
+		return err
+	}
+
 	return backoff.Retry(func() error {
 		services, _, err := consulApi.Health().Service(fullName, "", true, nil)
 
@@ -98,4 +103,15 @@ func ConsulClient(consulHost string) (*consul.Client, error) {
 	conf := consul.DefaultConfig()
 	conf.Address = consulHost + ":8500"
 	return consul.NewClient(conf)
+}
+
+type ConsulSetData struct {}
+
+func setKey(client *consul.Client, key string, value string) error {
+	kv := client.KV()
+	p := &consul.KVPair{Key: key, Value: []byte(value)}
+	if _, err := kv.Put(p, nil); err != nil {
+		return err
+	}
+	return nil
 }
