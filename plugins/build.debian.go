@@ -58,7 +58,6 @@ func (p BuildDebian) Run(data manifest.Manifest) error {
 	env["GO_STAGE_COUNTER"] = data.GetString("stage-counter")
 
 	for k, v := range env {
-		fmt.Printf("export %s=\"%s\"\n", k, v)
 		os.Setenv(k, v)
 	}
 
