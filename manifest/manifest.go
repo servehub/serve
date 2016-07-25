@@ -50,6 +50,14 @@ func (m Manifest) GetInt(path string) int {
 	return i
 }
 
+func (m Manifest) GetBool(path string) int {
+	if v, ok := m.tree.Path(path).Data().(bool); ok {
+		return v
+	} else {
+		return false
+	}
+}
+
 func (m Manifest) GetMap(path string) map[string]Manifest {
 	out := make(map[string]Manifest)
 	mmap, err := m.tree.Path(path).ChildrenMap()
