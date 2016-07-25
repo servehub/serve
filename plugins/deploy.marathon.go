@@ -19,8 +19,7 @@ func init() {
 	manifest.PluginRegestry.Add("deploy.marathon", DeployMarathon{})
 }
 
-type DeployMarathon struct{
-}
+type DeployMarathon struct{}
 
 func (p DeployMarathon) Run(data manifest.Manifest) error {
 	marathonApi, err := MarathonClient(data.GetString("marathon-host"))
