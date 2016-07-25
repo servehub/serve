@@ -126,24 +126,25 @@ func ConsulClient(consulHost string) (*consul.Client, error) {
 	return consul.NewClient(conf)
 }
 
-func setKey(client *consul.Client, key string, value string) error {
+func putConsulKv(client *consul.Client, key string, value string) error {
+	log.Printf("consul put `%s`: %s", key, value)
 	_, err := client.KV().Put(&consul.KVPair{Key: strings.TrimPrefix(key, "/"), Value: []byte(value)}, nil)
 	return err
 }
 
-func delKey(client *consul.Client, key string) error {
+func delConsulKv(client *consul.Client, key string) error {
+	log.Printf("consul delete `%s`", key)
 	_, err := client.KV().Delete(strings.TrimPrefix(key, "/"), nil)
 	return err
 }
 
 func registerPluginData(plugin string, packageName string, data string, consulHost string) error {
-	log.Println(color.YellowString("Register %s for %s package in consul", plugin, packageName))
 	consulApi, err := ConsulClient(consulHost)
 	if err != nil {
 		return err
 	}
 
-	return setKey(consulApi, "services/data/" + packageName + "/" + plugin, data)
+	return putConsulKv(consulApi, "services/data/" + packageName + "/" + plugin, data)
 }
 
 func deletePluginData(plugin string, packageName string, consulHost string) error {
@@ -153,5 +154,5 @@ func deletePluginData(plugin string, packageName string, consulHost string) erro
 		return err
 	}
 
-	return delKey(consulApi, "services/data/" + packageName + "/" + plugin)
+	return delConsulKv(consulApi, "services/data/" + packageName + "/" + plugin)
 }

@@ -9,7 +9,6 @@ import (
 
 	"github.com/cenk/backoff"
 	"github.com/fatih/color"
-	consul "github.com/hashicorp/consul/api"
 
 	"github.com/InnovaCo/serve/manifest"
 	"github.com/InnovaCo/serve/utils"
@@ -22,7 +21,7 @@ func init() {
 type Release struct{}
 
 func (p Release) Run(data manifest.Manifest) error {
-	consulApi, err := ConsulClient(data.GetString("consul-host"))
+	consul, err := ConsulClient(data.GetString("consul-host"))
 	if err != nil {
 		return err
 	}
@@ -31,7 +30,7 @@ func (p Release) Run(data manifest.Manifest) error {
 
 	// check current service is alive and healthy
 	if err := backoff.Retry(func() error {
-		services, _, err := consulApi.Health().Service(fullName, "", true, nil)
+		services, _, err := consul.Health().Service(fullName, "", true, nil)
 		if err != nil {
 			log.Println(color.RedString("Error in check health in consul: %v", err))
 			return err
@@ -77,17 +76,14 @@ func (p Release) Run(data manifest.Manifest) error {
 	}
 
 	// write routes to consul kv
-	if _, err := consulApi.KV().Put(&consul.KVPair{
-		Key:   fmt.Sprintf("services/routes/%s", fullName),
-		Value: routesJson,
-	}, nil); err != nil {
+	if err := putConsulKv(consul, "services/routes/"+fullName, string(routesJson)); err != nil {
 		return err
 	}
 
 	log.Println(color.GreenString("Service `%s` released with routes: %s", fullName, string(routesJson)))
 
 	// find old services with the same routes
-	existsRoutes, _, err := consulApi.KV().List(fmt.Sprintf("services/routes/%s", data.GetString("name-prefix")), nil)
+	existsRoutes, _, err := consul.KV().List("services/routes/"+data.GetString("name-prefix"), nil)
 	if err != nil {
 		return err
 	}
@@ -105,12 +101,12 @@ func (p Release) Run(data manifest.Manifest) error {
 						outdated := strings.TrimPrefix(existsRoute.Key, "services/routes/")
 						log.Println(color.GreenString("Found %s with the same routes %v. Remove it!", outdated, string(existsRoute.Value)))
 
-						if _, err := consulApi.KV().Delete(existsRoute.Key, nil); err != nil {
+						if err := delConsulKv(consul, existsRoute.Key); err != nil {
 							return err
 						}
 
-						outdatedJson := fmt.Sprintf(`{"endOfLife":%d}`, time.Now().UnixNano() / int64(time.Millisecond))
-						if _, err := consulApi.KV().Put(&consul.KVPair{Key: "services/outdated/" + fullName, Value: []byte(outdatedJson)}, nil); err != nil {
+						outdatedJson := fmt.Sprintf(`{"endOfLife":%d}`, time.Now().UnixNano()/int64(time.Millisecond))
+						if err := putConsulKv(consul, "services/outdated/"+fullName, outdatedJson); err != nil {
 							return err
 						}
 
