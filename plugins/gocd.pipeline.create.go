@@ -107,7 +107,7 @@ func goCdCreate(name string, env string, resource string, body string, headers m
 		return errors.New("Operation error: " + resp.Status)
 	}
 
-	if resp, err := goCdRequest("POST", resource+"/pipelines/"+name+"/unpause", body, headers); err != nil {
+	if resp, err := goCdRequest("POST", resource+"/pipelines/"+name+"/unpause", body, map[string]string{"Confirm": "true"}); err != nil {
 		log.Println(err)
 		return err
 	} else if resp.StatusCode != http.StatusOK {
@@ -166,7 +166,7 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 		}
 	}
 
-	if resp, err := goCdRequest("POST", resource+"/pipelines/"+name+"/unpause", body, headers); err != nil {
+	if resp, err := goCdRequest("POST", resource+"/pipelines/"+name+"/unpause", body, map[string]string{"Confirm": "true"}); err != nil {
 		log.Println(err)
 		return err
 	} else if resp.StatusCode != http.StatusOK {

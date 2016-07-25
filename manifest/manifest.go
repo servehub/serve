@@ -50,7 +50,7 @@ func (m Manifest) GetInt(path string) int {
 	return i
 }
 
-func (m Manifest) GetBool(path string) int {
+func (m Manifest) GetBool(path string) bool {
 	if v, ok := m.tree.Path(path).Data().(bool); ok {
 		return v
 	} else {
