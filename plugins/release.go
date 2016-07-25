@@ -21,6 +21,11 @@ func init() {
 type Release struct{}
 
 func (p Release) Run(data manifest.Manifest) error {
+	if !data.Has("routes") {
+		log.Println("No routes configured for release.")
+		return nil
+	}
+
 	consul, err := ConsulClient(data.GetString("consul-host"))
 	if err != nil {
 		return err
