@@ -25,19 +25,18 @@ func NginxTemplateContextCommand() cli.Command {
 		Action: func(c *cli.Context) error {
 			consul, _ := api.NewClient(api.DefaultConfig())
 
-			upstreams := make(map[string][]map[string]interface{})
+			upstreams := make(map[string]map[string]map[string]interface{})
 			services := make(map[string]map[string][]map[string]string)
-			localServers := make(map[string]map[string]string)
+			staticServers := make(map[string]map[string]string)
 			duplicates := make(map[string]string)
 
-			allRoutes, _, err := consul.KV().List("services/routes/", nil)
+			allServicesRoutes, _, err := consul.KV().List("services/routes/", nil)
 			if err != nil {
 				return fmt.Errorf("Error on load routes: %s", err)
 			}
 
-			for _, kv := range allRoutes {
+			for _, kv := range allServicesRoutes {
 				name := strings.TrimPrefix(kv.Key, "services/routes/")
-				upstream := ""
 
 				instances, _, err := consul.Health().Service(name, "", true, nil)
 				if err != nil {
@@ -53,24 +52,9 @@ func NginxTemplateContextCommand() cli.Command {
 					return fmt.Errorf("Error on parse route json: %s. Serive `%s`, json: %s", err, name, string(kv.Value))
 				}
 
-				for _, inst := range instances {
-					if inst.Service.Port != 0 {
-						upstream = upstreamNameRegex.ReplaceAllString("serve_"+name, "_")
-
-						if _, ok := upstreams[upstream]; !ok {
-							upstreams[upstream] = make([]map[string]interface{}, 0)
-						}
-
-						address := inst.Node.Address
-						if inst.Service.Address != "" {
-							address = inst.Service.Address
-						}
-
-						upstreams[upstream] = append(upstreams[upstream], map[string]interface{}{
-							"address": address,
-							"port":    inst.Service.Port,
-						})
-					}
+				upstream := upstreamNameRegex.ReplaceAllString("serve_"+name, "_")
+				if instances[0].Service.Port == 0 {
+					upstream += "_static"
 				}
 
 				for _, route := range routes {
@@ -84,20 +68,27 @@ func NginxTemplateContextCommand() cli.Command {
 						location = "/"
 					}
 
-					routeUpstream := upstream
-					if ups, ok := route["upstream"]; ok && ups == "local" { // so far support only "local" custom upstream
-						routeUpstream = ""
-					}
-
 					parts := strings.Split(name, "/")
 					category := strings.Join(parts[0:len(parts)-1], "/")
 					packageName := parts[len(parts)-1]
 
-					if routeUpstream == "" {
-						localServers[name] = map[string]string{
+					routeUpstream := upstream
+					if ups, ok := route["upstream"]; ok && ups == "local" && !strings.HasSuffix(upstream, "_static") { // todo: replace to "static"
+						routeUpstream = upstream + "_static"
+					}
+
+					staticHost := ""
+					if strings.HasSuffix(routeUpstream, "_static") {
+						staticHost = upstreamNameRegex.ReplaceAllString(category, "-") + "." + upstreamNameRegex.ReplaceAllString(packageName, "-") + ".static"
+
+						staticServers[staticHost] = map[string]string{
 							"category": category,
 							"package":  packageName,
 						}
+					}
+
+					for _, inst := range instances {
+						putUpstream(routeUpstream, inst, upstreams)
 					}
 
 					delete(route, "host")
@@ -128,8 +119,7 @@ func NginxTemplateContextCommand() cli.Command {
 
 					services[host][location] = append(services[host][location], map[string]string{
 						"upstream":    routeUpstream,
-						"category":    category,
-						"package":     packageName,
+						"staticHost":  staticHost,
 						"routeKeys":   routeKeys,
 						"routeValues": routeValues,
 						"sortIndex":   strconv.Itoa(len(route)),
@@ -145,13 +135,34 @@ func NginxTemplateContextCommand() cli.Command {
 			}
 
 			out, _ := json.MarshalIndent(map[string]interface{}{
-				"upstreams":    upstreams,
-				"services":     services,
-				"localServers": localServers,
+				"upstreams":     upstreams,
+				"services":      services,
+				"staticServers": staticServers,
 			}, "", "  ")
 
 			fmt.Fprintln(os.Stdout, string(out))
 			return nil
 		},
+	}
+}
+
+func putUpstream(upstream string, inst *api.ServiceEntry, upstreams map[string]map[string]map[string]interface{}) {
+	port := inst.Service.Port
+	if port == 0 || strings.HasSuffix(upstream, "_static") {
+		port = 83
+	}
+
+	if _, ok := upstreams[upstream]; !ok {
+		upstreams[upstream] = make(map[string]map[string]interface{}, 0)
+	}
+
+	address := inst.Node.Address
+	if inst.Service.Address != "" {
+		address = inst.Service.Address
+	}
+
+	upstreams[upstream][fmt.Sprintf("%s:%d", address, port)] = map[string]interface{}{
+		"address": address,
+		"port":    port,
 	}
 }
