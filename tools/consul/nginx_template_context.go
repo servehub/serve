@@ -73,7 +73,7 @@ func NginxTemplateContextCommand() cli.Command {
 					packageName := parts[len(parts)-1]
 
 					routeUpstream := upstream
-					if ups, ok := route["upstream"]; ok && ups == "local" && !strings.HasSuffix(upstream, "_static") { // todo: replace to "static"
+					if ups, ok := route["upstream"]; ok && ups == "static" && !strings.HasSuffix(upstream, "_static") {
 						routeUpstream = upstream + "_static"
 					}
 
