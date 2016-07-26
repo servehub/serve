@@ -258,12 +258,7 @@ func goCdRequest(method string, resource string, body string, headers map[string
 
 	req.SetBasicAuth(creds.Login, creds.Password)
 
-	if len(body) < 512 {
-		log.Printf(" --> %s %s:\n%s\n%s\n\n", method, resource, req.Header, body)
-	} else {
-		log.Printf(" --> %s %s:\n%s\n%s\n\n", method, resource, req.Header, utils.Substr(body, 0, 512))
-	}
-
+	log.Printf(" --> %s %s:\n%s\n%s\n\n", method, resource, req.Header, utils.Substr(body, 0, 512))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
