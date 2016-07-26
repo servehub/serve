@@ -64,7 +64,8 @@ func (p Release) Run(data manifest.Manifest) error {
 	routes := make([]map[string]string, 0)
 	for _, route := range data.GetArray("routes") {
 		if !route.Has("host") {
-			return fmt.Errorf("'host' is required for routes! Given: %s", route.String())
+			log.Printf("Not found 'host': %s, skip...", route.String())
+			continue
 		}
 
 		fields := make(map[string]string)
@@ -73,6 +74,11 @@ func (p Release) Run(data manifest.Manifest) error {
 		}
 
 		routes = append(routes, utils.MergeMaps(fields, routeVars))
+	}
+
+	if len(routes) == 0 {
+		log.Println("No routes configured for release.")
+		return nil
 	}
 
 	routesJson, err := json.MarshalIndent(routes, "", "  ")
