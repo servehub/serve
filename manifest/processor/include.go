@@ -5,6 +5,7 @@ import (
 	"strings"
 	"log"
 
+	"github.com/fatih/color"
 	"github.com/InnovaCo/serve/utils/gabs"
 	"github.com/InnovaCo/serve/manifest/loader"
 	"github.com/InnovaCo/serve/utils/mergemap"
@@ -52,7 +53,7 @@ func includeFile(file string, tree *gabs.Container) error {
 		return err
 	}
 
-	log.Println("include: ", file)
+	log.Println(color.GreenString("include: %s", file))
 
 	merged, err := mergemap.Merge(loaded.Data().(map[string]interface{}), tree.Data().(map[string]interface{}))
 	if err != nil {
