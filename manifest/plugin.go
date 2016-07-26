@@ -6,7 +6,7 @@ type Plugin interface {
 	Run(data Manifest) error
 }
 
-type PluginPair struct {
+type PluginData struct {
 	PluginName string
 	Plugin Plugin
 	Data Manifest

@@ -88,9 +88,9 @@ func (m Manifest) GetTree(path string) Manifest {
 	return Manifest{m.tree.Path(path)}
 }
 
-func (m Manifest) FindPlugins(plugin string) ([]PluginPair, error) {
+func (m Manifest) FindPlugins(plugin string) ([]PluginData, error) {
 	tree := m.tree.Path(plugin)
-	result := make([]PluginPair, 0)
+	result := make([]PluginData, 0)
 
 	if _, ok := tree.Data().([]interface{}); ok {
 		arr, _ := tree.Children()
@@ -105,17 +105,13 @@ func (m Manifest) FindPlugins(plugin string) ([]PluginPair, error) {
 			}
 		}
 	} else {
-		if tree.Data() == nil {
-			tree = m.tree.Path("vars")
-		}
-
 		result = append(result, makePluginPair(plugin, tree))
 	}
 
 	return result, nil
 }
 
-func (m Manifest) GetPluginWithData(plugin string) PluginPair {
+func (m Manifest) GetPluginWithData(plugin string) PluginData {
 	return makePluginPair(plugin, m.tree)
 }
 
@@ -147,7 +143,7 @@ func LoadJSON(json string) *Manifest {
 	return &Manifest{tree: tree}
 }
 
-func makePluginPair(plugin string, data *gabs.Container) PluginPair {
+func makePluginPair(plugin string, data *gabs.Container) PluginData {
 	if s, ok := data.Data().(string); ok {
 		obj := gabs.New()
 		ns := strings.Split(plugin, ".")
@@ -155,5 +151,5 @@ func makePluginPair(plugin string, data *gabs.Container) PluginPair {
 		data = obj
 	}
 
-	return PluginPair{plugin, PluginRegestry.Get(plugin), Manifest{data}}
+	return PluginData{plugin, PluginRegestry.Get(plugin), Manifest{data}}
 }

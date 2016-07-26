@@ -27,11 +27,11 @@ func main() {
 	kingpin.Version(version)
 	kingpin.Parse()
 
-	var plugins []manifest.PluginPair
+	var plugins []manifest.PluginData
 	var err error
 
 	if *pluginData != "" {
-		plugins = []manifest.PluginPair{manifest.LoadJSON(*pluginData).GetPluginWithData(*plugin)}
+		plugins = []manifest.PluginData{manifest.LoadJSON(*pluginData).GetPluginWithData(*plugin)}
 	} else {
 		plugins, err = manifest.Load(*manifestFile, vars).FindPlugins(*plugin)
 	}

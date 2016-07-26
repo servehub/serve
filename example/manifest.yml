@@ -10,12 +10,15 @@ info:
 build:
   - sh: "mkdir -p target/pack && touch target/pack/index.txt"
   - sbt-pack: {}
-  - marathon: {}
   - sh: "echo 'Hello, World!'"
   - debian:
       daemon: "$APPLICATION_PATH/bin/start"
       daemon-args: "--port=$PORT1 --env=${ENV_NAME}"
       daemon-port: 9040
+
+upload:
+  - debian: {}
+  - marathon: {}
 
 test: &some_test
   hello: a {{ vars.hello }}
