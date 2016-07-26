@@ -11,6 +11,7 @@ import (
 
 	"github.com/InnovaCo/serve/manifest"
 	"github.com/InnovaCo/serve/utils/gabs"
+	"github.com/InnovaCo/serve/utils"
 )
 
 func init() {
@@ -257,13 +258,13 @@ func goCdRequest(method string, resource string, body string, headers map[string
 
 	req.SetBasicAuth(creds.Login, creds.Password)
 
-	log.Printf(" --> %s %s:\n%s\n%s\n", method, resource, req.Header, []byte(body)[:512])
+	log.Printf(" --> %s %s:\n%s\n%s\n\n", method, resource, req.Header, utils.Substr(body, 0, 512))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	} else {
-		log.Printf("<-- %s", resp.Status)
+		log.Printf("<-- %s\n", resp.Status)
 	}
 
 	return resp, nil

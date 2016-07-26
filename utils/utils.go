@@ -9,6 +9,15 @@ import (
 	"github.com/fatih/color"
 )
 
+func Substr(s string, pos, length int) string {
+	runes := []rune(s)
+	l := pos + length
+	if l > len(runes) {
+		l = len(runes)
+	}
+	return string(runes[pos:l])
+}
+
 func Contains(elm string, list []string) bool {
 	for _, v := range list {
 		if v == elm {
