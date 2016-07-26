@@ -62,24 +62,22 @@ func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 	}
 
 	resp, err := goCdRequest("GET", url+"/go/api/admin/pipelines/"+name, "",
-		                     map[string]string{"Accept": "application/vnd.go.cd.v2+json"})
+		map[string]string{"Accept": "application/vnd.go.cd.v2+json"})
 	if err != nil {
 		return err
 	}
 
 	if resp.StatusCode == http.StatusOK {
 		err = goCdUpdate(name, data.GetString("environment"), url, body,
-			             map[string]string{"If-Match": resp.Header.Get("ETag"), "Accept": "application/vnd.go.cd.v2+json"})
+			map[string]string{"If-Match": resp.Header.Get("ETag"), "Accept": "application/vnd.go.cd.v2+json"})
 	} else if resp.StatusCode == http.StatusNotFound {
 		err = goCdCreate(name, data.GetString("environment"), url, body,
-			             map[string]string{"Accept": "application/vnd.go.cd.v2+json"})
+			map[string]string{"Accept": "application/vnd.go.cd.v2+json"})
 	} else {
-		log.Println("Operation error: " + resp.Status)
 		return fmt.Errorf("Operation error: %s", resp.Status)
 	}
 
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 
@@ -94,22 +92,21 @@ func goCdCreate(name string, env string, resource string, body string, headers m
 	}
 	data, tag, err := goCdChangeEnv(resource, env, name, "")
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 
 	if resp, err := goCdRequest("PUT", resource+"/go/api/admin/environments/"+env, data,
-		                        map[string]string{"If-Match": tag, "Accept": "application/vnd.go.cd.v1+json"}); err != nil {
+		map[string]string{"If-Match": tag, "Accept": "application/vnd.go.cd.v1+json"}); err != nil {
 		return err
 	} else if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("Operation error: %s", resp.Status)
 	}
 
 	if resp, err := goCdRequest("POST", resource+"/go/api/pipelines/"+name+"/unpause", "",
-		                        map[string]string{"Confirm": "true"}); err != nil {
+		map[string]string{"Confirm": "true"}); err != nil {
 		return err
 	} else if resp.StatusCode != http.StatusOK {
-		return  fmt.Errorf("Operation error: %s", resp.Status)
+		return fmt.Errorf("Operation error: %s", resp.Status)
 	}
 
 	return nil
@@ -119,10 +116,8 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 	fmt.Println(env)
 
 	if resp, err := goCdRequest("PUT", resource+"/go/api/admin/pipelines/"+name, body, headers); err != nil {
-		log.Println(err)
 		return err
 	} else if resp.StatusCode != http.StatusOK {
-		log.Println("Operation error: " + resp.Status)
 		return fmt.Errorf("Operation error: %s", resp.Status)
 	}
 
@@ -134,7 +129,7 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 				return err
 			}
 			if resp, err := goCdRequest("PUT", resource+"/go/api/admin/environments/"+cEnv, data,
-				                        map[string]string{"If-Match": tag, "Accept": "application/vnd.go.cd.v1+json"}); err != nil {
+				map[string]string{"If-Match": tag, "Accept": "application/vnd.go.cd.v1+json"}); err != nil {
 				return err
 			} else if resp.StatusCode != http.StatusOK {
 				return fmt.Errorf("Operation error: %s", resp.Status)
@@ -147,7 +142,7 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 		}
 
 		if resp, err := goCdRequest("PUT", resource+"/go/api/admin/environments/"+env, data,
-			                        map[string]string{"If-Match": tag, "Accept": "application/vnd.go.cd.v1+json"}); err != nil {
+			map[string]string{"If-Match": tag, "Accept": "application/vnd.go.cd.v1+json"}); err != nil {
 			return err
 		} else if resp.StatusCode != http.StatusOK {
 			return fmt.Errorf("Operation error: %s", resp.Status)
@@ -156,9 +151,8 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 		return err
 	}
 
-
 	if resp, err := goCdRequest("POST", resource+"/go/api/pipelines/"+name+"/unpause", "",
-		                        map[string]string{"Confirm": "true"}); err != nil {
+		map[string]string{"Confirm": "true"}); err != nil {
 		return err
 	} else if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("Operation error: %s", resp.Status)
@@ -176,7 +170,7 @@ func goCdDelete(name string, env string, resource string, headers map[string]str
 	log.Println(data)
 
 	if resp, err := goCdRequest("PUT", resource+"/go/api/admin/environments/"+env, data,
-		                        map[string]string{"If-Match": tag, "Accept": "application/vnd.go.cd.v1+json"}); err != nil {
+		map[string]string{"If-Match": tag, "Accept": "application/vnd.go.cd.v1+json"}); err != nil {
 		return err
 	} else if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("Operation error: %s", resp.Status)
@@ -194,7 +188,7 @@ func goCdDelete(name string, env string, resource string, headers map[string]str
 func goCdChangeEnv(resource string, env string, addPipeline string, delPipeline string) (string, string, error) {
 	log.Printf("change environment: %s", env)
 	resp, err := goCdRequest("GET", resource+"/go/api/admin/environments/"+env, "",
-		                     map[string]string{"Accept": "application/vnd.go.cd.v1+json"})
+		map[string]string{"Accept": "application/vnd.go.cd.v1+json"})
 	if err != nil {
 		return "", "", err
 	} else if resp.StatusCode != http.StatusOK {
@@ -211,7 +205,7 @@ func goCdChangeEnv(resource string, env string, addPipeline string, delPipeline 
 
 func goCdFindEnv(resource string, pipeline string) (string, error) {
 	resp, err := goCdRequest("GET", resource+"/go/api/admin/environments", "",
-		                     map[string]string{"Accept": "application/vnd.go.cd.v1+json"})
+		map[string]string{"Accept": "application/vnd.go.cd.v1+json"})
 	if err != nil {
 		return "", err
 	} else if resp.StatusCode != http.StatusOK {
