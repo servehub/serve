@@ -21,5 +21,6 @@ func init() {
 type GoCdPipelineDelete struct{}
 
 func (p GoCdPipelineDelete) Run(data manifest.Manifest) error {
-	return goCdDelete(data.GetString("pipeline.name"), data.GetString("environment"), data.GetString("api-url"))
+	return goCdDelete(data.GetString("pipeline.name"), data.GetString("environment"), data.GetString("api-url"),
+		              map[string]string{"Accept": "application/vnd.go.cd.v2+json"})
 }
