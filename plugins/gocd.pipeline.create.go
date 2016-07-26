@@ -12,7 +12,6 @@ import (
 	"github.com/InnovaCo/serve/manifest"
 	"github.com/InnovaCo/serve/utils/gabs"
 	"github.com/InnovaCo/serve/utils"
-	"debug/elf"
 )
 
 func init() {
