@@ -43,12 +43,10 @@ type goCdPipelineCreate struct{}
 func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 	name := data.GetString("pipeline.pipeline.name")
 	url := data.GetString("api-url")
-	pipeline := data.GetTree("pipeline")
-
-	if pipeline.GetString("pipeline.template") == "" {
-		fmt.Println(pipeline.DelTree("pipeline.template"))
+	if data.GetString("pipeline.pipeline.template") == "" {
+		data.DelTree("pipeline.pipeline.template")
 	}
-	body := pipeline.String()
+	body := data.GetTree("pipeline").String()
 	branch := data.GetString("branch")
 
 	m := false
