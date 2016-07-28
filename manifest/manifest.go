@@ -111,6 +111,10 @@ func (m Manifest) FindPlugins(plugin string) ([]PluginData, error) {
 	return result, nil
 }
 
+func (m Manifest) DelTree(path string) error {
+	return m.tree.DeleteP(path)
+}
+
 func (m Manifest) GetPluginWithData(plugin string) PluginData {
 	return makePluginPair(plugin, m.tree)
 }
