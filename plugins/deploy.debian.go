@@ -37,14 +37,6 @@ func (p DeployDebian) Uninstall(data manifest.Manifest) error {
 	if err := runSshCmd(
 		data.GetString("cluster"),
 		data.GetString("ssh-user"),
-		"env",
-	); err != nil {
-		return err
-	}
-
-	if err := runSshCmd(
-		data.GetString("cluster"),
-		data.GetString("ssh-user"),
 		fmt.Sprintf("sudo apt-get purge %s -y", data.GetString("package")),
 	); err != nil {
 		return err
