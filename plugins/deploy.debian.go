@@ -25,7 +25,7 @@ func (p DeployDebian) Install(data manifest.Manifest) error {
 	if err := runSshCmd(
 		data.GetString("cluster"),
 		data.GetString("ssh-user"),
-		fmt.Sprintf("sudo %s/debian-way/deploy.sh --package=%s", data.GetString("ci-tools-path"), data.GetString("package")),
+		fmt.Sprintf("sudo %s/debian-way/deploy.sh --package='%s' --version='%s'", data.GetString("ci-tools-path"), data.GetString("package"), data.GetString("version")),
 	); err != nil {
 		return err
 	}
