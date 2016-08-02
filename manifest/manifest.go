@@ -11,6 +11,7 @@ import (
 
 	"github.com/InnovaCo/serve/manifest/loader"
 	"github.com/InnovaCo/serve/manifest/processor"
+	"regexp"
 )
 
 type Manifest struct {
@@ -117,6 +118,37 @@ func (m Manifest) DelTree(path string) error {
 
 func (m Manifest) GetPluginWithData(plugin string) PluginData {
 	return makePluginPair(plugin, m.tree)
+}
+
+func (m Manifest) ToEnvArray() []string {
+	result := []string{}
+	if children, err := m.tree.ChildrenMap(); err == nil {
+		for k, child := range children {
+			reg, _ := regexp.Compile("\\W")
+			c := Manifest{tree: child}.ToEnvArray()
+			for _, n := range c {
+				if string(n[0]) == "=" {
+					result = append(result, strings.ToUpper(string(reg.ReplaceAll([]byte(k), []byte("_"))))  + n)
+				} else {
+					result = append(result, strings.ToUpper(string(reg.ReplaceAll([]byte(k), []byte("_"))))  + "_" + n)
+				}
+			}
+		}
+	} else if children, err := m.tree.Children(); err == nil {
+		for i, child := range children {
+			c := Manifest{tree: child}.ToEnvArray()
+			for _, n := range c {
+				if string(n[0]) == "=" {
+					result = append(result, strconv.Itoa(i) + n)
+				} else {
+					result = append(result, strconv.Itoa(i) + "_" + n)
+				}
+			}
+		}
+	} else {
+		result = append(result, fmt.Sprintf("=%v", m.tree.Data()))
+	}
+	return result
 }
 
 func Load(path string, vars map[string]string) *Manifest {
