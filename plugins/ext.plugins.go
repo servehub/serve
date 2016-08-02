@@ -2,15 +2,13 @@ package plugins
 
 import (
     "path/filepath"
-	"log"
-	"os/exec"
-	"github.com/fatih/color"
 	"strings"
+
 	"github.com/InnovaCo/serve/manifest"
+	"github.com/InnovaCo/serve/utils"
 )
 
 func init() {
-	log.Println(color.GreenString("external plugins:"))
     if files, err := filepath.Glob("/etc/serve/plugins/*"); err == nil {
         for _, file := range files {
 			plugin := ExternalPlugin{Path: file}
@@ -29,14 +27,5 @@ func (p ExternalPlugin)GetName() string {
 }
 
 func (p ExternalPlugin) Run(data manifest.Manifest) error {
-	cmd := exec.Command(p.Path, "--plugin-data", strings.Replace(data.String(), "\n", "", -1))
-	cmd.Env = data.ToEnvArray()
-
-	log.Printf("--> %s: ARGS=%s, ENV=%s", p.Path, cmd.Args, cmd.Env)
-
-	out, err := cmd.Output();
-
-	log.Printf("<-- %s: %s", p.Path, string(out))
-
-	return err
+	return utils.RunCmdWithEnv("%s %s %s", data.ToEnvArray("SERVE_"), p.Path, "--plugin-data", strings.Replace(data.String(), "\n", "", -1))
 }

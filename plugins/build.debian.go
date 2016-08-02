@@ -2,7 +2,6 @@ package plugins
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/InnovaCo/serve/manifest"
 	"github.com/InnovaCo/serve/utils"
@@ -57,12 +56,9 @@ func (p BuildDebian) Run(data manifest.Manifest) error {
 	env["GO_PIPELINE_LABEL"] = data.GetString("build-number")
 	env["GO_STAGE_COUNTER"] = data.GetString("stage-counter")
 
-	for k, v := range env {
-		os.Setenv(k, v)
-	}
-
-	return utils.RunCmd(
+	return utils.RunCmdWithEnv(
 		"%s/go/debian-build.sh --distribution=%s",
+		env,
 		data.GetString("ci-tools-path"),
 		data.GetString("distribution"),
 	)
