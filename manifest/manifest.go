@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -11,6 +12,7 @@ import (
 
 	"github.com/InnovaCo/serve/manifest/loader"
 	"github.com/InnovaCo/serve/manifest/processor"
+	"github.com/InnovaCo/serve/utils"
 )
 
 type Manifest struct {
@@ -119,6 +121,24 @@ func (m Manifest) GetPluginWithData(plugin string) PluginData {
 	return makePluginPair(plugin, m.tree)
 }
 
+var envNameRegex = regexp.MustCompile("\\W")
+
+func (m Manifest) ToEnvMap(prefix string) map[string]string {
+	result := make(map[string]string)
+	if children, err := m.tree.ChildrenMap(); err == nil {
+		for k, child := range children {
+			result = utils.MergeMaps(result, Manifest{child}.ToEnvMap(prefix+strings.ToUpper(string(envNameRegex.ReplaceAllString(k, "_")))+"_"))
+		}
+	} else if children, err := m.tree.Children(); err == nil {
+		for i, child := range children {
+			result = utils.MergeMaps(result, Manifest{child}.ToEnvMap(prefix+strconv.Itoa(i)+"_"))
+		}
+	} else if m.tree.Data() != nil {
+		result[prefix[:len(prefix)-1]] = fmt.Sprintf("%v", m.tree.Data())
+	}
+	return result
+}
+
 func Load(path string, vars map[string]string) *Manifest {
 	tree, err := loader.LoadFile(path)
 	if err != nil {
@@ -135,7 +155,7 @@ func Load(path string, vars map[string]string) *Manifest {
 		}
 	}
 
-	return &Manifest{tree: tree}
+	return &Manifest{tree}
 }
 
 func LoadJSON(json string) *Manifest {
@@ -144,7 +164,7 @@ func LoadJSON(json string) *Manifest {
 		log.Fatalf("Error on parse json '%s': %v\n", json, err)
 	}
 
-	return &Manifest{tree: tree}
+	return &Manifest{tree}
 }
 
 func makePluginPair(plugin string, data *gabs.Container) PluginData {

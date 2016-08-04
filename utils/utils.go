@@ -48,12 +48,23 @@ func MergeMaps(maps ...map[string]string) map[string]string {
 }
 
 func RunCmd(cmdline string, a ...interface{}) error {
-	cmdline = fmt.Sprintf(cmdline, a...)
+	return RunCmdWithEnv(fmt.Sprintf(cmdline, a...), make(map[string]string, 0))
+}
 
+func RunCmdWithEnv(cmdline string, env map[string]string) error {
 	log.Println(color.YellowString("> %s", cmdline))
+
 	cmd := exec.Command("/bin/bash", "-c", cmdline)
+
+	cmd.Env = os.Environ()
+
+	for k, v := range env {
+		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%v", k, v))
+	}
+
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+
 	return cmd.Run()
 }
 

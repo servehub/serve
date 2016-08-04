@@ -53,3 +53,7 @@ result:
   << : *some_test
   surname: kulikov
   name: Misha
+
+
+echo:
+  name: kulikov
