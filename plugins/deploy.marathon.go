@@ -132,6 +132,12 @@ func putConsulKv(client *consul.Client, key string, value string) error {
 	return err
 }
 
+func listConsulKv(client *consul.Client, prefix string, q *consul.QueryOptions) (consul.KVPairs, error) {
+	log.Printf("consul list `%s`", prefix)
+	list, _, err := client.KV().List(prefix, q)
+	return list, err
+}
+
 func delConsulKv(client *consul.Client, key string) error {
 	log.Printf("consul delete `%s`", key)
 	_, err := client.KV().Delete(strings.TrimPrefix(key, "/"), nil)

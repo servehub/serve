@@ -94,7 +94,7 @@ func (p Release) Run(data manifest.Manifest) error {
 	log.Println(color.GreenString("Service `%s` released with routes: %s", fullName, string(routesJson)))
 
 	// find old services with the same routes
-	existsRoutes, _, err := consul.KV().List("services/routes/"+data.GetString("name-prefix"), nil)
+	existsRoutes, err := listConsulKv(consul, "services/routes/"+data.GetString("name-prefix"), nil)
 	if err != nil {
 		return err
 	}
