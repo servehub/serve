@@ -106,7 +106,8 @@ func (p Release) Run(data manifest.Manifest) error {
 				return err
 			}
 
-			OuterLoop: for _, route := range routes {
+		OuterLoop:
+			for _, route := range routes {
 				for _, oldRoute := range oldRoutes {
 					if utils.MapsEqual(route, oldRoute) {
 						outdated := strings.TrimPrefix(existsRoute.Key, "services/routes/")
@@ -117,7 +118,7 @@ func (p Release) Run(data manifest.Manifest) error {
 						}
 
 						outdatedJson := fmt.Sprintf(`{"endOfLife":%d}`, time.Now().UnixNano()/int64(time.Millisecond))
-						if err := putConsulKv(consul, "services/outdated/"+fullName, outdatedJson); err != nil {
+						if err := putConsulKv(consul, "services/outdated/"+outdated, outdatedJson); err != nil {
 							return err
 						}
 
