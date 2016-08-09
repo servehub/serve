@@ -68,7 +68,7 @@ func (m Manifest) GetMap(path string) map[string]Manifest {
 	}
 
 	for k, v := range mmap {
-		out[k] = Manifest{tree: v}
+		out[k] = Manifest{v}
 	}
 	return out
 }
@@ -81,13 +81,13 @@ func (m Manifest) GetArray(path string) []Manifest {
 	}
 
 	for _, v := range arr {
-		out = append(out, Manifest{tree: v})
+		out = append(out, Manifest{v})
 	}
 	return out
 }
 
 func (m Manifest) GetTree(path string) Manifest {
-	return Manifest{tree: m.tree.Path(path)}
+	return Manifest{m.tree.Path(path)}
 }
 
 func (m Manifest) FindPlugins(plugin string) ([]PluginData, error) {
