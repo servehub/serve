@@ -22,7 +22,7 @@ func (p Outdated) Run(data manifest.Manifest) error {
 
 	fullName := data.GetString("full-name")
 
-	if existsRoutes, _, err := consul.KV().List("services/routes/"+data.GetString("name-prefix"), nil); err == nil {
+	if existsRoutes, err := listConsulKv(consul, "services/routes/"+data.GetString("name-prefix"), nil); err == nil {
 		for _, existsRoute := range existsRoutes {
 			if err := delConsulKv(consul, existsRoute.Key); err != nil {
 				return err
