@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/cenk/backoff"
 	"github.com/fatih/color"
@@ -112,7 +113,6 @@ func (p DeployMarathon) Uninstall(data manifest.Manifest) error {
 	return deletePluginData("deploy.marathon", data.GetString("app-name"), data.GetString("consul-host"))
 }
 
-
 func MarathonClient(marathonHost string) (marathon.Marathon, error) {
 	conf := marathon.NewDefaultConfig()
 	conf.URL = fmt.Sprintf("http://%s:8080", marathonHost)
@@ -150,7 +150,7 @@ func registerPluginData(plugin string, packageName string, data string, consulHo
 		return err
 	}
 
-	return putConsulKv(consulApi, "services/data/" + packageName + "/" + plugin, data)
+	return putConsulKv(consulApi, "services/data/"+packageName+"/"+plugin, data)
 }
 
 func deletePluginData(plugin string, packageName string, consulHost string) error {
@@ -160,5 +160,11 @@ func deletePluginData(plugin string, packageName string, consulHost string) erro
 		return err
 	}
 
-	return delConsulKv(consulApi, "services/data/" + packageName + "/" + plugin)
+	return delConsulKv(consulApi, "services/data/"+packageName+"/"+plugin)
+}
+
+func markAsOutdated(client *consul.Client, name string, delay time.Duration) error {
+	log.Printf("Mark service `%s` as outdated\n", name)
+	json := fmt.Sprintf(`{"endOfLife":%d}`, time.Now().Add(delay).UnixNano()/int64(time.Millisecond))
+	return putConsulKv(client, "services/outdated/"+name, json)
 }

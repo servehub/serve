@@ -117,8 +117,7 @@ func (p Release) Run(data manifest.Manifest) error {
 							return err
 						}
 
-						outdatedJson := fmt.Sprintf(`{"endOfLife":%d}`, time.Now().UnixNano()/int64(time.Millisecond))
-						if err := putConsulKv(consul, "services/outdated/"+outdated, outdatedJson); err != nil {
+						if err := markAsOutdated(consul, outdated, 10*time.Minute); err != nil {
 							return err
 						}
 
