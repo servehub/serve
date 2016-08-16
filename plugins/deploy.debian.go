@@ -30,7 +30,7 @@ func (p DeployDebian) Install(data manifest.Manifest) error {
 		return err
 	}
 
-	return registerPluginData("deploy.debian", data.GetString("package"), data.String(), data.GetString("consul-host"))
+	return registerPluginData("deploy.debian", data.GetString("app-name"), data.String(), data.GetString("consul-host"))
 }
 
 func (p DeployDebian) Uninstall(data manifest.Manifest) error {
