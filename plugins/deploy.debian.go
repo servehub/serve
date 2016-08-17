@@ -42,7 +42,7 @@ func (p DeployDebian) Uninstall(data manifest.Manifest) error {
 		return err
 	}
 
-	return deletePluginData("deploy.debian", data.GetString("package"), data.GetString("consul-host"))
+	return deletePluginData("deploy.debian", data.GetString("app-name"), data.GetString("consul-host"))
 }
 
 func runSshCmd(cluster, sshUser, cmd string) error {
