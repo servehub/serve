@@ -24,7 +24,7 @@ func (p DBClone) Clone(data manifest.Manifest) error {
 	err := runSshCmd(
 		data.GetString("server"),
 		data.GetString("ssh-user"),
-		fmt.Sprintf("sudo -u postgres createdb -O postgres %s && pg_dump %s | psql %s", data.GetString("to"), data.GetString("from"), data.GetString("to")),
+		fmt.Sprintf("sudo -EHu postgres createdb -O postgres %s && pg_dump %s | psql %s", data.GetString("to"), data.GetString("from"), data.GetString("to")),
 	)
 	if err != nil {
 		// ToDo analize db exist
@@ -37,6 +37,6 @@ func (p DBClone) Drop(data manifest.Manifest) error {
 	return runSshCmd(
 		data.GetString("server"),
 		data.GetString("ssh-user"),
-		fmt.Sprintf("sudo -u postgres dropdb %s", data.GetString("to")),
+		fmt.Sprintf("sudo -EHu postgres dropdb %s", data.GetString("to")),
 	)
 }
