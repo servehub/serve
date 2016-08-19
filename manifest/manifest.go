@@ -8,11 +8,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/InnovaCo/serve/utils/gabs"
+	"github.com/fatih/color"
 
 	"github.com/InnovaCo/serve/manifest/loader"
 	"github.com/InnovaCo/serve/manifest/processor"
 	"github.com/InnovaCo/serve/utils"
+	"github.com/InnovaCo/serve/utils/gabs"
 )
 
 type Manifest struct {
@@ -94,6 +95,10 @@ func (m Manifest) FindPlugins(plugin string) ([]PluginData, error) {
 	tree := m.tree.Path(plugin)
 	result := make([]PluginData, 0)
 
+	if tree.Data() == nil {
+		return nil, fmt.Errorf("Plugin `%s` not found in manifest!", plugin)
+	}
+
 	if _, ok := tree.Data().([]interface{}); ok {
 		arr, _ := tree.Children()
 		for _, item := range arr {
@@ -106,8 +111,10 @@ func (m Manifest) FindPlugins(plugin string) ([]PluginData, error) {
 				}
 			}
 		}
-	} else {
+	} else if PluginRegestry.Has(plugin) {
 		result = append(result, makePluginPair(plugin, tree))
+	} else {
+		log.Println(color.YellowString("Plugins for `%s` section not specified, skip...", plugin))
 	}
 
 	return result, nil

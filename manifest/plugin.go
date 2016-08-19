@@ -41,3 +41,8 @@ func (r *pluginRegestry) Get(name string) Plugin {
 	}
 	return p
 }
+
+func (r *pluginRegestry) Has(name string) bool {
+	_, ok := r.plugins[name]
+	return ok
+}

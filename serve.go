@@ -37,7 +37,7 @@ func main() {
 	}
 
 	if err != nil {
-		log.Fatalf("Error find plugins for '%s': %v", *plugin, err)
+		log.Fatalln(color.RedString("Error find plugins for '%s': %v", *plugin, err))
 	}
 
 	for _, pair := range plugins {
