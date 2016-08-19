@@ -35,8 +35,7 @@ func (p DBCreatePostgresql) Create(data manifest.Manifest) error {
 			"WHERE d.datname='%s' ORDER BY 1;\" | grep %s | awk '{print $3}'` %s && pg_dump %s | psql %s", s, s, t, s, t)
 
 	} else {
-		t := data.GetString("target")
-		cmd = fmt.Sprintf("sudo -EHu postgres createdb -O %s %s", data.GetStringOr("db-user", "postgres"), t)
+		cmd = fmt.Sprintf("sudo -EHu postgres createdb -O %s %s", data.GetStringOr("db-user", "postgres"), data.GetString("target"))
 	}
 
 	err := runSshCmd(data.GetString("host"), data.GetString("ssh-user"), cmd)
