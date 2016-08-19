@@ -15,12 +15,12 @@ import (
 )
 
 func init() {
-	manifest.PluginRegestry.Add("release", Release{})
+	manifest.PluginRegestry.Add("release.http", ReleaseHttp{})
 }
 
-type Release struct{}
+type ReleaseHttp struct{}
 
-func (p Release) Run(data manifest.Manifest) error {
+func (p ReleaseHttp) Run(data manifest.Manifest) error {
 	if !data.Has("routes") {
 		log.Println("No routes configured for release.")
 		return nil

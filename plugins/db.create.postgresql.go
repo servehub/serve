@@ -1,8 +1,9 @@
 package plugins
 
 import (
-	"github.com/InnovaCo/serve/manifest"
 	"fmt"
+
+	"github.com/InnovaCo/serve/manifest"
 )
 
 func init() {
@@ -12,16 +13,11 @@ func init() {
 type DBCreatePostgresql struct{}
 
 func (p DBCreatePostgresql) Run(data manifest.Manifest) error {
-	if !data.Has("host") {
-		return nil
-	}
-
 	if data.GetBool("purge") {
 		return p.Drop(data)
 	} else {
 		return p.Create(data)
 	}
-
 }
 
 func (p DBCreatePostgresql) Create(data manifest.Manifest) error {
