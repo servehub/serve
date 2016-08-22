@@ -34,11 +34,11 @@ func (p DBCreatePostgresql) Create(data manifest.Manifest) error {
 		cmd = fmt.Sprintf("sudo -EHu postgres createdb -O %s \"%s\"", data.GetStringOr("db-user", "postgres"), data.GetString("target"))
 	}
 
-	return runSshCmdSingle(data.GetString("host"), data.GetString("ssh-user"), cmd)
+	return runSshCmd(data.GetString("host"), data.GetString("ssh-user"), cmd)
 }
 
 func (p DBCreatePostgresql) Drop(data manifest.Manifest) error {
-	return runSshCmdSingle(
+	return runSshCmd(
 		data.GetString("host"),
 		data.GetString("ssh-user"),
 		fmt.Sprintf("sudo -EHu postgres dropdb \"%s\"", data.GetString("target")),
