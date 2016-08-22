@@ -47,7 +47,7 @@ func (p DeployDebian) Uninstall(data manifest.Manifest) error {
 
 func runSshCmd(cluster, sshUser, cmd string) error {
 	return utils.RunCmd(
-		`dig +short %s | sort | uniq | parallel --line-buffer -j 1 ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null %s@{} "%s"`,
+		`dig +short %s | sort | uniq | parallel --tag --line-buffer -j 1 ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null %s@{} "%s"`,
 		cluster,
 		sshUser,
 		cmd,
