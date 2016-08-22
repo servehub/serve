@@ -49,6 +49,11 @@ func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 	body := data.GetTree("pipeline").String()
 	branch := data.GetString("branch")
 
+	if data.GetBool("purge") {
+		return goCdDelete(name, data.GetString("environment"), url,
+			              map[string]string{"Accept": "application/vnd.go.cd.v2+json"})
+	}
+
 	m := false
 	for _, b := range data.GetArray("allowed-branches") {
 		re := b.Unwrap().(string)
