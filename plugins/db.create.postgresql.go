@@ -34,12 +34,7 @@ func (p DBCreatePostgresql) Create(data manifest.Manifest) error {
 		cmd = fmt.Sprintf("sudo -EHu postgres createdb -O %s %s", data.GetStringOr("db-user", "postgres"), data.GetString("target"))
 	}
 
-	err := runSshCmd(data.GetString("host"), data.GetString("ssh-user"), cmd)
-	if err != nil {
-		// ToDo analize db exist
-		return err
-	}
-	return nil
+	return runSshCmd(data.GetString("host"), data.GetString("ssh-user"), cmd)
 }
 
 func (p DBCreatePostgresql) Drop(data manifest.Manifest) error {
