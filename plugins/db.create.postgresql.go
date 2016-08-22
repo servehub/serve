@@ -28,19 +28,19 @@ func (p DBCreatePostgresql) Create(data manifest.Manifest) error {
 		t := data.GetString("target")
 		cmd = fmt.Sprintf("sudo -EHu postgres createdb -O "+
 			"`psql postgres -c \"SELECT d.datname, pg_catalog.pg_get_userbyid(d.datdba) FROM pg_catalog.pg_database d "+
-			"WHERE d.datname='%s' ORDER BY 1;\" | grep %s | awk '{print $3}'` %s && pg_dump %s | psql %s", s, s, t, s, t)
+			"WHERE d.datname='%s' ORDER BY 1;\" | grep %s | awk '{print $3}'` \"%s\" && pg_dump \"%s\" | psql \"%s\"", s, s, t, s, t)
 
 	} else {
-		cmd = fmt.Sprintf("sudo -EHu postgres createdb -O %s %s", data.GetStringOr("db-user", "postgres"), data.GetString("target"))
+		cmd = fmt.Sprintf("sudo -EHu postgres createdb -O %s \"%s\"", data.GetStringOr("db-user", "postgres"), data.GetString("target"))
 	}
 
-	return runSshCmd(data.GetString("host"), data.GetString("ssh-user"), cmd)
+	return runSshCmdSingle(data.GetString("host"), data.GetString("ssh-user"), cmd)
 }
 
 func (p DBCreatePostgresql) Drop(data manifest.Manifest) error {
-	return runSshCmd(
+	return runSshCmdSingle(
 		data.GetString("host"),
 		data.GetString("ssh-user"),
-		fmt.Sprintf("sudo -EHu postgres dropdb %s", data.GetString("target")),
+		fmt.Sprintf("sudo -EHu postgres dropdb \"%s\"", data.GetString("target")),
 	)
 }
