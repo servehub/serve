@@ -53,12 +53,3 @@ func runSshCmd(cluster, sshUser, cmd string) error {
 		cmd,
 	)
 }
-
-func runSshCmdSingle(cluster, sshUser, cmd string) error {
-	return utils.RunCmd(
-		`ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no %s@{} "%s"`,
-		cluster,
-		sshUser,
-		cmd,
-	)
-}
