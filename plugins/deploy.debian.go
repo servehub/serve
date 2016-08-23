@@ -22,10 +22,11 @@ func (p DeployDebian) Run(data manifest.Manifest) error {
 }
 
 func (p DeployDebian) Install(data manifest.Manifest) error {
-	if err := runSshCmd(
+	if err := runParallelSshCmd(
 		data.GetString("cluster"),
 		data.GetString("ssh-user"),
 		fmt.Sprintf("sudo %s/debian-way/deploy.sh --package='%s' --version='%s'", data.GetString("ci-tools-path"), data.GetString("package"), data.GetString("version")),
+		data.GetIntOr("parallel", 1),
 	); err != nil {
 		return err
 	}
@@ -46,9 +47,14 @@ func (p DeployDebian) Uninstall(data manifest.Manifest) error {
 }
 
 func runSshCmd(cluster, sshUser, cmd string) error {
+	return runParallelSshCmd(cluster, sshUser, cmd, 1)
+}
+
+func runParallelSshCmd(cluster, sshUser, cmd string, maxProcs int) error {
 	return utils.RunCmd(
-		`dig +short %s | sort | uniq | parallel --tag --line-buffer -j 1 ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null %s@{} "%s"`,
+		`dig +short %s | sort | uniq | parallel --tag --line-buffer -j %d ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null %s@{} "%s"`,
 		cluster,
+		maxProcs,
 		sshUser,
 		cmd,
 	)

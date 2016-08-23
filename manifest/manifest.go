@@ -53,6 +53,14 @@ func (m Manifest) GetInt(path string) int {
 	return i
 }
 
+func (m Manifest) GetIntOr(path string, defaultVal int) int {
+	if m.tree.ExistsP(path) {
+		return m.GetInt(path)
+	} else {
+		return defaultVal
+	}
+}
+
 func (m Manifest) GetBool(path string) bool {
 	if v, ok := m.tree.Path(path).Data().(bool); ok {
 		return v
