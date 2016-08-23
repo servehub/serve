@@ -27,7 +27,7 @@ func (p DBCreatePostgresql) Create(data manifest.Manifest) error {
 		s := data.GetString("source")
 		t := data.GetString("target")
 		cmd = fmt.Sprintf("sudo -Hu postgres createdb -O "+
-			"`psql postgres -c \"SELECT d.datname, pg_catalog.pg_get_userbyid(d.datdba) FROM pg_catalog.pg_database d "+
+			"`sudo -Hu postgres psql postgres -c \"SELECT d.datname, pg_catalog.pg_get_userbyid(d.datdba) FROM pg_catalog.pg_database d "+
 			"WHERE d.datname='%s' ORDER BY 1;\" | grep %s | awk '{print $3}'` \"%s\" && pg_dump \"%s\" | psql \"%s\"", s, s, t, s, t)
 
 	} else {
