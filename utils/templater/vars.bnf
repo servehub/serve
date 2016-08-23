@@ -1,0 +1,7 @@
+!whitespace : ’\t’ | ’\n’ | ’\r’ | ’ ’ ;
+_name : ’A’-’Z’ | ’a’-’z’ | ’0’-’9’ | ’.’
+_args : _name {’,’ _name}
+_func_name : _name
+_modify : _func_name | _func_name(_args)
+_var : _name{’|’, _modify}
+
