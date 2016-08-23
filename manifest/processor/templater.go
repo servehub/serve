@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/InnovaCo/serve/utils/gabs"
+	"github.com/InnovaCo/serve/utils/templater"
 )
 
 type Templater struct{}
@@ -13,7 +14,7 @@ func (t Templater) Process(tree *gabs.Container) error {
 		return ProcessAll(tree, func (ktype string, output *gabs.Container, value interface{}, key interface{}) error {
 			switch ktype {
 			case "map":
-				newKey, err := template(key.(string), tree)
+				newKey, err := templater.Template(key.(string), tree)
 				if err != nil {
 					return err
 				}
@@ -35,7 +36,7 @@ func (t Templater) Process(tree *gabs.Container) error {
 				case nil:
 					output.Set(value)
 				default:
-					newValue, err := template(fmt.Sprintf("%v", value), tree)
+					newValue, err := templater.Template(fmt.Sprintf("%v", value), tree)
 					if err != nil {
 						return err
 					}
