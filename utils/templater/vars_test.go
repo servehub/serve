@@ -2,39 +2,36 @@ package templater
 
 import (
 	"testing"
-	"github.com/InnovaCo/serve/utils/templater/lexer"
-	"github.com/InnovaCo/serve/utils/templater/token"
 	"fmt"
+	"log"
+	"github.com/fatih/color"
+
+	"github.com/InnovaCo/serve/utils/gabs"
 )
 
 func TestParser(t *testing.T) {
-	var testData = map[string]bool{
-		//"var1": true,
-		//"var1 | var2": true,
-		//"func(var2)": true,
-		"func()": true,
-		"var1 | f(var2,var3)": true,
-		//"\"var1\" | f(\"var2\",\"var3\")": true,
-		"\"v.var1\" | f(\"v.var2\",\"var3\")": true,
+	var testData = map[string]string{
+		"var2": "var2",
+		"v.var1": "v.var1",
+		"var2 | same": "var2",
+		"var1 | replace(-,_,-1)": "a_b1",
+		"var1 | same": "a-b1",
+		"var1 | same | replace(\"-\",\"_\",1)": "a_b1",
+		"var1 | p(\"_\",1)": "a_b1",
 	}
 
+	tree, _ := gabs.ParseJSON([]byte("{\"var1\": \"a-b1\", \"r\": 1}"))
+	log.Printf(tree.String())
 
-	for input, _ := range testData {
-		fmt.Println(input)
-
-		l := lexer.NewLexer([]byte(input))
-		for tok := l.Scan(); (tok.Type == token.TokMap.Type("var")) ||
-			                 (tok.Type == token.TokMap.Type("func")); tok = l.Scan() {
-			switch {
-			case  tok.Type == token.TokMap.Type("func"):
-				fmt.Println(string(tok.Lit))
-				fl := lexer.NewLexer([]byte(tok.Lit))
-				for ftok := fl.Scan(); (ftok.Type == token.TokMap.Type("var")); ftok = fl.Scan() {
-					fmt.Println(string(ftok.Lit))
-				}
-			default:
-				//fmt.Println(tok.Type)
-				fmt.Println(string(tok.Lit))
+	for input, output := range testData {
+		if result, err := modify_exec(input, tree); err != nil {
+			fmt.Printf("error: %v\n", err)
+		} else {
+			if output != result {
+				color.Red("%v != %v: Error\n", output, result)
+				t.Fail()
+			} else {
+				color.Green("%v: OK\n", result)
 			}
 		}
 	}

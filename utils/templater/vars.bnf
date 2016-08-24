@@ -1,6 +1,6 @@
 !whitespace : '\t' | '\n' | '\r' | ' ' | '|' | ',';
-_atext : 'A'-'Z' | 'a'-'z' | '0'-'9' | '"';
-_name : _atext {_atext} | _atext {'.' _atext};
+_atext : 'A'-'Z' | 'a'-'z' | '0'-'9' | '"' | '-' | '_' | '*';
+_name : _atext {_atext} | _atext {_atext} {'.' _atext {_atext}};
 _func_name : _atext {_atext} ;
 _args : _name | _name {',' _name};
 func : _func_name '(' { _args } ')' | _func_name '(' _args ')';
