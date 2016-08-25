@@ -106,11 +106,17 @@ func (p DeployMarathon) Uninstall(data manifest.Manifest) error {
 		return err
 	}
 
-	if _, err := marathonApi.DeleteApplication(data.GetString("app-name"), false); err != nil {
-		return err
+	name := data.GetString("app-name")
+
+	if _, err := marathonApi.Application(name); err == nil {
+		if _, err := marathonApi.DeleteApplication(name, false); err != nil {
+			return err
+		}
+	} else {
+		log.Println(color.YellowString("App `%s` doesnt exists in marathon!", name))
 	}
 
-	return deletePluginData("deploy.marathon", data.GetString("app-name"), data.GetString("consul-host"))
+	return deletePluginData("deploy.marathon", name, data.GetString("consul-host"))
 }
 
 func MarathonClient(marathonHost string) (marathon.Marathon, error) {
