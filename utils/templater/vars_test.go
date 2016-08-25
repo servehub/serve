@@ -3,6 +3,7 @@ package templater
 import (
 	"testing"
 	"fmt"
+	"github.com/InnovaCo/serve/utils/gabs"
 )
 
 func TestParser(t *testing.T) {
@@ -16,12 +17,15 @@ func TestParser(t *testing.T) {
 		"var.var": "var.var",
 		"var--v |  replace('\\W','_')": "var__v",
 		"var--v | replace('\\W',  '*')": "var**v",
+		"vars2 | replace('\\W',  '*')": "value*unknown",
 	}
 
+	json := `{"vars": "value-unknown", "vars1": "{{ vars }}", "vars2": "{{ vars1 }}"}`
 
+	tree, _ := gabs.ParseJSON([]byte(json))
 
 	for input, output := range testData {
-		m := Modify{}
+		m := Modify{tree}
 		if res, err := m.Exec(fmt.Sprintf("%v",input)); err == nil {
 			if output == res {
 				fmt.Printf("result %v == %v\n", output, res)

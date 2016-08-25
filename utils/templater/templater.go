@@ -16,6 +16,9 @@ var bytesBufferPool = sync.Pool{New: func() interface{} {
 }}
 
 func Template(s string, context *gabs.Container) (string, error) {
+
+	fmt.Println("--> ", s)
+
 	t, err := fasttemplate.NewTemplate(s, "{{", "}}")
 	if err != nil {
 		return "", err
@@ -27,8 +30,8 @@ func Template(s string, context *gabs.Container) (string, error) {
 		tag = strings.TrimSpace(tag)
 		if value := context.Path(tag).Data(); value != nil {
 			return w.Write([]byte(fmt.Sprintf("%v", value)))
-		} else if v, err := ModifyExec(tag, context); err == nil {
-			return w.Write([]byte(fmt.Sprintf("%v", v)))
+		//} else if v, err := ModifyExec(tag, context); err == nil {
+		//	return w.Write([]byte(fmt.Sprintf("%v", v)))
 		}else if strings.HasPrefix(tag, "vars.") || context.ExistsP(tag) {
 			return 0, nil
 		} else {

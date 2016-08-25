@@ -101,43 +101,51 @@ func (this Modify) ParseFunc(s []byte) (string, []interface{}, error) {
 	return funcName, funcArgs, nil
 }
 
-func (this Modify) Resolve(v interface{}, times int) string {
-	//fmt.Printf("resolve: %v (times %v)\n", v, times)
+func (this Modify) Resolve(v string, times int) string {
+	fmt.Printf("--> resolve: %v (times %v)\n", v, times)
 	if this.context == nil {
+		fmt.Printf("<-- resolve: %v\n", v)
 		return fmt.Sprintf("%v", v)
 	}
-	switch v.(type)  {
-		case string:
-			//fmt.Printf("resolve: %v (times %v)\n", v.(string), times)
-			if value := this.context.Path(v.(string)).Data(); value != nil {
-				v = value
-			}
-			t, err := fasttemplate.NewTemplate(v.(string), "{{", "}}")
-			if err != nil || (times < 0) {
-				return v.(string)
-			}
 
-			w := bytesBufferPool.Get().(*bytes.Buffer)
+	if value := this.context.Path(v).Data(); value != nil {
+		switch value.(type) {
+			case string:
+				v = value.(string)
+			default:
+				return fmt.Sprintf("%v", value)
+		}
+	} else {
+		fmt.Printf("<-- resolve: %v\n", v)
+		return v
+	}
 
-			if _, err := t.ExecuteFunc(w, func(w io.Writer, tag string) (int, error) {
+	for i:=0; i < times; i++ {
+		if !(strings.Contains(v, "{{") && strings.Contains(v, "}}")){
+			break
+		}
+
+		t, err := fasttemplate.NewTemplate(v, "{{", "}}")
+		if err != nil || (times < 0) {
+			fmt.Printf("<-- resolve: %v\n", v)
+			return v
+		}
+		w := bytesBufferPool.Get().(*bytes.Buffer)
+		if _, err := t.ExecuteFunc(w, func(w io.Writer, tag string) (int, error) {
 				tag = strings.TrimSpace(tag)
 				if value := this.context.Path(tag).Data(); value != nil {
-					return w.Write([]byte(this.Resolve(value, times-1)))
+					return w.Write([]byte(fmt.Sprintf("%v", value)))
 				}
 				return w.Write([]byte(fmt.Sprintf("%v", tag)))
 			}); err != nil {
-				return v.(string)
-			}
-
-			out := string(w.Bytes())
-			w.Reset()
-			bytesBufferPool.Put(w)
-
-			return out
-		default:
-			return fmt.Sprintf("%v", v)
+				fmt.Printf("<-- resolve: %v\n", v)
+				return v
+		}
+		v = string(w.Bytes())
+		fmt.Printf("<--> resolve: %v (%v)\n", v, i)
 	}
-	return fmt.Sprintf("%v", v)
+	fmt.Printf("<-- resolve: %v\n", v)
+	return v
 }
 
 func (this Modify) Exec(s string) (interface{}, error) {
@@ -151,7 +159,7 @@ func (this Modify) Exec(s string) (interface{}, error) {
 		//fmt.Printf("-->exp %v\n", string(tok.Lit))
 		switch {
 			case tok.Type == token.TokMap.Type("var"):
-				res = this.Convert(this.Resolve(string(tok.Lit), 3))
+				res = this.Convert(this.Resolve(string(tok.Lit), 10))
 			case tok.Type == token.TokMap.Type("func"):
 				//fmt.Printf("--> func %v\n", string(tok.Lit))
 				if funcName, funcArgs, err := this.ParseFunc(tok.Lit); err == nil {
