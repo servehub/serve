@@ -15,14 +15,14 @@ func TestParser(t *testing.T) {
 		"var-var": "var-var",
 		"var.var": "var.var",
 		"var--v |  replace('\\W','_')": "var__v",
-		"var--v | replace('\\W','*')": "var**v",
+		"var--v | replace('\\W',  '*')": "var**v",
 	}
 
 
 
 	for input, output := range testData {
 		m := Modify{}
-		if res, err := m.Exec(fmt.Sprintf("%v",input), nil); err == nil {
+		if res, err := m.Exec(fmt.Sprintf("%v",input)); err == nil {
 			if output == res {
 				fmt.Printf("result %v == %v\n", output, res)
 			} else {
