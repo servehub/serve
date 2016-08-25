@@ -1,7 +1,31 @@
-!whitespace : '\t' | '\n' | '\r' | ' ' | '|' | ',';
-_atext : 'A'-'Z' | 'a'-'z' | '0'-'9' | '"';
-_name : _atext {_atext} | _atext {'.' _atext};
-_func_name : _atext {_atext} ;
-_args : _name | _name {',' _name};
-func : _func_name '(' { _args } ')' | _func_name '(' _args ')';
-var : _name ;
+_digit : '0'-'9';
+_bool : 't' 'r' 'u' 'e' | 'f' 'a' 'l' 's' 'e';
+_sep : '-' | '_';
+_spec : '*' | '|' | '#' | '\\' | '@' | ',' | '(' | ')' | '/' | '.';
+_quote : '\'' | '"';
+_char : 'A'-'Z' | 'a'-'z';
+_any : _char | _digit | _sep | _spec ;
+
+_var : {' '} {_any} |
+       {' '} '"' {_any} '"' |
+       {' '} '"' {_any} _var '"' |
+       {' '} '\'' {_any} _var '\'' |
+       {' '} '\'' {_any} '\'' |
+       {' '} _digit {_digit} |
+       {' '} _bool;
+
+_arg : {','} {' '} '"' {_any} '"' |
+       {','} {' '} '"' {_any} _arg '"' |
+       {','} {' '} '\'' {_any} _arg '\'' |
+       {','} {' '} '\'' {_any} '\'' |
+       {','} {' '} _digit {_digit} |
+       {','} {' '} _bool;
+
+_func_name : _char | _func_name {_char} | _func_name {_digit};
+
+_func : { ' ' } '|' { ' ' } _func_name{ ' ' } |
+        _func '('  {_arg {',' _arg}} ')';
+
+arg : _arg;
+func : _func;
+var : _var;
