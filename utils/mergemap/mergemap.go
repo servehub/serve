@@ -3,6 +3,7 @@ package mergemap
 import (
 	"errors"
 	"reflect"
+	"strings"
 )
 
 var (
@@ -19,6 +20,7 @@ func merge(dst, src map[string]interface{}, depth int) (map[string]interface{}, 
 	if depth > MaxDepth {
 		return nil, errors.New("mergemap: maps too deeply nested")
 	}
+
 	for key, srcVal := range src {
 		if dstVal, ok := dst[key]; ok {
 			srcMap, srcMapOk := mapify(srcVal)
@@ -55,6 +57,9 @@ func merge(dst, src map[string]interface{}, depth int) (map[string]interface{}, 
 				}
 			}
 		}
+
+		cleanupMatchingKeys(dst, key)
+
 		dst[key] = srcVal
 	}
 	return dst, nil
@@ -70,4 +75,18 @@ func mapify(i interface{}) (map[string]interface{}, bool) {
 		return m, true
 	}
 	return map[string]interface{}{}, false
+}
+
+func cleanupMatchingKeys(dest map[string]interface{}, key string) {
+	cleanKey := strings.TrimSpace(strings.SplitN(key, "?", 2)[0])
+
+	if cleanKey != key {
+		delete(dest, cleanKey)
+	}
+
+	for k := range dest {
+		if strings.HasPrefix(k, cleanKey+" ") || strings.HasPrefix(k, cleanKey+"?") {
+			delete(dest, k)
+		}
+	}
 }
