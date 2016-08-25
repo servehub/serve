@@ -62,11 +62,7 @@ func (m Manifest) GetIntOr(path string, defaultVal int) int {
 }
 
 func (m Manifest) GetBool(path string) bool {
-	if v, ok := m.tree.Path(path).Data().(bool); ok {
-		return v
-	} else {
-		return false
-	}
+	return strings.ToLower(m.GetString(path)) == "true"
 }
 
 func (m Manifest) GetMap(path string) map[string]Manifest {
