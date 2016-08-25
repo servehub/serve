@@ -7,35 +7,45 @@ import (
 	"log"
 	"strconv"
 	"fmt"
-
-	"github.com/InnovaCo/serve/utils/gabs"
+	"regexp"
+	"bytes"
+	"io"
 
 	"github.com/InnovaCo/serve/utils/templater/lexer"
 	"github.com/InnovaCo/serve/utils/templater/token"
+	"github.com/InnovaCo/serve/utils/gabs"
+	"github.com/valyala/fasttemplate"
 )
 
-
-type Modify struct {
-}
-
-var modify_funcs = map[string]interface{}{
-	"replace": strings.Replace,
+var ModifyFuncs = map[string]interface{}{
+	"replace": replace,
 	"same": same,
+	"reverse": reverse,
 }
 
+func replace(old, r, new string) string {
+	return regexp.MustCompile(r).ReplaceAllString(old, new)
+}
 
 func same(s string) string {
 	return s
 }
 
-func (p Modify) Call(name string, params ... interface{}) (reflect.Value, error) {
-	log.Printf("--> call: %s %v\n", name, params)
+func reverse(s bool) bool {
+	return !s
+}
 
-	if _, ok := modify_funcs[name]; !ok {
+type Modify struct {
+}
+
+func (this Modify) Call(name string, params ... interface{}) (reflect.Value, error) {
+	log.Printf("modify call: func=%s args=%v\n", name, params)
+
+	if _, ok := ModifyFuncs[name]; !ok {
 		return reflect.Value{}, fmt.Errorf("function %v not register", name)
 	}
 
-    f := reflect.ValueOf(modify_funcs[name])
+    f := reflect.ValueOf(ModifyFuncs[name])
     if len(params) != f.Type().NumIn() {
 		return reflect.Value{}, errors.New("The number of params is not adapted.")
     }
@@ -46,115 +56,125 @@ func (p Modify) Call(name string, params ... interface{}) (reflect.Value, error)
 	return f.Call(in)[0], nil
 }
 
-func (p Modify) convert(val string) interface{} {
+func (this Modify) Convert(val string) interface{} {
 	if i, err := strconv.Atoi(val); err == nil {
-		//log.Printf("%v is int", val)
 		return i
 	} else if f, err := strconv.ParseFloat(val, 64); err == nil {
-		//log.Printf("%v is float", f)
 		return f
 	} else  if b, err := strconv.ParseBool(val); err == nil {
-		//log.Printf("%v is bool", val)
 		return b
 	}
 	//log.Printf("%v is str", val)
 	b := []byte(val)
-	if b[0] == []byte("\"")[0] && b[len(b) - 1] == []byte("\"")[0] {
+	if (b[0] == []byte("\"")[0] && b[len(b) - 1] == []byte("\"")[0]) ||
+		(b[0] == []byte("'")[0] && b[len(b) - 1] == []byte("'")[0])	{
 		return string(b[1:len(val)-1])
 	}
 	return fmt.Sprintf("%v", val)
 }
 
-
-func (p Modify) ParseFunc(s []byte, context *gabs.Container) (string, []interface{}, error) {
-	f := strings.Split(string(s), "(")
-	func_name := f[0]
-	fl := lexer.NewLexer([]byte(f[1])[:len(f[1])-1])
-	func_args := []interface{}{nil}
-
-	//log.Printf("func %s, args %v\n", func_name, string([]byte(f[1])[:len(f[1])-1]))
-
-	for ftok := fl.Scan(); ftok.Type == token.TokMap.Type("var"); ftok = fl.Scan() {
-		//log.Printf("%v\n", string(ftok.Lit))
-
-		if (context != nil) && context.ExistsP(string(ftok.Lit)) {
-			//log.Printf("substitution")
-			func_args = append(func_args, p.convert(context.Path(string(ftok.Lit)).String()))
-		} else {
-			func_args = append(func_args, ftok.Lit)
-		}
-		val := string(func_args[len(func_args)-1].([]byte))
-		//fmt.Println(val)
-
-		func_args[len(func_args)-1] = p.convert(val)
-
-		//log.Printf("%v\n", func_args)
-	}
-	return func_name, func_args, nil
+func (this Modify) ClearFunc(s []byte) []string {
+	return strings.Split(strings.TrimSpace(string([]byte(strings.TrimSpace(string(s)))[1:])), "(")
 }
 
-func (p Modify) Exec(s string, context *gabs.Container) (interface{}, error) {
+func (this Modify) ClearArg(s []byte) string {
+	a := []byte(strings.TrimSpace(string(s)))
+	if a[0] == []byte(",")[0] {
+		return string(a[1:])
+	}
+	return string(a)
+}
+
+func (this Modify) ParseFunc(s []byte) (string, []interface{}, error) {
+	f := this.ClearFunc(s)
+	funcName := f[0]
+	funcArgs := []interface{}{nil}
+	if len(f) == 1 {
+		return funcName, funcArgs, nil
+	}
+	fl := lexer.NewLexer([]byte(f[1]))
+	for ftok := fl.Scan(); ftok.Type == token.TokMap.Type("arg"); ftok = fl.Scan() {
+		//fmt.Printf("args %v\n", string(ftok.Lit))
+		funcArgs = append(funcArgs, this.Convert(this.ClearArg(ftok.Lit)))
+	}
+	return funcName, funcArgs, nil
+}
+
+func (this Modify) Resolve(v interface{}, context *gabs.Container, times int) string {
+	fmt.Printf("resolve: %v (times %v)\n", v, times)
+	switch v.(type)  {
+		case string:
+			//fmt.Printf("resolve: %v (times %v)\n", v.(string), times)
+			if value := context.Path(v.(string)).Data(); value != nil {
+				v = value
+			}
+			t, err := fasttemplate.NewTemplate(v.(string), "{{", "}}")
+			if err != nil || (times < 0) {
+				return v.(string)
+			}
+
+			w := bytesBufferPool.Get().(*bytes.Buffer)
+
+			if _, err := t.ExecuteFunc(w, func(w io.Writer, tag string) (int, error) {
+				tag = strings.TrimSpace(tag)
+				if value := context.Path(tag).Data(); value != nil {
+					return w.Write([]byte(this.Resolve(value, context, times-1)))
+				}
+				return w.Write([]byte(fmt.Sprintf("%v", tag)))
+			}); err != nil {
+				return v.(string)
+			}
+
+			out := string(w.Bytes())
+			w.Reset()
+			bytesBufferPool.Put(w)
+
+			return out
+		default:
+			return fmt.Sprintf("%v", v)
+	}
+	return fmt.Sprintf("%v", v)
+}
+
+func (this Modify) Exec(s string, context *gabs.Container) (interface{}, error) {
+	//fmt.Printf("input --> %v\n", s)
 	l := lexer.NewLexer([]byte(s))
-	v := []interface{}{nil}
-	init := false
+	var res interface{}
+	res = nil
 
 	for tok := l.Scan(); (tok.Type == token.TokMap.Type("var")) ||
 						 (tok.Type == token.TokMap.Type("func")); tok = l.Scan() {
-		//log.Printf("--> %v\n", v)
-
+		//fmt.Printf("-->exp %v\n", string(tok.Lit))
 		switch {
-		case  tok.Type == token.TokMap.Type("func"):
-			//log.Printf("func %v\n", string(tok.Lit))
-
-			if func_name, func_args, err := p.ParseFunc(tok.Lit, context); err == nil {
-				func_args[0] = v[0]
-				//log.Printf("%v\n", func_args)
-
-				if fv, err := p.Call(func_name, func_args...); err != nil {
-					return nil, fmt.Errorf("execution error %s: %v", func_name, err)
+			case tok.Type == token.TokMap.Type("var"):
+				res = this.Convert(this.Resolve(string(tok.Lit), context, 3))
+			case tok.Type == token.TokMap.Type("func"):
+				//fmt.Printf("--> func %v\n", string(tok.Lit))
+				if funcName, funcArgs, err := this.ParseFunc(tok.Lit); err == nil {
+					funcArgs[0] = res
+					//fmt.Printf("call %v: %v\n", funcName, funcArgs)
+					if fv, err := this.Call(funcName, funcArgs...); err != nil {
+						return nil, fmt.Errorf("execution error %s: %v", funcName, err)
+					} else {
+						//log.Printf("<-- %s %v\n", funcName, fv)
+						res = this.Convert(fv.String())
+					}
 				} else {
-					//log.Printf("<-- %s %v\n", func_name, fv)
-					v[0] = p.convert(fv.String())
+					return nil, fmt.Errorf("error parse %s: %v", tok.Lit, err )
 				}
-			} else {
-				return nil, fmt.Errorf("error parse %s: %v", tok.Lit, err )
-			}
-
-		case  tok.Type == token.TokMap.Type("var"):
-			if init {
-				//log.Printf("func %v\n", string(tok.Lit))
-
-				func_name := string(tok.Lit)
-				func_args := []interface{}{v[0]}
-				if fv, err := p.Call(func_name, func_args...); err != nil {
-					return nil, fmt.Errorf("error executin %s: %v", func_name, err)
-				} else {
-					//log.Printf("<-- %s %v\n", func_name, fv)
-					v[0] = p.convert(fv.String())
-				}
-			} else {
-				//log.Printf("var %v\n", string(tok.Lit))
-
-				if (context != nil) && context.ExistsP(string(tok.Lit)) {
-					//log.Printf("substitution")
-					v = []interface{}{p.convert(context.Path(string(tok.Lit)).String())}
-				} else {
-					v = []interface{}{string(tok.Lit)}
-				}
-				init = true
-			}
-		default:
-			fmt.Println(string(tok.Lit))
+			default:
+				return nil, fmt.Errorf("unknown token %v\n", string(tok.Lit))
 		}
 	}
-	return v[0], nil
+	return res, nil
 }
 
-func modify_exec(s string, context *gabs.Container) (interface{}, error) {
-	m := Modify{}
-	if result, err := m.Exec(s, context); err != nil {
-		return nil, err
-	} else {
-		return result, err
+func ModifyExec(s interface{}, context *gabs.Container) (interface{}, error) {
+	switch s.(type) {
+		case string:
+			if strings.Contains(s.(string), "{{") && strings.Contains(s.(string), "}}") {
+				return nil, fmt.Errorf("find symbols '{{' and '}}' in %v", s)
+			}
 	}
+	return Modify{}.Exec(fmt.Sprintf("%v",s), context)
 }

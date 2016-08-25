@@ -5,3 +5,4 @@ serve
 .idea/
 gocd_credentials
 /vendor/
+/*.yml

@@ -3,36 +3,34 @@ package templater
 import (
 	"testing"
 	"fmt"
-	"log"
-	"github.com/fatih/color"
-
-	"github.com/InnovaCo/serve/utils/gabs"
 )
 
 func TestParser(t *testing.T) {
-	var testData = map[string]string{
-		"var2": "var2",
-		"v.var1": "v.var1",
-		"var2 | same": "var2",
-		"var1 | replace(-,_,-1)": "a_b1",
-		"var1 | same": "a-b1",
-		"var1 | same | replace(\"-\",\"_\",1)": "a_b1",
-		"var1 | p(\"_\",1)": "a_b1",
+	var testData = map[interface{}]interface{}{
+		//"true ": "true",
+		//"1 ": "1",
+		//"true |reverse": "false",
+		"var": "var",
+		"var1": "var1",
+		"var-var": "var-var",
+		"var.var": "var.var",
+		"var--v |  replace('\\W','_')": "var__v",
+		"var--v | replace('\\W','*')": "var**v",
 	}
 
-	tree, _ := gabs.ParseJSON([]byte("{\"var1\": \"a-b1\", \"r\": 1}"))
-	log.Printf(tree.String())
+
 
 	for input, output := range testData {
-		if result, err := modify_exec(input, tree); err != nil {
-			fmt.Printf("error: %v\n", err)
-		} else {
-			if output != result {
-				color.Red("%v != %v: Error\n", output, result)
-				t.Fail()
+		m := Modify{}
+		if res, err := m.Exec(fmt.Sprintf("%v",input), nil); err == nil {
+			if output == res {
+				fmt.Printf("result %v == %v\n", output, res)
 			} else {
-				color.Green("%v: OK\n", result)
+				fmt.Printf("result %v != %v\n", output, res)
+				t.Fail()
 			}
+		} else {
+			fmt.Printf("error %v\n", err)
 		}
 	}
 }
