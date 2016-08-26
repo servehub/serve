@@ -16,9 +16,23 @@ var bytesBufferPool = sync.Pool{New: func() interface{} {
 }}
 
 func Template(s string, context *gabs.Container) (string, error) {
+	var result = s
+	var err error = nil
 
-	fmt.Println("--> ", s)
+	for i := 0; i < 42; i++ {
+		if result, err = _template(result, context); err != nil {
+			return "", err
+		}
 
+		if !(strings.Contains(result, "{{") && strings.Contains(result, "}}")) {
+			break
+		}
+	}
+
+	return result, nil
+}
+
+func _template(s string, context *gabs.Container) (string, error) {
 	t, err := fasttemplate.NewTemplate(s, "{{", "}}")
 	if err != nil {
 		return "", err
@@ -32,7 +46,7 @@ func Template(s string, context *gabs.Container) (string, error) {
 			return w.Write([]byte(fmt.Sprintf("%v", value)))
 		//} else if v, err := ModifyExec(tag, context); err == nil {
 		//	return w.Write([]byte(fmt.Sprintf("%v", v)))
-		}else if strings.HasPrefix(tag, "vars.") || context.ExistsP(tag) {
+		} else if strings.HasPrefix(tag, "vars.") || context.ExistsP(tag) {
 			return 0, nil
 		} else {
 			return 0, fmt.Errorf("Undefined template variable: '%s'", tag)

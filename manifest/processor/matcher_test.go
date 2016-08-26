@@ -122,5 +122,23 @@ func TestMatcher(t *testing.T) {
 			`,
 			expect: `{"deploy":{},"vars":{"env":"live"}}`,
 		},
+
+		"cycling refs": {
+			in: `
+				{
+					"vars": {
+						"env": "{{ vars.branch }}",
+						"branch": ""
+					},
+					"deploy": {
+						"host ? {{ vars.env }}": {
+							"*": "other-host.com",
+							"": "empty-host.com"
+						}
+					}
+				}
+			`,
+			expect: `{"deploy":{"host":"empty-host.com"},"vars":{"branch":"","env":"{{ vars.branch }}"}}`,
+		},
 	})
 }
