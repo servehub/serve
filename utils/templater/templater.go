@@ -23,12 +23,10 @@ func Template(s string, context *gabs.Container) (string, error) {
 		if result, err = _template(result, context); err != nil {
 			return "", err
 		}
-
 		if !(strings.Contains(result, "{{") && strings.Contains(result, "}}")) {
 			break
 		}
 	}
-
 	return result, nil
 }
 
@@ -44,10 +42,10 @@ func _template(s string, context *gabs.Container) (string, error) {
 		tag = strings.TrimSpace(tag)
 		if value := context.Path(tag).Data(); value != nil {
 			return w.Write([]byte(fmt.Sprintf("%v", value)))
-		//} else if v, err := ModifyExec(tag, context); err == nil {
-		//	return w.Write([]byte(fmt.Sprintf("%v", v)))
 		} else if strings.HasPrefix(tag, "vars.") || context.ExistsP(tag) {
 			return 0, nil
+		} else if v, err := ModifyExec(tag, context); err == nil {
+			return w.Write([]byte(fmt.Sprintf("%v", v)))
 		} else {
 			return 0, fmt.Errorf("Undefined template variable: '%s'", tag)
 		}

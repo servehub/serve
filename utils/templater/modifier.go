@@ -39,6 +39,14 @@ type Modify struct {
 	context *gabs.Container
 }
 
+func (this Modify) SetFunc(name string, function interface{}) error {
+	if _, ok := ModifyFuncs[name]; ok {
+		return fmt.Errorf("function %s exist", name)
+	}
+	ModifyFuncs[name] = function
+	return nil
+}
+
 func (this Modify) Call(name string, params ... interface{}) (reflect.Value, error) {
 	log.Printf("modify call: func=%s args=%v\n", name, params)
 
@@ -57,7 +65,7 @@ func (this Modify) Call(name string, params ... interface{}) (reflect.Value, err
 	return f.Call(in)[0], nil
 }
 
-func (this Modify) Convert(val string) interface{} {
+func (this Modify) convert(val string) interface{} {
 	if i, err := strconv.Atoi(val); err == nil {
 		return i
 	} else if f, err := strconv.ParseFloat(val, 64); err == nil {
@@ -65,7 +73,6 @@ func (this Modify) Convert(val string) interface{} {
 	} else  if b, err := strconv.ParseBool(val); err == nil {
 		return b
 	}
-	//log.Printf("%v is str", val)
 	b := []byte(val)
 	if (b[0] == []byte("\"")[0] && b[len(b) - 1] == []byte("\"")[0]) ||
 		(b[0] == []byte("'")[0] && b[len(b) - 1] == []byte("'")[0])	{
@@ -74,11 +81,11 @@ func (this Modify) Convert(val string) interface{} {
 	return fmt.Sprintf("%v", val)
 }
 
-func (this Modify) ClearFunc(s []byte) []string {
+func (this Modify) clearFunc(s []byte) []string {
 	return strings.Split(strings.TrimSpace(string([]byte(strings.TrimSpace(string(s)))[1:])), "(")
 }
 
-func (this Modify) ClearArg(s []byte) string {
+func (this Modify) clearArg(s []byte) string {
 	a := []byte(strings.TrimSpace(string(s)))
 	if a[0] == []byte(",")[0] {
 		return strings.TrimSpace(string(a[1:]))
@@ -86,8 +93,8 @@ func (this Modify) ClearArg(s []byte) string {
 	return string(a)
 }
 
-func (this Modify) ParseFunc(s []byte) (string, []interface{}, error) {
-	f := this.ClearFunc(s)
+func (this Modify) parseFunc(s []byte) (string, []interface{}, error) {
+	f := this.clearFunc(s)
 	funcName := f[0]
 	funcArgs := []interface{}{nil}
 	if len(f) == 1 {
@@ -95,28 +102,25 @@ func (this Modify) ParseFunc(s []byte) (string, []interface{}, error) {
 	}
 	fl := lexer.NewLexer([]byte(f[1]))
 	for ftok := fl.Scan(); ftok.Type == token.TokMap.Type("arg"); ftok = fl.Scan() {
-		//fmt.Printf("args %v\n", string(ftok.Lit))
-		funcArgs = append(funcArgs, this.Convert(this.ClearArg(ftok.Lit)))
+		funcArgs = append(funcArgs, this.convert(this.clearArg(ftok.Lit)))
 	}
 	return funcName, funcArgs, nil
 }
 
-func (this Modify) Resolve(v string, times int) string {
-	fmt.Printf("--> resolve: %v (times %v)\n", v, times)
+func (this Modify) resolve(v string, times int) string {
+	//fmt.Printf("--> resolve: %v (times %v)\n", v, times)
 	if this.context == nil {
-		fmt.Printf("<-- resolve: %v\n", v)
-		return fmt.Sprintf("%v", v)
+		//fmt.Printf("<-- resolve: %v\n", v)
+		return v
 	}
 
 	if value := this.context.Path(v).Data(); value != nil {
-		switch value.(type) {
-			case string:
-				v = value.(string)
-			default:
-				return fmt.Sprintf("%v", value)
-		}
+		//fmt.Printf("find: %v\n", value)
+		v = fmt.Sprintf("%v", value)
 	} else {
-		fmt.Printf("<-- resolve: %v\n", v)
+		//fmt.Println("not find")
+		//fmt.Println(this.context.String())
+		//fmt.Printf("<-- resolve: %v\n", v)
 		return v
 	}
 
@@ -126,8 +130,8 @@ func (this Modify) Resolve(v string, times int) string {
 		}
 
 		t, err := fasttemplate.NewTemplate(v, "{{", "}}")
-		if err != nil || (times < 0) {
-			fmt.Printf("<-- resolve: %v\n", v)
+		if err != nil {
+			//fmt.Printf("<-- resolve: %v\n", v)
 			return v
 		}
 		w := bytesBufferPool.Get().(*bytes.Buffer)
@@ -138,38 +142,33 @@ func (this Modify) Resolve(v string, times int) string {
 				}
 				return w.Write([]byte(fmt.Sprintf("%v", tag)))
 			}); err != nil {
-				fmt.Printf("<-- resolve: %v\n", v)
+				//fmt.Printf("<-- resolve: %v\n", v)
 				return v
 		}
 		v = string(w.Bytes())
-		fmt.Printf("<--> resolve: %v (%v)\n", v, i)
+		//fmt.Printf("<--> resolve: %v (%v)\n", v, i)
 	}
-	fmt.Printf("<-- resolve: %v\n", v)
+	//fmt.Printf("<-- resolve: %v\n", v)
 	return v
 }
 
 func (this Modify) Exec(s string) (interface{}, error) {
-	//fmt.Printf("input --> %v\n", s)
 	l := lexer.NewLexer([]byte(s))
 	var res interface{}
 	res = nil
 
 	for tok := l.Scan(); (tok.Type == token.TokMap.Type("var")) ||
 						 (tok.Type == token.TokMap.Type("func")); tok = l.Scan() {
-		//fmt.Printf("-->exp %v\n", string(tok.Lit))
 		switch {
 			case tok.Type == token.TokMap.Type("var"):
-				res = this.Convert(this.Resolve(string(tok.Lit), 10))
+				res = this.convert(this.resolve(string(tok.Lit), 10))
 			case tok.Type == token.TokMap.Type("func"):
-				//fmt.Printf("--> func %v\n", string(tok.Lit))
-				if funcName, funcArgs, err := this.ParseFunc(tok.Lit); err == nil {
+				if funcName, funcArgs, err := this.parseFunc(tok.Lit); err == nil {
 					funcArgs[0] = res
-					//fmt.Printf("call %v: %v\n", funcName, funcArgs)
 					if fv, err := this.Call(funcName, funcArgs...); err != nil {
 						return nil, fmt.Errorf("execution error %s: %v", funcName, err)
 					} else {
-						//log.Printf("<-- %s %v\n", funcName, fv)
-						res = this.Convert(fv.String())
+						res = this.convert(fv.String())
 					}
 				} else {
 					return nil, fmt.Errorf("error parse %s: %v", tok.Lit, err )
@@ -187,6 +186,7 @@ func ModifyExec(s interface{}, context *gabs.Container) (interface{}, error) {
 			if strings.Contains(s.(string), "{{") && strings.Contains(s.(string), "}}") {
 				return nil, fmt.Errorf("find symbols '{{' and '}}' in %v", s)
 			}
+			return Modify{context}.Exec(fmt.Sprintf("%v",s))
 	}
-	return Modify{context}.Exec(fmt.Sprintf("%v",s))
+	return s, nil
 }
