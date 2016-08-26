@@ -44,8 +44,8 @@ func _template(s string, context *gabs.Container) (string, error) {
 			return w.Write([]byte(fmt.Sprintf("%v", value)))
 		} else if strings.HasPrefix(tag, "vars.") || context.ExistsP(tag) {
 			return 0, nil
-		} else if v, err := ModifyExec(tag, context); err == nil {
-			return w.Write([]byte(fmt.Sprintf("%v", v)))
+		//} else if v, err := ModifyExec(tag, context); err == nil {
+		//	return w.Write([]byte(fmt.Sprintf("%v", v)))
 		} else {
 			return 0, fmt.Errorf("Undefined template variable: '%s'", tag)
 		}
