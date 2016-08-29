@@ -5,7 +5,7 @@ default: test
 
 test:
 	echo "==> Running tests..."
-	go test -v `go list ./... | grep -v /vendor/`
+	go test -cover -v `go list ./... | grep -v /vendor/`
 
 build:
 	echo "==> Build binaries..."

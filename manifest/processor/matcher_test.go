@@ -140,5 +140,27 @@ func TestMatcher(t *testing.T) {
 			`,
 			expect: `{"deploy":{"host":"empty-host.com"},"vars":{"branch":"","env":"{{ vars.branch }}"}}`,
 		},
+
+		"cycling match": {
+			in: `
+				{
+					"deploy": {
+						"host ? {{ vars.feature }}": {
+							"*": "other-host.com",
+							"": "empty-host.com"
+						}
+					},
+					"vars": {
+						"env": "{{ vars.branch }}",
+						"branch": "",
+						"feature ? {{ vars.env }}": {
+							"*": "feature",
+							"": "not feature"
+						}
+					}
+				}
+			`,
+			expect: `{"deploy":{"host":"other-host.com"},"vars":{"branch":"","env":"{{ vars.branch }}","feature":"not feature"}}`,
+		},
 	})
 }

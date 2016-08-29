@@ -8,13 +8,10 @@ import (
 	"strconv"
 	"fmt"
 	"regexp"
-	"bytes"
-	"io"
 
 	"github.com/InnovaCo/serve/utils/templater/lexer"
 	"github.com/InnovaCo/serve/utils/templater/token"
 	"github.com/InnovaCo/serve/utils/gabs"
-	"github.com/valyala/fasttemplate"
 )
 
 var ModifyFuncs = map[string]interface{}{
@@ -107,49 +104,27 @@ func (this Modify) parseFunc(s []byte) (string, []interface{}, error) {
 	return funcName, funcArgs, nil
 }
 
-func (this Modify) resolve(v string, times int) string {
-	//fmt.Printf("--> resolve: %v (times %v)\n", v, times)
+func (this Modify) resolve(v string) (string, error) {
+	//fmt.Printf("--> resolve: %v\n", v)
 	if this.context == nil {
 		//fmt.Printf("<-- resolve: %v\n", v)
-		return v
+		return v, nil
 	}
-
 	if value := this.context.Path(v).Data(); value != nil {
 		//fmt.Printf("find: %v\n", value)
 		v = fmt.Sprintf("%v", value)
 	} else {
-		//fmt.Println("not find")
 		//fmt.Println(this.context.String())
 		//fmt.Printf("<-- resolve: %v\n", v)
-		return v
+		return v, nil
 	}
-
-	for i:=0; i < times; i++ {
-		if !(strings.Contains(v, "{{") && strings.Contains(v, "}}")){
-			break
-		}
-
-		t, err := fasttemplate.NewTemplate(v, "{{", "}}")
-		if err != nil {
-			//fmt.Printf("<-- resolve: %v\n", v)
-			return v
-		}
-		w := bytesBufferPool.Get().(*bytes.Buffer)
-		if _, err := t.ExecuteFunc(w, func(w io.Writer, tag string) (int, error) {
-				tag = strings.TrimSpace(tag)
-				if value := this.context.Path(tag).Data(); value != nil {
-					return w.Write([]byte(fmt.Sprintf("%v", value)))
-				}
-				return w.Write([]byte(fmt.Sprintf("%v", tag)))
-			}); err != nil {
-				//fmt.Printf("<-- resolve: %v\n", v)
-				return v
-		}
-		v = string(w.Bytes())
-		//fmt.Printf("<--> resolve: %v (%v)\n", v, i)
+	if s, err := Template(v, this.context); err != nil {
+		//fmt.Println("<-- fuck", v)
+		return v, nil
+	} else {
+		//fmt.Println("<--", v)
+		return s, nil
 	}
-	//fmt.Printf("<-- resolve: %v\n", v)
-	return v
 }
 
 func (this Modify) Exec(s string) (interface{}, error) {
@@ -161,8 +136,14 @@ func (this Modify) Exec(s string) (interface{}, error) {
 						 (tok.Type == token.TokMap.Type("func")); tok = l.Scan() {
 		switch {
 			case tok.Type == token.TokMap.Type("var"):
-				res = this.convert(this.resolve(string(tok.Lit), 10))
+				//fmt.Printf("var token: %v\n", string(tok.Lit))
+				if val, err := this.resolve(string(tok.Lit)); err != nil {
+					return nil, err
+				} else {
+					res = this.convert(val)
+				}
 			case tok.Type == token.TokMap.Type("func"):
+				//fmt.Printf("func token: %v\n", string(tok.Lit))
 				if funcName, funcArgs, err := this.parseFunc(tok.Lit); err == nil {
 					funcArgs[0] = res
 					if fv, err := this.Call(funcName, funcArgs...); err != nil {
