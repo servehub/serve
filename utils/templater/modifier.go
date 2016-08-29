@@ -133,8 +133,7 @@ func (this Modify) Exec(s string) (interface{}, error) {
 	res = nil
 
 	for tok := l.Scan(); (tok.Type == token.TokMap.Type("var")) ||
-						 (tok.Type == token.TokMap.Type("func")) ||
-	                     (tok.Type == token.TokMap.Type("match")); tok = l.Scan() {
+						 (tok.Type == token.TokMap.Type("func")); tok = l.Scan() {
 		switch {
 			case tok.Type == token.TokMap.Type("var"):
 				//fmt.Printf("var token: %v\n", string(tok.Lit))
@@ -155,9 +154,6 @@ func (this Modify) Exec(s string) (interface{}, error) {
 				} else {
 					return nil, fmt.Errorf("error parse %s: %v", tok.Lit, err )
 				}
-			case tok.Type == token.TokMap.Type("match"):
-				//fmt.Printf("match token: %v\n", string(tok.Lit))
-				return s, nil
 			default:
 				return nil, fmt.Errorf("unknown token %v\n", string(tok.Lit))
 		}
