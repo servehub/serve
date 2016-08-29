@@ -14,7 +14,7 @@ func (m Matcher) Process(tree *gabs.Container) error {
 	return Repeat(5, func() error {
 		return ProcessAll(tree, func(ktype string, output *gabs.Container, value interface{}, key interface{}) error {
 			if ktype == "map" {
-				skey, err := templater.Template(key.(string), tree)
+				skey, err := templater.MatchTemplate(key.(string), tree)
 				if err != nil {
 					return err
 				}

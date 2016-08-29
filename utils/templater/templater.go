@@ -15,12 +15,22 @@ var bytesBufferPool = sync.Pool{New: func() interface{} {
 	return &bytes.Buffer{}
 }}
 
+const TIMES = 42
+
 func Template(s string, context *gabs.Container) (string, error) {
+	return _templater(s, context, true)
+}
+
+func MatchTemplate(s string, context *gabs.Container) (string, error) {
+	return _templater(s, context, false)
+}
+
+func _templater(s string, context *gabs.Container, modify bool) (string, error) {
 	var result = s
 	var err error = nil
 
-	for i := 0; i < 42; i++ {
-		if result, err = _template(result, context); err != nil {
+	for i := 0; i < TIMES; i++ {
+		if result, err = _template(result, context, modify); err != nil {
 			return "", err
 		}
 		if !(strings.Contains(result, "{{") && strings.Contains(result, "}}")) {
@@ -30,7 +40,7 @@ func Template(s string, context *gabs.Container) (string, error) {
 	return result, nil
 }
 
-func _template(s string, context *gabs.Container) (string, error) {
+func _template(s string, context *gabs.Container, modify bool) (string, error) {
 	t, err := fasttemplate.NewTemplate(s, "{{", "}}")
 	if err != nil {
 		return "", err
@@ -44,11 +54,12 @@ func _template(s string, context *gabs.Container) (string, error) {
 			return w.Write([]byte(fmt.Sprintf("%v", value)))
 		} else if strings.HasPrefix(tag, "vars.") || context.ExistsP(tag) {
 			return 0, nil
-		//} else if v, err := ModifyExec(tag, context); err == nil {
-		//	return w.Write([]byte(fmt.Sprintf("%v", v)))
-		} else {
-			return 0, fmt.Errorf("Undefined template variable: '%s'", tag)
+		} else if modify {
+			if v, err := ModifyExec(tag, context); err == nil {
+				return w.Write([]byte(fmt.Sprintf("%v", v)))
+			}
 		}
+		return 0, fmt.Errorf("Undefined template variable: '%s'", tag)
 	}); err != nil {
 		return "", err
 	}
