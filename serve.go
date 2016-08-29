@@ -29,11 +29,25 @@ func main() {
 
 	var plugins []manifest.PluginData
 	var err error
+	var manifestData *manifest.Manifest
 
 	if *pluginData != "" {
-		plugins = []manifest.PluginData{manifest.LoadJSON(*pluginData).GetPluginWithData(*plugin)}
+		manifestData = manifest.LoadJSON(*pluginData)
 	} else {
-		plugins, err = manifest.Load(*manifestFile, vars).FindPlugins(*plugin)
+		manifestData = manifest.Load(*manifestFile, vars)
+	}
+
+	if *plugin == "" && *dryRun {
+		log.Printf(color.GreenString(">>> manifest:"))
+		fmt.Println(manifestData.String())
+		log.Printf(color.GreenString("<<< manifest: OK\n"))
+		return
+	}
+
+	if *pluginData != "" {
+		plugins = []manifest.PluginData{manifestData.GetPluginWithData(*plugin)}
+	} else {
+		plugins, err = manifestData.FindPlugins(*plugin)
 	}
 
 	if err != nil {

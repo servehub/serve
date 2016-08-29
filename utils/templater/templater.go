@@ -52,10 +52,10 @@ func _template(s string, context *gabs.Container, modify bool) (string, error) {
 		tag = strings.TrimSpace(tag)
 		if value := context.Path(tag).Data(); value != nil {
 			return w.Write([]byte(fmt.Sprintf("%v", value)))
-		} else if strings.HasPrefix(tag, "vars.") || context.ExistsP(tag) {
-			return 0, nil
 		} else if modify {
-			if v, err := ModifyExec(tag, context); err == nil {
+			if strings.HasPrefix(tag, "vars.") || context.ExistsP(tag) {
+				return 0, nil
+			} else if v, err := ModifyExec(tag, context); err == nil {
 				return w.Write([]byte(fmt.Sprintf("%v", v)))
 			}
 		}
