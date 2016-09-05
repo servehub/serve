@@ -9,12 +9,13 @@ import (
 
 	"github.com/InnovaCo/serve/tools/consul"
 	"github.com/InnovaCo/serve/tools/supervisor"
+	"github.com/InnovaCo/serve/tools/compare"
 )
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "serve-tools"
-	app.Version = "0.3"
+	app.Version = "0.4"
 	app.Usage = "Serve tools"
 
 	app.Commands = []cli.Command{
@@ -27,6 +28,7 @@ func main() {
 			},
 		},
 		supervisor.SupervisorCommand(),
+		compare.CompareCommand(),
 	}
 
 	if err := app.Run(os.Args); err != nil {
