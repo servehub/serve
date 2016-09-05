@@ -36,7 +36,7 @@ type Modify struct {
 	context *gabs.Container
 }
 
-func (this Modify) SetFunc(name string, function interface{}) error {
+func (m Modify) SetFunc(name string, function interface{}) error {
 	if _, ok := ModifyFuncs[name]; ok {
 		return fmt.Errorf("function %s exist", name)
 	}
@@ -44,7 +44,7 @@ func (this Modify) SetFunc(name string, function interface{}) error {
 	return nil
 }
 
-func (this Modify) Call(name string, params ... interface{}) (reflect.Value, error) {
+func (m Modify) Call(name string, params ... interface{}) (reflect.Value, error) {
 	log.Printf("modify call: func=%s args=%v\n", name, params)
 
 	if _, ok := ModifyFuncs[name]; !ok {
@@ -62,8 +62,10 @@ func (this Modify) Call(name string, params ... interface{}) (reflect.Value, err
 	return f.Call(in)[0], nil
 }
 
-func (this Modify) convert(val string) interface{} {
-	if i, err := strconv.Atoi(val); err == nil {
+func (_ Modify) convert(val string) interface{} {
+	if val == "" {
+		return val
+	} else if i, err := strconv.Atoi(val); err == nil {
 		return i
 	} else if f, err := strconv.ParseFloat(val, 64); err == nil {
 		return f
@@ -78,11 +80,11 @@ func (this Modify) convert(val string) interface{} {
 	return fmt.Sprintf("%v", val)
 }
 
-func (this Modify) clearFunc(s []byte) []string {
+func (_ Modify) clearFunc(s []byte) []string {
 	return strings.Split(strings.TrimSpace(string([]byte(strings.TrimSpace(string(s)))[1:])), "(")
 }
 
-func (this Modify) clearArg(s []byte) string {
+func (_ Modify) clearArg(s []byte) string {
 	a := []byte(strings.TrimSpace(string(s)))
 	if a[0] == []byte(",")[0] {
 		return strings.TrimSpace(string(a[1:]))
@@ -90,8 +92,8 @@ func (this Modify) clearArg(s []byte) string {
 	return string(a)
 }
 
-func (this Modify) parseFunc(s []byte) (string, []interface{}, error) {
-	f := this.clearFunc(s)
+func (m Modify) parseFunc(s []byte) (string, []interface{}, error) {
+	f := m.clearFunc(s)
 	funcName := f[0]
 	funcArgs := []interface{}{nil}
 	if len(f) == 1 {
@@ -99,18 +101,18 @@ func (this Modify) parseFunc(s []byte) (string, []interface{}, error) {
 	}
 	fl := lexer.NewLexer([]byte(f[1]))
 	for ftok := fl.Scan(); ftok.Type == token.TokMap.Type("arg"); ftok = fl.Scan() {
-		funcArgs = append(funcArgs, this.convert(this.clearArg(ftok.Lit)))
+		funcArgs = append(funcArgs, m.convert(m.clearArg(ftok.Lit)))
 	}
 	return funcName, funcArgs, nil
 }
 
-func (this Modify) resolve(v string) (string, error) {
+func (m Modify) resolve(v string) (string, error) {
 	//fmt.Printf("--> resolve: %v\n", v)
-	if this.context == nil {
+	if m.context == nil {
 		//fmt.Printf("<-- resolve: %v\n", v)
 		return v, nil
 	}
-	if value := this.context.Path(v).Data(); value != nil {
+	if value := m.context.Path(v).Data(); value != nil {
 		//fmt.Printf("find: %v\n", value)
 		v = fmt.Sprintf("%v", value)
 	} else {
@@ -118,7 +120,7 @@ func (this Modify) resolve(v string) (string, error) {
 		//fmt.Printf("<-- resolve: %v\n", v)
 		return v, nil
 	}
-	if s, err := Template(v, this.context); err != nil {
+	if s, err := Template(v, m.context); err != nil {
 		//fmt.Println("<-- fuck", v)
 		return v, nil
 	} else {
@@ -127,7 +129,7 @@ func (this Modify) resolve(v string) (string, error) {
 	}
 }
 
-func (this Modify) Exec(s string) (interface{}, error) {
+func (m Modify) Exec(s string) (interface{}, error) {
 	l := lexer.NewLexer([]byte(s))
 	var res interface{}
 	res = nil
@@ -137,19 +139,19 @@ func (this Modify) Exec(s string) (interface{}, error) {
 		switch {
 			case tok.Type == token.TokMap.Type("var"):
 				//fmt.Printf("var token: %v\n", string(tok.Lit))
-				if val, err := this.resolve(string(tok.Lit)); err != nil {
+				if val, err := m.resolve(string(tok.Lit)); err != nil {
 					return nil, err
 				} else {
-					res = this.convert(val)
+					res = m.convert(val)
 				}
 			case tok.Type == token.TokMap.Type("func"):
 				//fmt.Printf("func token: %v\n", string(tok.Lit))
-				if funcName, funcArgs, err := this.parseFunc(tok.Lit); err == nil {
+				if funcName, funcArgs, err := m.parseFunc(tok.Lit); err == nil {
 					funcArgs[0] = res
-					if fv, err := this.Call(funcName, funcArgs...); err != nil {
+					if fv, err := m.Call(funcName, funcArgs...); err != nil {
 						return nil, fmt.Errorf("execution error %s: %v", funcName, err)
 					} else {
-						res = this.convert(fv.String())
+						res = m.convert(fv.String())
 					}
 				} else {
 					return nil, fmt.Errorf("error parse %s: %v", tok.Lit, err )
