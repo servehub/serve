@@ -19,10 +19,10 @@ func init() {
 
 func main() {
 	manifestFile := kingpin.Flag("manifest", "Path to manifest.yml file.").Default("manifest.yml").String()
-	plugin       := kingpin.Arg("plugin", "Plugin name for run.").String()
-	vars         := *kingpin.Flag("var", "key=value pairs with manifest vars.").StringMap()
-	dryRun       := kingpin.Flag("dry-run", "Show manifest section only").Bool()
-	pluginData   := kingpin.Flag("plugin-data", "Data for plugin").String()
+	plugin := kingpin.Arg("plugin", "Plugin name for run.").String()
+	vars := *kingpin.Flag("var", "key=value pairs with manifest vars.").StringMap()
+	dryRun := kingpin.Flag("dry-run", "Show manifest section only").Bool()
+	pluginData := kingpin.Flag("plugin-data", "Data for plugin").String()
 
 	kingpin.Version(version)
 	kingpin.Parse()
@@ -38,9 +38,10 @@ func main() {
 	}
 
 	if *plugin == "" && *dryRun {
-		fmt.Printf("%s\n%s\n%s\n", color.GreenString(">>> manifest:"),
-			                       manifestData.String(),
-			                       color.GreenString("<<< manifest: OK\n"))
+		fmt.Printf("%s\n%s\n%s\n",
+			color.GreenString(">>> manifest:"),
+			manifestData.String(),
+			color.GreenString("<<< manifest: OK\n"))
 		return
 	}
 
