@@ -38,9 +38,9 @@ func main() {
 	}
 
 	if *plugin == "" && *dryRun {
-		log.Printf(color.GreenString(">>> manifest:"))
-		fmt.Println(manifestData.String())
-		log.Printf(color.GreenString("<<< manifest: OK\n"))
+		fmt.Printf("%s\n%s\n%s\n", color.GreenString(">>> manifest:"),
+			                       manifestData.String(),
+			                       color.GreenString("<<< manifest: OK\n"))
 		return
 	}
 
