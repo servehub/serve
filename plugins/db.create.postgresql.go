@@ -40,6 +40,6 @@ func (p DBCreatePostgresql) Drop(data manifest.Manifest) error {
 	return runSshCmd(
 		data.GetString("host"),
 		data.GetString("ssh-user"),
-		fmt.Sprintf("sudo -EHu postgres dropdb --if-exists \"%s\"", data.GetString("target")),
+		fmt.Sprintf("sudo -Hu postgres dropdb --if-exists \"%s\"", data.GetString("target")),
 	)
 }
