@@ -25,7 +25,7 @@ func (p DBCreatePostgresql) Create(data manifest.Manifest) error {
 
 	if data.Has("source") {
 		t := data.GetString("target")
-		cmd = fmt.Sprintf("sudo -Hu postgres createdb -O %s \"%s\" && pg_dump \"%s\" | psql \"%s\"",
+		cmd = fmt.Sprintf("sudo -Hu postgres createdb -O %s \"%s\" && sudo -Hu postgres pg_dump \"%s\" | sudo -Hu postgres psql \"%s\"",
 			              data.GetStringOr("db-user", "postgres"), t, data.GetString("source"), t)
 
 	} else {
