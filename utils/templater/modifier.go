@@ -1,22 +1,21 @@
 package templater
 
 import (
-	"reflect"
 	"errors"
-	"strings"
-	"log"
-	"strconv"
 	"fmt"
+	"reflect"
 	"regexp"
+	"strconv"
+	"strings"
 
+	"github.com/InnovaCo/serve/utils/gabs"
 	"github.com/InnovaCo/serve/utils/templater/lexer"
 	"github.com/InnovaCo/serve/utils/templater/token"
-	"github.com/InnovaCo/serve/utils/gabs"
 )
 
 var ModifyFuncs = map[string]interface{}{
 	"replace": replace,
-	"same": same,
+	"same":    same,
 	"reverse": reverse,
 }
 
@@ -44,21 +43,19 @@ func (m Modify) SetFunc(name string, function interface{}) error {
 	return nil
 }
 
-func (m Modify) Call(name string, params ... interface{}) (reflect.Value, error) {
-	log.Printf("modify call: func=%s args=%v\n", name, params)
-
+func (m Modify) Call(name string, params ...interface{}) (reflect.Value, error) {
 	if _, ok := ModifyFuncs[name]; !ok {
 		return reflect.Value{}, fmt.Errorf("function %v not register", name)
 	}
 
-    f := reflect.ValueOf(ModifyFuncs[name])
-    if len(params) != f.Type().NumIn() {
+	f := reflect.ValueOf(ModifyFuncs[name])
+	if len(params) != f.Type().NumIn() {
 		return reflect.Value{}, errors.New("The number of params is not adapted.")
-    }
-    in := make([]reflect.Value, len(params))
-    for k, param := range params {
-        in[k] = reflect.ValueOf(param)
-    }
+	}
+	in := make([]reflect.Value, len(params))
+	for k, param := range params {
+		in[k] = reflect.ValueOf(param)
+	}
 	return f.Call(in)[0], nil
 }
 
@@ -69,13 +66,13 @@ func (_ Modify) convert(val string) interface{} {
 		return i
 	} else if f, err := strconv.ParseFloat(val, 64); err == nil {
 		return f
-	} else  if b, err := strconv.ParseBool(val); err == nil {
+	} else if b, err := strconv.ParseBool(val); err == nil {
 		return b
 	}
 	b := []byte(val)
-	if (b[0] == []byte("\"")[0] && b[len(b) - 1] == []byte("\"")[0]) ||
-		(b[0] == []byte("'")[0] && b[len(b) - 1] == []byte("'")[0])	{
-		return string(b[1:len(val)-1])
+	if (b[0] == []byte("\"")[0] && b[len(b)-1] == []byte("\"")[0]) ||
+		(b[0] == []byte("'")[0] && b[len(b)-1] == []byte("'")[0]) {
+		return string(b[1 : len(val)-1])
 	}
 	return fmt.Sprintf("%v", val)
 }
@@ -135,29 +132,29 @@ func (m Modify) Exec(s string) (interface{}, error) {
 	res = nil
 
 	for tok := l.Scan(); (tok.Type == token.TokMap.Type("var")) ||
-						 (tok.Type == token.TokMap.Type("func")); tok = l.Scan() {
+		(tok.Type == token.TokMap.Type("func")); tok = l.Scan() {
 		switch {
-			case tok.Type == token.TokMap.Type("var"):
-				//fmt.Printf("var token: %v\n", string(tok.Lit))
-				if val, err := m.resolve(string(tok.Lit)); err != nil {
-					return nil, err
+		case tok.Type == token.TokMap.Type("var"):
+			//fmt.Printf("var token: %v\n", string(tok.Lit))
+			if val, err := m.resolve(string(tok.Lit)); err != nil {
+				return nil, err
+			} else {
+				res = m.convert(val)
+			}
+		case tok.Type == token.TokMap.Type("func"):
+			//fmt.Printf("func token: %v\n", string(tok.Lit))
+			if funcName, funcArgs, err := m.parseFunc(tok.Lit); err == nil {
+				funcArgs[0] = res
+				if fv, err := m.Call(funcName, funcArgs...); err != nil {
+					return nil, fmt.Errorf("execution error %s: %v", funcName, err)
 				} else {
-					res = m.convert(val)
+					res = m.convert(fv.String())
 				}
-			case tok.Type == token.TokMap.Type("func"):
-				//fmt.Printf("func token: %v\n", string(tok.Lit))
-				if funcName, funcArgs, err := m.parseFunc(tok.Lit); err == nil {
-					funcArgs[0] = res
-					if fv, err := m.Call(funcName, funcArgs...); err != nil {
-						return nil, fmt.Errorf("execution error %s: %v", funcName, err)
-					} else {
-						res = m.convert(fv.String())
-					}
-				} else {
-					return nil, fmt.Errorf("error parse %s: %v", tok.Lit, err )
-				}
-			default:
-				return nil, fmt.Errorf("unknown token %v\n", string(tok.Lit))
+			} else {
+				return nil, fmt.Errorf("error parse %s: %v", tok.Lit, err)
+			}
+		default:
+			return nil, fmt.Errorf("unknown token %v\n", string(tok.Lit))
 		}
 	}
 	return res, nil
@@ -165,11 +162,11 @@ func (m Modify) Exec(s string) (interface{}, error) {
 
 func ModifyExec(s interface{}, context *gabs.Container) (interface{}, error) {
 	switch s.(type) {
-		case string:
-			if strings.Contains(s.(string), "{{") && strings.Contains(s.(string), "}}") {
-				return nil, fmt.Errorf("find symbols '{{' and '}}' in %v", s)
-			}
-			return Modify{context}.Exec(fmt.Sprintf("%v",s))
+	case string:
+		if strings.Contains(s.(string), "{{") && strings.Contains(s.(string), "}}") {
+			return nil, fmt.Errorf("find symbols '{{' and '}}' in %v", s)
+		}
+		return Modify{context}.Exec(fmt.Sprintf("%v", s))
 	}
 	return s, nil
 }
