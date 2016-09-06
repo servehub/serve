@@ -1,4 +1,4 @@
-package test_runner
+package testrunner
 
 import (
 	"fmt"
@@ -67,7 +67,7 @@ func action(ctx *cli.Context) error {
 }
 
 func runTest(serve string, data map[string]interface{}) error {
-	params := strings.Split(data["params"].(string), " ")
+	params := strings.Split(data["run"].(string), " ")
 	params = append(params, "--manifest", data["manifest"].(string), "--dry-run")
 	result, err := serveCommand(serve, params...)
 	if err != nil {

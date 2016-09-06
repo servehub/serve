@@ -9,7 +9,7 @@ import (
 
 	"github.com/InnovaCo/serve/tools/consul"
 	"github.com/InnovaCo/serve/tools/supervisor"
-	"github.com/InnovaCo/serve/tools/test-runner"
+	"github.com/InnovaCo/serve/tools/testrunner"
 )
 
 func main() {
@@ -28,7 +28,7 @@ func main() {
 			},
 		},
 		supervisor.SupervisorCommand(),
-		test_runner.TestRunnerCommand(),
+		testrunner.TestRunnerCommand(),
 	}
 
 	if err := app.Run(os.Args); err != nil {
