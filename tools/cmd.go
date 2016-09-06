@@ -9,12 +9,13 @@ import (
 
 	"github.com/InnovaCo/serve/tools/consul"
 	"github.com/InnovaCo/serve/tools/supervisor"
+	"github.com/InnovaCo/serve/tools/test-runner"
 )
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "serve-tools"
-	app.Version = "0.3"
+	app.Version = "0.4"
 	app.Usage = "Serve tools"
 
 	app.Commands = []cli.Command{
@@ -27,9 +28,11 @@ func main() {
 			},
 		},
 		supervisor.SupervisorCommand(),
+		test_runner.TestRunnerCommand(),
 	}
 
 	if err := app.Run(os.Args); err != nil {
 		log.Fatalln(color.RedString("Exit: %v", err))
+		os.Exit(1)
 	}
 }
