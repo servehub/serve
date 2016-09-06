@@ -52,7 +52,7 @@ func _template(s string, context *gabs.Container, modify bool) (string, error) {
 		tag = strings.TrimSpace(tag)
 		if value := context.Path(tag).Data(); value != nil {
 			return w.Write([]byte(fmt.Sprintf("%v", value)))
-		} else if modify {
+		} else if modify && strings.Contains(tag, "|") {
 			if v, err := ModifyExec(tag, context); err == nil {
 				return w.Write([]byte(fmt.Sprintf("%v", v)))
 			}
