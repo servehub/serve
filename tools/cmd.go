@@ -33,6 +33,5 @@ func main() {
 
 	if err := app.Run(os.Args); err != nil {
 		log.Fatalln(color.RedString("Exit: %v", err))
-		os.Exit(1)
 	}
 }
