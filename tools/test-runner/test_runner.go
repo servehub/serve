@@ -67,11 +67,9 @@ func action(ctx *cli.Context) error {
 }
 
 func runTest(serve string, data map[string]interface{}) error {
-	testCmd, ok := data["run"].(string)
-	if !ok {
-		return fmt.Errorf("%v, field \"run\" not string type", data["run"])
-	}
-	result, err := serveCommand(serve, testCmd, data["manifest"].(string))
+	params := strings.Split(data["params"].(string), " ")
+	params = append(params, "--manifest", data["manifest"].(string), "--dry-run")
+	result, err := serveCommand(serve, params...)
 	if err != nil {
 		return err
 	}
@@ -82,14 +80,16 @@ func runTest(serve string, data map[string]interface{}) error {
 	return nil
 }
 
-func serveCommand(serve, cmdParams, manifest string) (map[string]interface{}, error) {
-	cmd := exec.Command(serve, cmdParams, "--manifest", manifest, "--dry-run")
+func serveCommand(serve string, params...string) (map[string]interface{}, error) {
+	log.Printf("RUN: %v %v\n", serve, params)
+
+	cmd := exec.Command(serve, params...)
 	cmd.Env = os.Environ()
 	buf := bytes.Buffer{}
 	cmd.Stderr = &buf
 
 	if err := cmd.Run(); err != nil {
-		log.Printf("%v\n", err)
+		log.Printf("serve error: %v\n%v\n", err, buf.String())
 		return nil, err
 	}
 	result := make(map[string]interface{})
