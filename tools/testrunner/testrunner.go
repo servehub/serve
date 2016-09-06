@@ -23,7 +23,8 @@ func TestRunnerCommand() cli.Command {
 		Usage: "Run serve with parameters and compare result",
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "file", Usage: "file name with tests"},
-			cli.StringFlag{Name: "serve", Usage: "serve path"},
+			cli.StringFlag{Name: "serve", Usage: "serve file"},
+			cli.StringFlag{Name: "config-path", Usage: "config path"},
 		},
 		Action: action,
 	}
@@ -34,8 +35,8 @@ func action(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	if _, ok := data["manifest"]; !ok {
-		return fmt.Errorf("Key \"manifest\" not found in file %s", ctx.String("file"))
+	if _, ok := data["manifest"].(map[string]interface{}); !ok {
+		return fmt.Errorf("Key \"manifest\" not found or incorrect type in file %s", ctx.String("file"))
 	}
 	manifestName, err := saveManifest(data["manifest"].(map[string]interface{}))
 	if err != nil {
@@ -49,29 +50,39 @@ func action(ctx *cli.Context) error {
 	counterOK := 0
 	counterErr := 0
 	for _, test := range data["tests"].([]interface{}) {
-		test.(map[string]interface{})["manifest"] = manifestName
-		if runTest(ctx.String("serve"), test.(map[string]interface{})) != nil {
-			log.Println(color.RedString("%v: %v ERROR\n", ctx.String("file"), test.(map[string]interface{})["name"]))
+		if _, ok := test.(map[string]interface{}); !ok {
+			log.Printf("Test incorrect format data: %v\n", test)
+			continue
+		}
+		testData := test.(map[string]interface{})
+		if _, ok := testData["name"]; !ok {
+			log.Printf("Key \"name\" not found in %v\n", testData)
+		}
+		testData["manifest"] = manifestName
+		if runTest(ctx.String("serve"), ctx.String("config-path"), testData) != nil {
+			log.Println(color.RedString("%v: %v ERROR\n", ctx.String("file"), testData["name"]))
 			counterErr += 1
 		} else {
-			log.Println(color.GreenString("%v: %v OK\n", ctx.String("file"), test.(map[string]interface{})["name"]))
+			log.Println(color.GreenString("%v: %v OK\n", ctx.String("file"), testData["name"]))
 			counterOK += 1
 		}
 	}
-
-	log.Printf("Stat: All test %d\n", (counterErr+counterOK))
+	log.Printf("in total: number of tests %d\n", (counterErr+counterOK))
 	if counterErr > 0 {
 		return fmt.Errorf("Tests with errors: %d\n", counterErr)
 	}
 	return nil
 }
 
-func runTest(serve string, data map[string]interface{}) error {
+func runTest(serve, configPath string, data map[string]interface{}) error {
 	params := strings.Split(data["run"].(string), " ")
-	params = append(params, "--manifest", data["manifest"].(string), "--dry-run")
+	params = append(params, "--var", fmt.Sprintf("config-path=%v", configPath), "--manifest", data["manifest"].(string), "--dry-run")
 	result, err := serveCommand(serve, params...)
 	if err != nil {
 		return err
+	}
+	if _, ok := data["expect"].(map[string]interface{}); !ok {
+		return fmt.Errorf("Expect is not map type: %v\n", data["expect"])
 	}
 	if d := diff(result, data["expect"].(map[string]interface{})); !reflect.DeepEqual(d, make(map[string]interface{})) {
 		log.Printf("diff %v\n", d)
@@ -93,6 +104,7 @@ func serveCommand(serve string, params...string) (map[string]interface{}, error)
 		return nil, err
 	}
 	result := make(map[string]interface{})
+
 	if b := strings.Index(buf.String(), "{"); b != -1 {
 		if e := strings.Index(buf.String(), "}\n\n"); e != -1 {
 			if err := json.Unmarshal(buf.Bytes()[b:e + 1], &result); err != nil {
@@ -140,9 +152,9 @@ func diff(first map[string]interface{}, second map[string]interface{}) map[strin
 	result := make(map[string]interface{})
 	for k := range first {
 		if _, ok := second[k]; !ok {
-			result[k] = second[k]
+			result[k] = fmt.Sprintf("%v != <nil>", first[k])
 		} else if reflect.TypeOf(first[k]) != reflect.TypeOf(second[k]) {
-			result[k] = second[k]
+			result[k] = fmt.Sprintf("type(%v) != type(%v)", first[k], second[k])
 		} else {
 			switch first[k].(type){
 			case map[string]interface{}:
@@ -152,7 +164,7 @@ func diff(first map[string]interface{}, second map[string]interface{}) map[strin
 				}
 			case []interface{}:
 				if !reflect.DeepEqual(first[k], second[k]) {
-					result[k] = second[k]
+					result[k] = fmt.Sprintf("%v != %v", first[k], second[k])
 				}
 			default:
 				if(first[k] != second[k]) {
@@ -163,7 +175,7 @@ func diff(first map[string]interface{}, second map[string]interface{}) map[strin
 	}
 	for k := range second {
 		if _, ok := first[k]; !ok {
-			result[k] = second[k]
+			result[k] = fmt.Sprintf("<nil> != %v", second[k])
 		}
 	}
 
