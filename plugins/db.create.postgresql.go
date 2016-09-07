@@ -40,7 +40,7 @@ func (p DBCreatePostgresql) Drop(data manifest.Manifest) error {
 	return runSingleSshCmd(
 		data.GetString("host"),
 		data.GetString("ssh-user"),
-		fmt.Sprintf("sudo -Hu postgres psql -c \"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='%s';\" && sudo -Hu postgres dropdb --if-exists \"%s\"",
+		fmt.Sprintf("sudo -Hu postgres psql -c \\\"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='%s';\\\" && sudo -Hu postgres dropdb --if-exists \"%s\"",
 			data.GetString("target"), data.GetString("target")),
 	)
 }
