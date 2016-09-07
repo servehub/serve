@@ -23,5 +23,6 @@ func (p ReleaseDebian) Run(data manifest.Manifest) error {
 			data.GetString("site"),
 			data.GetString("mode"),
 		),
+		SshMaxProcs,
 	)
 }

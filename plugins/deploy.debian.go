@@ -11,6 +11,8 @@ func init() {
 	manifest.PluginRegestry.Add("deploy.debian", DeployDebian{})
 }
 
+const SshMaxProcs=1
+
 type DeployDebian struct{}
 
 func (p DeployDebian) Run(data manifest.Manifest) error {
@@ -22,11 +24,12 @@ func (p DeployDebian) Run(data manifest.Manifest) error {
 }
 
 func (p DeployDebian) Install(data manifest.Manifest) error {
-	if err := runParallelSshCmd(
+	if err := runSshCmd(
 		data.GetString("cluster"),
 		data.GetString("ssh-user"),
 		fmt.Sprintf("sudo %s/debian-way/deploy.sh --package='%s' --version='%s'", data.GetString("ci-tools-path"), data.GetString("package"), data.GetString("version")),
-		data.GetIntOr("parallel", 1),
+		data.GetIntOr("parallel", SshMaxProcs),
+
 	); err != nil {
 		return err
 	}
@@ -39,6 +42,7 @@ func (p DeployDebian) Uninstall(data manifest.Manifest) error {
 		data.GetString("cluster"),
 		data.GetString("ssh-user"),
 		fmt.Sprintf("sudo apt-get purge %s -y", data.GetString("package")),
+		1,
 	); err != nil {
 		return err
 	}
@@ -46,16 +50,27 @@ func (p DeployDebian) Uninstall(data manifest.Manifest) error {
 	return deletePluginData("deploy.debian", data.GetString("app-name"), data.GetString("consul-host"))
 }
 
-func runSshCmd(cluster, sshUser, cmd string) error {
-	return runParallelSshCmd(cluster, sshUser, cmd, 1)
-}
-
-func runParallelSshCmd(cluster, sshUser, cmd string, maxProcs int) error {
-	return utils.RunCmd(
-		`dig +short %s | sort | uniq | parallel --tag --line-buffer -j %d ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null %s@{} "%s"`,
-		cluster,
-		maxProcs,
-		sshUser,
-		cmd,
-	)
+func runSshCmd(cluster, sshUser, cmd string, maxProcs int) error {
+	sshCmd := "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+	if maxProcs > 1 {
+		if maxProcs > SshMaxProcs {
+			maxProcs = SshMaxProcs
+		}
+		return utils.RunCmd(
+			`dig +short %s | sort | uniq | parallel --tag --line-buffer -j %d %s %s@{} "%s"`,
+			cluster,
+			maxProcs,
+			sshCmd,
+			sshUser,
+			cmd,
+		)
+	} else {
+		return utils.RunCmd(
+			`%s %s@{%s} "%s"`,
+			sshCmd,
+			sshUser,
+			cluster,
+			cmd,
+		)
+	}
 }
