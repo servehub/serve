@@ -11,7 +11,7 @@ func init() {
 	manifest.PluginRegestry.Add("deploy.debian", DeployDebian{})
 }
 
-const SshMaxProcs=1
+const DefaultSshMaxProcs=1
 
 type DeployDebian struct{}
 
@@ -28,7 +28,7 @@ func (p DeployDebian) Install(data manifest.Manifest) error {
 		data.GetString("cluster"),
 		data.GetString("ssh-user"),
 		fmt.Sprintf("sudo %s/debian-way/deploy.sh --package='%s' --version='%s'", data.GetString("ci-tools-path"), data.GetString("package"), data.GetString("version")),
-		data.GetIntOr("parallel", SshMaxProcs),
+		data.GetIntOr("parallel", DefaultSshMaxProcs),
 
 	); err != nil {
 		return err
@@ -53,9 +53,6 @@ func (p DeployDebian) Uninstall(data manifest.Manifest) error {
 func runSshCmd(cluster, sshUser, cmd string, maxProcs int) error {
 	sshCmd := "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 	if maxProcs > 1 {
-		if maxProcs > SshMaxProcs {
-			maxProcs = SshMaxProcs
-		}
 		return utils.RunCmd(
 			`dig +short %s | sort | uniq | parallel --tag --line-buffer -j %d %s %s@{} "%s"`,
 			cluster,
