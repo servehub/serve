@@ -62,7 +62,7 @@ func runParallelSshCmd(cluster, sshUser, cmd string, maxProcs int) error {
 
 func runSingleSshCmd(cluster, sshUser, cmd string) error {
 	return utils.RunCmd(
-		`ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null %s@{%s} "%s"`,
+		`ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null %s@%s "%s"`,
 		sshUser,
 		cluster,
 		cmd,
