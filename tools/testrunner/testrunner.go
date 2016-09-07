@@ -1,20 +1,20 @@
 package testrunner
 
 import (
-	"fmt"
-	"os"
-	"encoding/json"
-	"reflect"
-	"os/exec"
-	"strings"
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
+	"os/exec"
+	"reflect"
+	"strings"
 
-	"github.com/fatih/color"
-
-	"github.com/ghodss/yaml"
 	"github.com/codegangsta/cli"
+	"github.com/fatih/color"
+	"github.com/ghodss/yaml"
+	"errors"
 )
 
 func TestRunnerCommand() cli.Command {
@@ -22,68 +22,81 @@ func TestRunnerCommand() cli.Command {
 		Name:  "test-runner",
 		Usage: "Run serve with parameters and compare result",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "file", Usage: "file name with tests"},
-			cli.StringFlag{Name: "serve", Usage: "serve file"},
-			cli.StringFlag{Name: "config-path", Usage: "config path"},
+			cli.StringFlag{Name: "file", Usage: "Path to yml file with tests"},
+			cli.StringFlag{Name: "serve", Value: "serve", Usage: "Path to serve binary file"},
+			cli.StringFlag{Name: "config-path", Usage: "Config path with include.d dir, by default = /etc/serve/"},
 		},
-		Action: action,
-	}
-}
+		Action: func(ctx *cli.Context) error {
+			data, err := loadData(ctx.String("file"))
+			if err != nil {
+				return err
+			}
 
-func action(ctx *cli.Context) error {
-	data, err := loadData(ctx.String("file"))
-	if err != nil {
-		return err
-	}
-	if _, ok := data["manifest"].(map[string]interface{}); !ok {
-		return fmt.Errorf("Key \"manifest\" not found or incorrect type in file %s", ctx.String("file"))
-	}
-	manifestName, err := saveManifest(data["manifest"].(map[string]interface{}))
-	if err != nil {
-		return err
-	}
+			if _, ok := data["manifest"].(map[string]interface{}); !ok {
+				return fmt.Errorf("Key \"manifest\" not found or incorrect type in file %s", ctx.String("file"))
+			}
 
-	if _, ok := data["tests"]; !ok {
-		return fmt.Errorf("Key \"tests\" not found in file %s", ctx.String("file"))
-	}
+			manifestFile, err := saveManifest(data["manifest"].(map[string]interface{}))
+			if err != nil {
+				return err
+			}
 
-	counterOK := 0
-	counterErr := 0
-	for _, test := range data["tests"].([]interface{}) {
-		if _, ok := test.(map[string]interface{}); !ok {
-			log.Printf("Test incorrect format data: %v\n", test)
-			continue
-		}
-		testData := test.(map[string]interface{})
-		if _, ok := testData["name"]; !ok {
-			log.Printf("Key \"name\" not found in %v\n", testData)
-		}
-		testData["manifest"] = manifestName
-		if runTest(ctx.String("serve"), ctx.String("config-path"), testData) != nil {
-			log.Println(color.RedString("%v: %v ERROR\n", ctx.String("file"), testData["name"]))
-			counterErr += 1
-		} else {
-			log.Println(color.GreenString("%v: %v OK\n", ctx.String("file"), testData["name"]))
-			counterOK += 1
-		}
+			defer os.Remove(manifestFile) // clean up
+
+			if _, ok := data["tests"]; !ok {
+				return fmt.Errorf("Key \"tests\" not found in file %s", ctx.String("file"))
+			}
+
+			counterOK := 0
+			counterErr := 0
+			for _, test := range data["tests"].([]interface{}) {
+				if _, ok := test.(map[string]interface{}); !ok {
+					log.Printf("Test incorrect format data: %v\n", test)
+					continue
+				}
+
+				testData := test.(map[string]interface{})
+
+				testName, ok := testData["name"]
+				if !ok {
+					testName = testData["run"]
+				}
+
+				testData["manifest"] = manifestFile
+				if runTest(ctx.String("serve"), ctx.String("config-path"), testData) != nil {
+					log.Println(color.RedString("%v: %v ERROR\n", ctx.String("file"), testName))
+					counterErr += 1
+				} else {
+					log.Println(color.GreenString("%v: %v OK\n", ctx.String("file"), testName))
+					counterOK += 1
+				}
+			}
+			log.Printf("in total: number of tests %d\n", (counterErr + counterOK))
+			if counterErr > 0 {
+				return fmt.Errorf("Tests with errors: %d\n", counterErr)
+			}
+			return nil
+		},
 	}
-	log.Printf("in total: number of tests %d\n", (counterErr+counterOK))
-	if counterErr > 0 {
-		return fmt.Errorf("Tests with errors: %d\n", counterErr)
-	}
-	return nil
 }
 
 func runTest(serve, configPath string, data map[string]interface{}) error {
-	params := strings.Split(data["run"].(string), " ")
+	run, ok := data["run"]
+	if !ok {
+		return errors.New("Field `run` is required for test!")
+	}
+
+	params := strings.Split(run.(string), " ")
 	params = append(params, "--var", fmt.Sprintf("config-path=%v", configPath), "--manifest", data["manifest"].(string), "--dry-run")
 	result, err := serveCommand(serve, params...)
 	if err != nil {
 		return err
 	}
+
 	if _, ok := data["expect"].(map[string]interface{}); !ok {
 		return fmt.Errorf("Expect is not map type: %v\n", data["expect"])
 	}
+
 	if d := diff(result, data["expect"].(map[string]interface{})); !reflect.DeepEqual(d, make(map[string]interface{})) {
 		log.Printf("diff %v\n", d)
 		return fmt.Errorf("Error diff: %v\n", d)
@@ -91,8 +104,8 @@ func runTest(serve, configPath string, data map[string]interface{}) error {
 	return nil
 }
 
-func serveCommand(serve string, params...string) (map[string]interface{}, error) {
-	log.Printf("RUN: %v %v\n", serve, params)
+func serveCommand(serve string, params ...string) (map[string]interface{}, error) {
+	log.Printf("RUN: %v %v\n", serve, strings.Join(params, " "))
 
 	cmd := exec.Command(serve, params...)
 	cmd.Env = os.Environ()
@@ -107,7 +120,7 @@ func serveCommand(serve string, params...string) (map[string]interface{}, error)
 
 	if b := strings.Index(buf.String(), "{"); b != -1 {
 		if e := strings.Index(buf.String(), "}\n\n"); e != -1 {
-			if err := json.Unmarshal(buf.Bytes()[b:e + 1], &result); err != nil {
+			if err := json.Unmarshal(buf.Bytes()[b:e+1], &result); err != nil {
 				log.Printf("%v\n", err)
 				return nil, err
 			}
@@ -119,13 +132,20 @@ func serveCommand(serve string, params...string) (map[string]interface{}, error)
 func saveManifest(data map[string]interface{}) (string, error) {
 	jsonData, err := yaml.Marshal(&data)
 	if err != nil {
-		log.Fatalf("error: %v", err)
 		return "", err
 	}
-    if err := ioutil.WriteFile("/tmp/serve_test_manifest.yml", jsonData, 0644); err != nil {
+
+	tmpfile, err := ioutil.TempFile("", "serve-test-manifest")
+	if err != nil {
 		return "", err
 	}
-	return "/tmp/serve_test_manifest.yml", nil
+
+	if err := ioutil.WriteFile(tmpfile.Name(), jsonData, 0644); err != nil {
+		os.Remove(tmpfile.Name())
+		return "", err
+	}
+
+	return tmpfile.Name(), nil
 }
 
 func loadData(name string) (map[string]interface{}, error) {
@@ -156,7 +176,7 @@ func diff(first map[string]interface{}, second map[string]interface{}) map[strin
 		} else if reflect.TypeOf(first[k]) != reflect.TypeOf(second[k]) {
 			result[k] = fmt.Sprintf("type(%v) != type(%v)", first[k], second[k])
 		} else {
-			switch first[k].(type){
+			switch first[k].(type) {
 			case map[string]interface{}:
 				subResult := diff(first[k].(map[string]interface{}), second[k].(map[string]interface{}))
 				if len(subResult) != 0 {
@@ -167,7 +187,7 @@ func diff(first map[string]interface{}, second map[string]interface{}) map[strin
 					result[k] = fmt.Sprintf("%v != %v", first[k], second[k])
 				}
 			default:
-				if(first[k] != second[k]) {
+				if first[k] != second[k] {
 					result[k] = fmt.Sprintf("%v != %v", first[k], second[k])
 				}
 			}
