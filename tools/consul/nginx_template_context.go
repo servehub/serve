@@ -44,7 +44,7 @@ func NginxTemplateContextCommand() cli.Command {
 				}
 
 				if len(instances) == 0 {
-					break
+					continue
 				}
 
 				routes := make([]map[string]string, 0)
