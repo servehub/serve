@@ -12,10 +12,12 @@ import (
 	"github.com/InnovaCo/serve/tools/testrunner"
 )
 
+var version = "0.0"
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "serve-tools"
-	app.Version = "0.4"
+	app.Version = version
 	app.Usage = "Serve tools"
 
 	app.Commands = []cli.Command{

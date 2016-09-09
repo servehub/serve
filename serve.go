@@ -11,7 +11,7 @@ import (
 	_ "github.com/InnovaCo/serve/plugins"
 )
 
-var version = "1.3"
+var version = "0.0"
 
 func init() {
 	color.NoColor = false
