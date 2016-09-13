@@ -6,6 +6,7 @@ import (
 	"github.com/fatih/color"
 
 	"github.com/InnovaCo/serve/utils/gabs"
+	//"golang.org/x/crypto/ssh/test"
 )
 
 type processorTestCase struct {
@@ -15,8 +16,8 @@ type processorTestCase struct {
 
 func TestUtilsTemplater(t *testing.T) {
 	runAllProcessorTests(t, map[string]processorTestCase{
-		"simple resolve": {
-			in: `{{ var }}`,
+		"simple": {
+			in: `var`,
 			expect: `var`,
 		},
 
@@ -32,7 +33,7 @@ func TestUtilsTemplater(t *testing.T) {
 
 		"simple resolve with dot": {
 			in: `{{ var.var }}`,
-			expect: `var.var`,
+			expect: `1`,
 		},
 
 		"multi resolve": {
@@ -63,12 +64,19 @@ func runAllProcessorTests(t *testing.T, cases map[string]processorTestCase) {
 	color.NoColor = false
 
 	json := `{
+		"var1": "var1",
+		"var-var": "var-var",
+		"var": {"var": "1"},
 		"version": "{{ feature }}-{{ feature-suffix }}",
 		"feature": "value-unknown",
 		"feature-suffix": "{{ feature }}"
 	}`
 
-	tree, _ := gabs.ParseJSON([]byte(json))
+	tree, err := gabs.ParseJSON([]byte(json))
+	if err != nil {
+		color.Red("%v: failed!\n", err)
+		t.Fail()
+	}
 
 	for name, test := range cases {
 		if res, err := Template(test.in, tree); err == nil {
@@ -79,7 +87,8 @@ func runAllProcessorTests(t *testing.T, cases map[string]processorTestCase) {
 				t.Fail()
 			}
 		} else {
-			color.Green("error %v\n: Ok", err)
+			color.Red("error %v\n: failed!", err)
+			t.Fail()
 		}
 	}
 }
