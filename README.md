@@ -288,7 +288,6 @@ version: <str>
   MEMORY: <str>
   SERVICE_NAME: <str>
   SERVICE_VERSION: <str>
- 
  instances: <int>
  marathon-host: <str>
   mem: <int>
