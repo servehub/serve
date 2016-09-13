@@ -11,7 +11,6 @@ import (
 
 	"github.com/InnovaCo/serve/manifest"
 	"github.com/InnovaCo/serve/utils/gabs"
-	"github.com/InnovaCo/serve/utils"
 )
 
 func init() {
@@ -51,7 +50,7 @@ func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 
 	if data.GetBool("purge") {
 		return goCdDelete(name, data.GetString("environment"), url,
-			              map[string]string{"Accept": "application/vnd.go.cd.v2+json"})
+			map[string]string{"Accept": "application/vnd.go.cd.v2+json"})
 	}
 
 	m := false
@@ -266,9 +265,10 @@ func goCdRequest(method string, resource string, body string, headers map[string
 
 	req.SetBasicAuth(creds.Login, creds.Password)
 
-	log.Printf(" --> %s %s:\n%s\n%s\n\n", method, resource, req.Header, utils.Substr(body, 0, 512))
+	log.Printf(" --> %s %s:\n%s\n%s\n\n", method, resource, req.Header, body)
 
 	resp, err := http.DefaultClient.Do(req)
+
 	if err != nil {
 		return nil, err
 	} else {
