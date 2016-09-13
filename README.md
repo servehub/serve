@@ -196,9 +196,9 @@ stages:
 # serve
 
 Утилита для парсинга манифеста и запуска плагинов
-
+```
     serve <plugin-name> args...
-    
+```
 Поддерживаемые флаги:
 
  * `--manifest=./manifest.yml`
@@ -230,9 +230,7 @@ stages:
 ### build.sh
 Просто вызывает любую sh команду.
 ```
-{
-  "sh": "echo 'hello world!'"
-}
+sh: <str> // bash command
 ```
 
 ### build.sbt-pack
@@ -241,68 +239,60 @@ stages:
     sbt ';set version := "%s"' clean test pack
     
 ```
-{
-  "version": "1.3.42"
-}
+version: <str> // version
 ```
 
 ### build.marathon
 Упаковывает `source` директорию в tar.gz архив и заливает через webdav в marathon task-registry по указанному в `registry-url` урлу.
 ```
-{
-  "registry-url": "http://mesos1-q.qa.inn.ru/task-registry/kidzania/kidzite-api/kidzite-api-v2.1.34.tar.gz",
-  "source": "target/pack"
-}
+registry-url: <str // uri 
+source: <str> // 
 ```
 
 ### build.debian
 Создает deb-пакет и заливает его в apt репозиторий. Используются inn-ci-tools скрипты.
 ```
-{
-  "build-number": "34",
-  "category": "kidzania",
-  "ci-tools-path": "/var/go/inn-ci-tools",
-  "cron": "",
-  "daemon": "$APPLICATION_PATH/bin/start",
-  "daemon-args": "--port=$PORT1 --env=${ENV_NAME}",
-  "daemon-port": 9040,
-  "daemon-user": "innova",
-  "depends": "python3-setuptools, python3-dev, python3-pip",
-  "description": "Kidzania CMS v1.6.0",
-  "distribution": "unstable",
-  "init": "debian-way",
-  "install-root": "/local/innova/www-versions",
-  "maintainer-email": "bamboo@inn.ru",
-  "maintainer-name": "Continuous Integration",
-  "make-pidfile": "yes",
-  "name": "inn-kidzania-cms",
-  "package": "inn-kidzania-cms-v1.6.34",
-  "service-owner": "innova",
-  "stage-counter": "0",
-  "version": "1.6"
-}
+build-number: <str>
+category: <str>
+ci-tools-path: <str> // for example: "/var/go/inn-ci-tools",
+cron: <str>
+daemon: <str> // for example: "$APPLICATION_PATH/bin/start"
+daemon-args: <str> // for example: "--port=$PORT1 --env=${ENV_NAME}",
+daemon-port: <int>
+daemon-user: <str>
+depends: <str> // for exanple: "python3-setuptools, python3-dev, python3-pip",
+description: <str> 
+distribution: <str> // "unstable"/"stable"
+init: <str>
+install-root: <str>
+maintainer-email: <str> // for example: "bamboo@inn.ru",
+maintainer-name: <str> // for example: "Continuous Integration",
+make-pidfile: <str> // "yes"/"no"
+name: <str>
+package: <str>
+service-owner: <str>
+stage-counter: <str>
+version: <str>
 ```
 
 ### deploy.marathon
 Запускает приложение в марафоне. Оборачивает `cmd` в специальный скрипт-враппер, который регистрирует запущенный сервис в консуле в реестре сервисов. 
 ```
-{
-  "app-name": "kidzania/kidzite-api-v2.1.34",
-  "cmd": "bin/start",
-  "constraints": "kidz:true",
-  "consul-host": "mesos1-q.qa.inn.ru",
-  "cpu": 0.1,
-  "environment": {
-    "ENV": "qa",
-    "MEMORY": "512",
-    "SERVICE_NAME": "kidzite-api",
-    "SERVICE_VERSION": "2.1.34"
-  },
-  "instances": 1,
-  "marathon-host": "mesos1-q.qa.inn.ru",
-  "mem": 512,
-  "package-uri": "http://mesos1-q.qa.inn.ru/task-registry/kidzania/kidzite-api/kidzite-api-v2.1.34.tar.gz"
-}
+ app-name: <str>
+ cmd: <str>
+ constraints: <str:bool>
+ consul-host: <str>
+ cpu: <float>
+ environment:
+  ENV: <str>
+  MEMORY: <str>
+  SERVICE_NAME: <str>
+  SERVICE_VERSION: <str>
+ 
+ instances: <int>
+ marathon-host: <str>
+  mem: <int>
+  package-uri: <uri>
 ```
 
 ### release
@@ -310,33 +300,26 @@ stages:
 В параметре `--var route='{"stage":"staging"}'` можно передавать доп. параметры для роутинга. 
 
 ```
-{
-  "consul-host": "mesos1-q.qa.inn.ru",
-  "full-name": "kidzania/kidzite-api-v2.1.34",
-  "name-prefix": "kidzania/kidzite-api-v",
-  "outdated": {
-    "marathon": {
-      "marathon-host": "mesos1-q.qa.inn.ru"
-    }
-  },
-  "route": "",
-  "routes": [
-    {
-      "host": "api2.kidzite.qa",
-      "location": "/"
-    }
-  ]
-}
+consul-host: <str> // consul host name
+full-name: <str>
+name-prefix: <str>
+outdated:
+ marathon:
+  marathon-host": <str> // marathon host name
+route: <str> //
+routes:
+ - host: <str> // host nmae
+   location: <str> // host
+ ...  
 ```
 
 ### db.create.postgresql 
 
 Создает клон или удаляет БД Postgresql. Параметры для клонирования
 ```
-purge: true/false
-ssh-user: user-name
-target: target-dbname
-source: source-dbname
-host: dbserver-host
+purge: <bool> // if delete database purge=false 
+ssh-user: <str> // ssh user name
+target: <str> //target database name
+source: <str> // source database name
+host: <str> // host name
 ```
-Если в параметр `purge=true` будет произведена попытка удаления БД.
