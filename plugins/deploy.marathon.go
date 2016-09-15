@@ -122,7 +122,7 @@ func (p DeployMarathon) Uninstall(data manifest.Manifest) error {
 func MarathonClient(marathonHost string) (marathon.Marathon, error) {
 	conf := marathon.NewDefaultConfig()
 	conf.URL = fmt.Sprintf("http://%s:8080", marathonHost)
-	conf.LogOutput = os.Stdout
+	conf.LogOutput = os.Stderr
 	return marathon.NewClient(conf)
 }
 
