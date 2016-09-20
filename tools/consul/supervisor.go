@@ -79,7 +79,7 @@ func SupervisorCommand() cli.Command {
 						Name: c.GlobalString("service"),
 						Port: port,
 						Check: &api.AgentServiceCheck{
-							TCP:      "localhost:" + string(port),
+							TCP:      "localhost:" + strconv.Itoa(port),
 							Interval: "5s",
 						},
 					}); err != nil {
