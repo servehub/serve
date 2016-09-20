@@ -46,7 +46,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 	}
 
 	app.Name(fullName)
-	app.Command(fmt.Sprintf("serve-tools consul supervisor --service '%s' --port $PORT0 start %s", fullName, data.GetString("cmd")))
+	app.AddArgs("serve-tools", "consul", "supervisor", "--service", fullName, "--port", "PORT0", "start", data.GetString("cmd"))
 	app.Count(data.GetInt("instances"))
 	app.Memory(float64(data.GetInt("mem")))
 

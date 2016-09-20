@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -38,7 +39,14 @@ func SupervisorCommand() cli.Command {
 
 					consul, _ := api.NewClient(api.DefaultConfig())
 
-					serviceId := fmt.Sprintf("%s:%s", c.GlobalString("service"), c.GlobalString("port"))
+					port, err := strconv.Atoi(c.GlobalString("port"))
+					if err != nil {
+						if port, err = strconv.Atoi(os.Getenv(c.GlobalString("port"))); err != nil {
+							log.Fatal("Error on get service --port", c.GlobalString("port"), err)
+						}
+					}
+
+					serviceId := fmt.Sprintf("%s:%d", c.GlobalString("service"), port)
 
 					// wait for child process compelete and unregister it from consul
 					go func() {
@@ -69,9 +77,9 @@ func SupervisorCommand() cli.Command {
 					if err := consul.Agent().ServiceRegister(&api.AgentServiceRegistration{
 						ID:   serviceId,
 						Name: c.GlobalString("service"),
-						Port: c.GlobalInt("port"),
+						Port: port,
 						Check: &api.AgentServiceCheck{
-							TCP:      "localhost:" + c.GlobalString("port"),
+							TCP:      "localhost:" + string(port),
 							Interval: "5s",
 						},
 					}); err != nil {
