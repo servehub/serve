@@ -45,8 +45,13 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		MaxLaunchDelaySeconds: &bmax,
 	}
 
+	portArgs := ""
+	if port := data.GetString("listen-port"); port != "" {
+		portArgs = "--port " + port
+	}
+
 	app.Name(fullName)
-	app.Command(fmt.Sprintf("exec serve-tools consul supervisor --service '%s' --port $PORT0 start %s", fullName, data.GetString("cmd")))
+	app.Command(fmt.Sprintf("exec serve-tools consul supervisor --service '%s' %s start %s", fullName, portArgs, data.GetString("cmd")))
 	app.Count(data.GetInt("instances"))
 	app.Memory(float64(data.GetInt("mem")))
 
@@ -59,6 +64,8 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		app.AddConstraint(cs[0], "CLUSTER", cs[1])
 		app.AddLabel(cs[0], cs[1])
 	}
+
+	app.AddEnv("SERVICE_DEPLOY_TIME", time.Now().Format(time.RFC3339)) // force redeploy app
 
 	for k, v := range data.GetMap("environment") {
 		app.AddEnv(k, fmt.Sprintf("%s", v.Unwrap()))

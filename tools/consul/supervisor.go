@@ -39,12 +39,34 @@ func SupervisorCommand() cli.Command {
 
 					consul, _ := api.NewClient(api.DefaultConfig())
 
-					port, err := strconv.Atoi(c.GlobalString("port"))
-					if err != nil {
-						log.Fatal("Error on get service --port", c.GlobalString("port"), err)
-					}
+					var serviceId string
+					var serviceReg *api.AgentServiceRegistration
 
-					serviceId := fmt.Sprintf("%s:%d", c.GlobalString("service"), port)
+					if c.GlobalString("port") != "" {
+						port, err := strconv.Atoi(c.GlobalString("port"))
+						if err != nil {
+							log.Fatal("Error on get service --port", c.GlobalString("port"), err)
+						}
+
+						serviceId = fmt.Sprintf("%s:%d", c.GlobalString("service"), port)
+
+						serviceReg = &api.AgentServiceRegistration{
+							ID:   serviceId,
+							Name: c.GlobalString("service"),
+							Port: port,
+							Check: &api.AgentServiceCheck{
+								TCP:      "localhost:" + strconv.Itoa(port),
+								Interval: "5s",
+							},
+						}
+					} else {
+						serviceId = fmt.Sprintf("%s:%d", c.GlobalString("service"), time.Now().UnixNano())
+
+						serviceReg = &api.AgentServiceRegistration{
+							ID:   serviceId,
+							Name: c.GlobalString("service"),
+						}
+					}
 
 					// wait for child process compelete and unregister it from consul
 					go func() {
@@ -72,15 +94,7 @@ func SupervisorCommand() cli.Command {
 					}()
 
 					// Register service into consul
-					if err := consul.Agent().ServiceRegister(&api.AgentServiceRegistration{
-						ID:   serviceId,
-						Name: c.GlobalString("service"),
-						Port: port,
-						Check: &api.AgentServiceCheck{
-							TCP:      "localhost:" + strconv.Itoa(port),
-							Interval: "5s",
-						},
-					}); err != nil {
+					if err := consul.Agent().ServiceRegister(serviceReg); err != nil {
 						cmd.Process.Signal(syscall.SIGTERM)
 						log.Fatal(err)
 					}
