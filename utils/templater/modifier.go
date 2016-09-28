@@ -44,6 +44,9 @@ func (m Modify) SetFunc(name string, function interface{}) error {
 }
 
 func (m Modify) Call(name string, params ...interface{}) (reflect.Value, error) {
+	fmt.Printf("call: %s %v", name, params)
+
+
 	if _, ok := ModifyFuncs[name]; !ok {
 		return reflect.Value{}, fmt.Errorf("function %v not register", name)
 	}

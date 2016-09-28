@@ -55,6 +55,11 @@ func TestUtilsTemplater(t *testing.T) {
 			in: `{{ version | replace('\W',  '*') }}`,
 			expect: `value*unknown*value*unknown`,
 		},
+
+		"multi resolve and replace with breaks": {
+			in: `{{ version | replace('[a-b]',  '*') }}`,
+			expect: `v*lue-unknown-v*lue-unknown`,
+		},
 	})
 }
 
