@@ -10,7 +10,9 @@ import (
 	"github.com/InnovaCo/serve/utils/gabs"
 )
 
-func TestManifest_ToEnvMap(t *testing.T) {
+func TestManifest(t *testing.T) {
+	color.NoColor = false
+
 	json := []byte(`
 		{
 			"info": { "name": "dima" },
