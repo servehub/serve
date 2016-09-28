@@ -6,6 +6,7 @@ import (
 	"github.com/fatih/color"
 
 	"github.com/InnovaCo/serve/utils/gabs"
+	"github.com/ghodss/yaml"
 )
 
 func TestTemplater(t *testing.T) {
@@ -61,9 +62,22 @@ func runAllProcessorTests(t *testing.T, processor func() Processor, cases map[st
 	color.NoColor = false
 
 	for name, test := range cases {
-		tree, _ := gabs.ParseJSON([]byte(test.in))
+		if test.yaml != "" {
+			s, err := yaml.YAMLToJSON([]byte(test.yaml))
+			if err != nil {
+				t.Fatal(err)
+			}
+			test.in = string(s)
+		}
+
+		tree, err := gabs.ParseJSON([]byte(test.in))
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		proc := processor()
-		err := proc.Process(tree)
+		err = proc.Process(tree)
 
 		if err != nil {
 			t.Fatal(err)
@@ -80,6 +94,7 @@ func runAllProcessorTests(t *testing.T, processor func() Processor, cases map[st
 }
 
 type processorTestCase struct {
+	yaml   string
 	in     string
 	expect string
 }
