@@ -16,8 +16,8 @@ type Include struct{}
 
 func (in Include) Process(tree *gabs.Container) error {
 	path := ConfigPath
-	if path, ok := tree.Search("vars", "config-path").Data().(string); ok {
-		path = path
+	if customPath, ok := tree.Path("vars.config-path").Data().(string); ok {
+		path = customPath
 	}
 
 	if tree.ExistsP("include") {

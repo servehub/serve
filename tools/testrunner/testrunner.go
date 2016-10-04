@@ -105,6 +105,7 @@ func runTest(serve, configPath string, data map[string]interface{}) error {
 }
 
 func serveCommand(serve string, params ...string) (map[string]interface{}, error) {
+	print("\n\n")
 	log.Printf("RUN: %v %v\n", serve, strings.Join(params, " "))
 
 	cmd := exec.Command(serve, params...)
@@ -117,6 +118,8 @@ func serveCommand(serve string, params ...string) (map[string]interface{}, error
 		return nil, err
 	}
 	result := make(map[string]interface{})
+
+	println("\n ---> ", buf.String())
 
 	if b := strings.Index(buf.String(), "{"); b != -1 {
 		if e := strings.Index(buf.String(), "}\n\n"); e != -1 {
