@@ -11,7 +11,7 @@ func init() {
 type Outdated struct{}
 
 func (p Outdated) Run(data manifest.Manifest) error {
-	consul, err := ConsulClient(data.GetString("consul-host"))
+	consul, err := ConsulClient(data.GetString("consul-address"))
 	if err != nil {
 		return err
 	}

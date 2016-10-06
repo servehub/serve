@@ -27,6 +27,7 @@ func main() {
 				consul.SupervisorCommand(),
 				consul.NginxTemplateContextCommand(),
 				consul.RouteCommand(),
+				consul.KvPatchCommand(),
 			},
 		},
 		supervisor.SupervisorCommand(),

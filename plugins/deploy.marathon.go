@@ -91,12 +91,12 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 	color.Green("marathon <- %s", app)
 
-	consulApi, err := ConsulClient(data.GetString("consul-host"))
+	consulApi, err := ConsulClient(data.GetString("consul-address"))
 	if err != nil {
 		return err
 	}
 
-	if err := registerPluginData("deploy.marathon", data.GetString("app-name"), data.String(), data.GetString("consul-host")); err != nil {
+	if err := registerPluginData("deploy.marathon", data.GetString("app-name"), data.String(), data.GetString("consul-address")); err != nil {
 		return err
 	}
 
@@ -134,7 +134,7 @@ func (p DeployMarathon) Uninstall(data manifest.Manifest) error {
 		log.Println(color.YellowString("App `%s` doesnt exists in marathon!", name))
 	}
 
-	return deletePluginData("deploy.marathon", name, data.GetString("consul-host"))
+	return deletePluginData("deploy.marathon", name, data.GetString("consul-address"))
 }
 
 func MarathonClient(marathonHost string) (marathon.Marathon, error) {
@@ -144,9 +144,9 @@ func MarathonClient(marathonHost string) (marathon.Marathon, error) {
 	return marathon.NewClient(conf)
 }
 
-func ConsulClient(consulHost string) (*consul.Client, error) {
+func ConsulClient(consulAddress string) (*consul.Client, error) {
 	conf := consul.DefaultConfig()
-	conf.Address = consulHost + ":8500"
+	conf.Address = consulAddress
 	return consul.NewClient(conf)
 }
 
@@ -168,8 +168,8 @@ func delConsulKv(client *consul.Client, key string) error {
 	return err
 }
 
-func registerPluginData(plugin string, packageName string, data string, consulHost string) error {
-	consulApi, err := ConsulClient(consulHost)
+func registerPluginData(plugin string, packageName string, data string, consulAddress string) error {
+	consulApi, err := ConsulClient(consulAddress)
 	if err != nil {
 		return err
 	}
@@ -177,9 +177,9 @@ func registerPluginData(plugin string, packageName string, data string, consulHo
 	return putConsulKv(consulApi, "services/data/"+packageName+"/"+plugin, data)
 }
 
-func deletePluginData(plugin string, packageName string, consulHost string) error {
+func deletePluginData(plugin string, packageName string, consulAddress string) error {
 	log.Println(color.YellowString("Delete %s for %s package in consul", plugin, packageName))
-	consulApi, err := ConsulClient(consulHost)
+	consulApi, err := ConsulClient(consulAddress)
 	if err != nil {
 		return err
 	}
