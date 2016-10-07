@@ -56,7 +56,7 @@ func main() {
 	}
 
 	for _, pair := range plugins {
-		log.Printf("%s\n%s\n\n", color.GreenString(">>> %s:", pair.PluginName), pair.Data)
+		log.Printf("%s\n%s\n\n", color.GreenString(">>> %s:", pair.PluginName), color.CyanString("%s", pair.Data))
 
 		if !*dryRun {
 			if err := pair.Plugin.Run(pair.Data); err != nil {
