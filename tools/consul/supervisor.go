@@ -45,7 +45,7 @@ func SupervisorCommand() cli.Command {
 					if c.GlobalString("port") != "" {
 						port, err := strconv.Atoi(c.GlobalString("port"))
 						if err != nil {
-							log.Fatal("Error on get service --port", c.GlobalString("port"), err)
+							log.Fatalf("Error on get service --port %s: %s", c.GlobalString("port"), err)
 						}
 
 						serviceId = fmt.Sprintf("%s:%d", c.GlobalString("service"), port)
