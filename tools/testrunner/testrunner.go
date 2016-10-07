@@ -87,7 +87,7 @@ func runTest(serve, configPath string, data map[string]interface{}) error {
 	}
 
 	params := strings.Split(run.(string), " ")
-	params = append(params, "--var", fmt.Sprintf("config-path=%v", configPath), "--manifest", data["manifest"].(string), "--dry-run")
+	params = append(params, "--var", fmt.Sprintf("config-path=%v", configPath), "--manifest", data["manifest"].(string), "--dry-run", "--no-color")
 	result, err := serveCommand(serve, params...)
 	if err != nil {
 		return err
@@ -98,15 +98,15 @@ func runTest(serve, configPath string, data map[string]interface{}) error {
 	}
 
 	if d := diff(result, data["expect"].(map[string]interface{})); !reflect.DeepEqual(d, make(map[string]interface{})) {
-		log.Printf("diff %v\n", d)
+		log.Println(color.RedString("diff %v\n", d))
 		return fmt.Errorf("Error diff: %v\n", d)
 	}
 	return nil
 }
 
 func serveCommand(serve string, params ...string) (map[string]interface{}, error) {
-	print("\n\n")
-	log.Printf("RUN: %v %v\n", serve, strings.Join(params, " "))
+	print("\n")
+	log.Println(color.CyanString("RUN: %v %v\n", serve, strings.Join(params, " ")))
 
 	cmd := exec.Command(serve, params...)
 	cmd.Env = os.Environ()
@@ -119,7 +119,7 @@ func serveCommand(serve string, params ...string) (map[string]interface{}, error
 	}
 	result := make(map[string]interface{})
 
-	println("\n ---> ", buf.String())
+	println(buf.String())
 
 	if b := strings.Index(buf.String(), "{"); b != -1 {
 		if e := strings.Index(buf.String(), "}\n\n"); e != -1 {

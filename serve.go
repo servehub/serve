@@ -13,15 +13,12 @@ import (
 
 var version = "0.0"
 
-func init() {
-	color.NoColor = false
-}
-
 func main() {
 	manifestFile := kingpin.Flag("manifest", "Path to manifest.yml file.").Default("manifest.yml").String()
 	plugin := kingpin.Arg("plugin", "Plugin name for run.").String()
 	vars := *kingpin.Flag("var", "key=value pairs with manifest vars.").StringMap()
 	dryRun := kingpin.Flag("dry-run", "Show manifest section only").Bool()
+	noColor := kingpin.Flag("no-color", "Disable colored output").Bool()
 	pluginData := kingpin.Flag("plugin-data", "Data for plugin").String()
 
 	kingpin.Version(version)
@@ -30,6 +27,8 @@ func main() {
 	var plugins []manifest.PluginData
 	var err error
 	var manifestData *manifest.Manifest
+
+	color.NoColor = *noColor
 
 	if *pluginData != "" {
 		manifestData = manifest.LoadJSON(*pluginData)
