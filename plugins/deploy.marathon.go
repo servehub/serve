@@ -31,7 +31,7 @@ func (p DeployMarathon) Run(data manifest.Manifest) error {
 }
 
 func (p DeployMarathon) Install(data manifest.Manifest) error {
-	marathonApi, err := MarathonClient(data.GetString("marathon-host"))
+	marathonApi, err := MarathonClient(data.GetString("marathon-address"))
 	if err != nil {
 		return err
 	}
@@ -119,7 +119,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 }
 
 func (p DeployMarathon) Uninstall(data manifest.Manifest) error {
-	marathonApi, err := MarathonClient(data.GetString("marathon-host"))
+	marathonApi, err := MarathonClient(data.GetString("marathon-address"))
 	if err != nil {
 		return err
 	}
@@ -137,9 +137,9 @@ func (p DeployMarathon) Uninstall(data manifest.Manifest) error {
 	return deletePluginData("deploy.marathon", name, data.GetString("consul-address"))
 }
 
-func MarathonClient(marathonHost string) (marathon.Marathon, error) {
+func MarathonClient(marathonAddress string) (marathon.Marathon, error) {
 	conf := marathon.NewDefaultConfig()
-	conf.URL = fmt.Sprintf("http://%s:8080", marathonHost)
+	conf.URL = fmt.Sprintf("http://%s", marathonAddress)
 	conf.LogOutput = os.Stderr
 	return marathon.NewClient(conf)
 }
