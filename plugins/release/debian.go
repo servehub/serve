@@ -1,9 +1,10 @@
-package plugins
+package release
 
 import (
 	"fmt"
 
 	"github.com/InnovaCo/serve/manifest"
+	"github.com/InnovaCo/serve/utils"
 )
 
 func init() {
@@ -13,7 +14,7 @@ func init() {
 type ReleaseDebian struct{}
 
 func (p ReleaseDebian) Run(data manifest.Manifest) error {
-	return runSshCmd(
+	return utils.RunSshCmd(
 		data.GetString("cluster"),
 		data.GetString("ssh-user"),
 		fmt.Sprintf(

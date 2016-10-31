@@ -1,4 +1,4 @@
-package plugins
+package release
 
 import (
 	"encoding/json"
@@ -26,7 +26,7 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 		return nil
 	}
 
-	consul, err := ConsulClient(data.GetString("consul-address"))
+	consul, err := utils.ConsulClient(data.GetString("consul-address"))
 	if err != nil {
 		return err
 	}
@@ -87,14 +87,14 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 	}
 
 	// write routes to consul kv
-	if err := putConsulKv(consul, "services/routes/"+fullName, string(routesJson)); err != nil {
+	if err := utils.PutConsulKv(consul, "services/routes/"+fullName, string(routesJson)); err != nil {
 		return err
 	}
 
 	log.Println(color.GreenString("Service `%s` released with routes: %s", fullName, string(routesJson)))
 
 	// find old services with the same routes
-	existsRoutes, err := listConsulKv(consul, "services/routes/"+data.GetString("name-prefix"), nil)
+	existsRoutes, err := utils.ListConsulKv(consul, "services/routes/"+data.GetString("name-prefix"), nil)
 	if err != nil {
 		return err
 	}
@@ -113,11 +113,11 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 						outdated := strings.TrimPrefix(existsRoute.Key, "services/routes/")
 						log.Println(color.GreenString("Found %s with the same routes %v. Remove it!", outdated, string(existsRoute.Value)))
 
-						if err := delConsulKv(consul, existsRoute.Key); err != nil {
+						if err := utils.DelConsulKv(consul, existsRoute.Key); err != nil {
 							return err
 						}
 
-						if err := markAsOutdated(consul, outdated, 10*time.Minute); err != nil {
+						if err := utils.MarkAsOutdated(consul, outdated, 10*time.Minute); err != nil {
 							return err
 						}
 

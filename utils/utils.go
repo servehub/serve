@@ -1,14 +1,5 @@
 package utils
 
-import (
-	"fmt"
-	"log"
-	"os"
-	"os/exec"
-
-	"github.com/fatih/color"
-)
-
 func Substr(s string, pos, length int) string {
 	runes := []rune(s)
 	l := pos + length
@@ -45,27 +36,6 @@ func MergeMaps(maps ...map[string]string) map[string]string {
 		}
 	}
 	return out
-}
-
-func RunCmd(cmdline string, a ...interface{}) error {
-	return RunCmdWithEnv(fmt.Sprintf(cmdline, a...), make(map[string]string, 0))
-}
-
-func RunCmdWithEnv(cmdline string, env map[string]string) error {
-	log.Println(color.YellowString("> %s", cmdline))
-
-	cmd := exec.Command("/bin/bash", "-c", cmdline)
-
-	cmd.Env = os.Environ()
-
-	for k, v := range env {
-		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%v", k, v))
-	}
-
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	return cmd.Run()
 }
 
 func MapsEqual(a, b map[string]string) bool {

@@ -20,13 +20,16 @@ upload:
   - debian: {}
   - marathon: {}
 
-test: &some_test
-  hello: a {{ vars.hello }}
-  name: Dima
-  new ? {{ vars.env }}:
-    qa: Dima-Qa
-    live: Dima-Live
-    dev: Dima-Dev
+test:
+  - integration:
+      repo: git@github.com:InnovaCo/4game-feature-tests.git
+      branch: master
+      jobs:
+        - sh: ./test.sh --suite common-acc-1-qa
+        - sh: ./test.sh --suite common-acc-2-qa
+        - sh: ./test.sh --suite common-acc-3-qa
+        - sh: ./test.sh --suite common-acc-4-qa
+        - sh: ./test.sh --suite common-acc-5-qa
 
 deploy:
   - marathon:
@@ -48,12 +51,3 @@ release:
         "-qa": "~^(.+\\.)?kidzite.qa$;"
         "*": "{{vars.branch}}.kidzite.qa"
       location: /
-
-result:
-  << : *some_test
-  surname: kulikov
-  name: Misha
-
-
-echo:
-  name: kulikov

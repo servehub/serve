@@ -2,6 +2,7 @@ package plugins
 
 import (
 	"github.com/InnovaCo/serve/manifest"
+	"github.com/InnovaCo/serve/utils"
 )
 
 func init() {
@@ -11,18 +12,18 @@ func init() {
 type Outdated struct{}
 
 func (p Outdated) Run(data manifest.Manifest) error {
-	consul, err := ConsulClient(data.GetString("consul-address"))
+	consul, err := utils.ConsulClient(data.GetString("consul-address"))
 	if err != nil {
 		return err
 	}
 
 	fullName := data.GetString("full-name")
 
-	if err := markAsOutdated(consul, fullName, 0); err != nil {
+	if err := utils.MarkAsOutdated(consul, fullName, 0); err != nil {
 		return err
 	}
 
-	if err := delConsulKv(consul, "services/routes/"+fullName); err != nil {
+	if err := utils.DelConsulKv(consul, "services/routes/"+fullName); err != nil {
 		return err
 	}
 

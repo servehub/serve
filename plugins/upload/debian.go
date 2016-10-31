@@ -1,4 +1,4 @@
-package plugins
+package upload
 
 import (
 	"github.com/InnovaCo/serve/manifest"
