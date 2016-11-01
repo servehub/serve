@@ -1,7 +1,7 @@
 VERSION?="1.3.0"
 DEST?=./bin
 
-default: test
+default: install
 
 test:
 	echo "==> Running tests..."
