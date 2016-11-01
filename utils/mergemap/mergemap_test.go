@@ -57,6 +57,26 @@ func TestMerge(t *testing.T) {
 			src:      `{"build": [ {"sh": "echo hello"}, {"sh": "echo hello2"}, {"sh": {"sh": "echo hello3", "other": "ok"}}, {"zip": {"target": "/tmp/" }}, {"zip": {"format": "new" }} ]}`,
 			expected: `{"build": [ {"sh": {"sh": "echo hello", "version": "1.0.34"}}, {"sh": {"sh": "echo hello2", "version": "1.0.34"}}, {"sh": {"sh": "echo hello3", "version": "1.0.34", "other": "ok"}}, {"zip": {"target": "/tmp/", "format": "tar.gz"}} , {"zip": {"format": "new"}} ]}`,
 		},
+		{
+			dst:      `{"build": [ {"debian": {"install-root": "/local/innova/tools"}} ] }`,
+			src:      `{"build": [ {"debian": {"user": "innova"}} ] }`,
+			expected: `{"build": [ {"debian": {"install-root": "/local/innova/tools", "user": "innova"}} ] }`,
+		},
+		{
+			dst:      `{"build": [ {"debian": {"install-root": "/local/innova/tools"}}, {"sh": {"version": "1.0.34"}} ] }`,
+			src:      `{"build": [ {"debian": {"user": "innova"}} ] }`,
+			expected: `{"build": [ {"debian": {"install-root": "/local/innova/tools", "user": "innova"}} ] }`,
+		},
+		{
+			dst:      `{"build": [ {"debian": {"install-root": "/local/innova/tools"}}, {"sh": {"version": "1.0.34"}} ] }`,
+			src:      `{"build": [ {"debian": {"user": "innova"}}, {"sh": {"version": "1.123"}} ] }`,
+			expected: `{"build": [ {"debian": {"install-root": "/local/innova/tools", "user": "innova"}}, {"sh": {"version": "1.123"}} ] }`,
+		},
+		{
+			dst:      `{"build": [ {"debian": {"install-root": "/local/innova/tools"}}, {"sh": {"version": "1.0.34"}} ] }`,
+			src:      `{"build": [ {"debian": {"user": "innova"}}, {"sh": {"format": "zip"}} ] }`,
+			expected: `{"build": [ {"debian": {"install-root": "/local/innova/tools", "user": "innova"}}, {"sh": {"version": "1.0.34", "format": "zip"}} ] }`,
+		},
 	} {
 		var dst map[string]interface{}
 		if err := json.Unmarshal([]byte(tuple.dst), &dst); err != nil {
@@ -93,7 +113,7 @@ func assert(t *testing.T, expected, got map[string]interface{}) {
 		return
 	}
 	if bytes.Compare(expectedBuf, gotBuf) != 0 {
-		t.Errorf("expected %s, got %s", string(expectedBuf), string(gotBuf))
+		t.Errorf("\nexpected %s, \ngot %s", string(expectedBuf), string(gotBuf))
 		return
 	}
 }

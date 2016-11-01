@@ -31,24 +31,42 @@ func merge(dst, src map[string]interface{}, depth int) (map[string]interface{}, 
 				if err != nil {
 					return nil, err
 				}
-			} else if dstMapOk {
-				if srcArr, ok := srcVal.([]interface{}); ok {
-					for _, item := range srcArr {
-						if itemMap, ok := item.(map[string]interface{}); ok {
-							for k, v := range itemMap {
-								if dstVal, ok := dstMap[k]; ok {
-									vMap, ok := v.(map[string]interface{})
-									if !ok {
-										vMap = map[string]interface{}{k: v}
+			} else {
+				if !dstMapOk {
+					// try convert array with one-field maps to map
+					if dstArr, ok := dstVal.([]interface{}); ok {
+						for _, item := range dstArr {
+							if itemMap, ok := item.(map[string]interface{}); ok {
+								if len(itemMap) == 1 {
+									for k, v := range itemMap {
+										dstMap[k] = v
+										dstMapOk = true
 									}
+								}
+							}
+						}
+					}
+				}
 
-									if dstVal, ok := mapify(dstVal); ok {
-										vMap, err := merge(dstVal, vMap, depth+1)
-										if err != nil {
-											return nil, err
+				if dstMapOk {
+					if srcArr, ok := srcVal.([]interface{}); ok {
+						for _, item := range srcArr {
+							if itemMap, ok := item.(map[string]interface{}); ok {
+								for k, v := range itemMap {
+									if dstVal, ok := dstMap[k]; ok {
+										vMap, ok := v.(map[string]interface{})
+										if !ok {
+											vMap = map[string]interface{}{k: v}
 										}
 
-										itemMap[k] = vMap
+										if dstVal, ok := mapify(dstVal); ok {
+											vMap, err := merge(dstVal, vMap, depth+1)
+											if err != nil {
+												return nil, err
+											}
+
+											itemMap[k] = vMap
+										}
 									}
 								}
 							}
