@@ -45,7 +45,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -100,7 +104,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -151,7 +159,11 @@ var TransTab = TransitionTable{
 				return 13
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 16
+			case r == 91 : // ['[','[']
+				return 13
 			case r == 92 : // ['\','\']
+				return 13
+			case r == 93 : // [']',']']
 				return 13
 			case r == 95 : // ['_','_']
 				return 14
@@ -192,7 +204,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -235,7 +251,11 @@ var TransTab = TransitionTable{
 				return 18
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 22
+			case r == 91 : // ['[','[']
+				return 18
 			case r == 92 : // ['\','\']
+				return 18
+			case r == 93 : // [']',']']
 				return 18
 			case r == 95 : // ['_','_']
 				return 20
@@ -282,7 +302,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -331,7 +355,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -372,7 +400,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -413,7 +445,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -454,7 +490,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -497,7 +537,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -544,7 +588,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 32
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -600,7 +648,11 @@ var TransTab = TransitionTable{
 				return 13
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 16
+			case r == 91 : // ['[','[']
+				return 13
 			case r == 92 : // ['\','\']
+				return 13
+			case r == 93 : // [']',']']
 				return 13
 			case r == 95 : // ['_','_']
 				return 14
@@ -643,7 +695,11 @@ var TransTab = TransitionTable{
 				return 13
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 16
+			case r == 91 : // ['[','[']
+				return 13
 			case r == 92 : // ['\','\']
+				return 13
+			case r == 93 : // [']',']']
 				return 13
 			case r == 95 : // ['_','_']
 				return 14
@@ -686,7 +742,11 @@ var TransTab = TransitionTable{
 				return 13
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 16
+			case r == 91 : // ['[','[']
+				return 13
 			case r == 92 : // ['\','\']
+				return 13
+			case r == 93 : // [']',']']
 				return 13
 			case r == 95 : // ['_','_']
 				return 14
@@ -729,7 +789,11 @@ var TransTab = TransitionTable{
 				return 13
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 16
+			case r == 91 : // ['[','[']
+				return 13
 			case r == 92 : // ['\','\']
+				return 13
+			case r == 93 : // [']',']']
 				return 13
 			case r == 95 : // ['_','_']
 				return 14
@@ -770,7 +834,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -813,7 +881,11 @@ var TransTab = TransitionTable{
 				return 18
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 22
+			case r == 91 : // ['[','[']
+				return 18
 			case r == 92 : // ['\','\']
+				return 18
+			case r == 93 : // [']',']']
 				return 18
 			case r == 95 : // ['_','_']
 				return 20
@@ -869,7 +941,11 @@ var TransTab = TransitionTable{
 				return 18
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 22
+			case r == 91 : // ['[','[']
+				return 18
 			case r == 92 : // ['\','\']
+				return 18
+			case r == 93 : // [']',']']
 				return 18
 			case r == 95 : // ['_','_']
 				return 20
@@ -912,7 +988,11 @@ var TransTab = TransitionTable{
 				return 18
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 22
+			case r == 91 : // ['[','[']
+				return 18
 			case r == 92 : // ['\','\']
+				return 18
+			case r == 93 : // [']',']']
 				return 18
 			case r == 95 : // ['_','_']
 				return 20
@@ -955,7 +1035,11 @@ var TransTab = TransitionTable{
 				return 18
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 22
+			case r == 91 : // ['[','[']
+				return 18
 			case r == 92 : // ['\','\']
+				return 18
+			case r == 93 : // [']',']']
 				return 18
 			case r == 95 : // ['_','_']
 				return 20
@@ -1021,7 +1105,11 @@ var TransTab = TransitionTable{
 				return 37
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 40
+			case r == 91 : // ['[','[']
+				return 37
 			case r == 92 : // ['\','\']
+				return 37
+			case r == 93 : // [']',']']
 				return 37
 			case r == 95 : // ['_','_']
 				return 38
@@ -1064,7 +1152,11 @@ var TransTab = TransitionTable{
 				return 41
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 45
+			case r == 91 : // ['[','[']
+				return 41
 			case r == 92 : // ['\','\']
+				return 41
+			case r == 93 : // [']',']']
 				return 41
 			case r == 95 : // ['_','_']
 				return 43
@@ -1105,7 +1197,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -1146,7 +1242,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -1189,7 +1289,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -1234,7 +1338,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -1279,7 +1387,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -1343,7 +1455,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 32
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -1438,7 +1554,11 @@ var TransTab = TransitionTable{
 				return 37
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 40
+			case r == 91 : // ['[','[']
+				return 37
 			case r == 92 : // ['\','\']
+				return 37
+			case r == 93 : // [']',']']
 				return 37
 			case r == 95 : // ['_','_']
 				return 38
@@ -1481,7 +1601,11 @@ var TransTab = TransitionTable{
 				return 37
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 40
+			case r == 91 : // ['[','[']
+				return 37
 			case r == 92 : // ['\','\']
+				return 37
+			case r == 93 : // [']',']']
 				return 37
 			case r == 95 : // ['_','_']
 				return 38
@@ -1524,7 +1648,11 @@ var TransTab = TransitionTable{
 				return 37
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 40
+			case r == 91 : // ['[','[']
+				return 37
 			case r == 92 : // ['\','\']
+				return 37
+			case r == 93 : // [']',']']
 				return 37
 			case r == 95 : // ['_','_']
 				return 38
@@ -1567,7 +1695,11 @@ var TransTab = TransitionTable{
 				return 37
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 40
+			case r == 91 : // ['[','[']
+				return 37
 			case r == 92 : // ['\','\']
+				return 37
+			case r == 93 : // [']',']']
 				return 37
 			case r == 95 : // ['_','_']
 				return 38
@@ -1610,7 +1742,11 @@ var TransTab = TransitionTable{
 				return 41
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 45
+			case r == 91 : // ['[','[']
+				return 41
 			case r == 92 : // ['\','\']
+				return 41
+			case r == 93 : // [']',']']
 				return 41
 			case r == 95 : // ['_','_']
 				return 43
@@ -1666,7 +1802,11 @@ var TransTab = TransitionTable{
 				return 41
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 45
+			case r == 91 : // ['[','[']
+				return 41
 			case r == 92 : // ['\','\']
+				return 41
+			case r == 93 : // [']',']']
 				return 41
 			case r == 95 : // ['_','_']
 				return 43
@@ -1709,7 +1849,11 @@ var TransTab = TransitionTable{
 				return 41
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 45
+			case r == 91 : // ['[','[']
+				return 41
 			case r == 92 : // ['\','\']
+				return 41
+			case r == 93 : // [']',']']
 				return 41
 			case r == 95 : // ['_','_']
 				return 43
@@ -1752,7 +1896,11 @@ var TransTab = TransitionTable{
 				return 41
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 45
+			case r == 91 : // ['[','[']
+				return 41
 			case r == 92 : // ['\','\']
+				return 41
+			case r == 93 : // [']',']']
 				return 41
 			case r == 95 : // ['_','_']
 				return 43
@@ -1793,7 +1941,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -1838,7 +1990,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -1883,7 +2039,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -1928,7 +2088,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -2015,7 +2179,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -2066,7 +2234,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 32
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -2133,7 +2305,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -2178,7 +2354,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -2223,7 +2403,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -2268,7 +2452,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -2382,7 +2570,11 @@ var TransTab = TransitionTable{
 				return 79
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 82
+			case r == 91 : // ['[','[']
+				return 79
 			case r == 92 : // ['\','\']
+				return 79
+			case r == 93 : // [']',']']
 				return 79
 			case r == 95 : // ['_','_']
 				return 80
@@ -2425,7 +2617,11 @@ var TransTab = TransitionTable{
 				return 83
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 87
+			case r == 91 : // ['[','[']
+				return 83
 			case r == 92 : // ['\','\']
+				return 83
+			case r == 93 : // [']',']']
 				return 83
 			case r == 95 : // ['_','_']
 				return 85
@@ -2466,7 +2662,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -2513,7 +2713,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -2562,7 +2766,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -2603,7 +2811,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -2646,7 +2858,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -2717,7 +2933,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -2862,7 +3082,11 @@ var TransTab = TransitionTable{
 				return 79
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 82
+			case r == 91 : // ['[','[']
+				return 79
 			case r == 92 : // ['\','\']
+				return 79
+			case r == 93 : // [']',']']
 				return 79
 			case r == 95 : // ['_','_']
 				return 80
@@ -2905,7 +3129,11 @@ var TransTab = TransitionTable{
 				return 79
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 82
+			case r == 91 : // ['[','[']
+				return 79
 			case r == 92 : // ['\','\']
+				return 79
+			case r == 93 : // [']',']']
 				return 79
 			case r == 95 : // ['_','_']
 				return 80
@@ -2948,7 +3176,11 @@ var TransTab = TransitionTable{
 				return 79
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 82
+			case r == 91 : // ['[','[']
+				return 79
 			case r == 92 : // ['\','\']
+				return 79
+			case r == 93 : // [']',']']
 				return 79
 			case r == 95 : // ['_','_']
 				return 80
@@ -2991,7 +3223,11 @@ var TransTab = TransitionTable{
 				return 79
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 82
+			case r == 91 : // ['[','[']
+				return 79
 			case r == 92 : // ['\','\']
+				return 79
+			case r == 93 : // [']',']']
 				return 79
 			case r == 95 : // ['_','_']
 				return 80
@@ -3034,7 +3270,11 @@ var TransTab = TransitionTable{
 				return 83
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 87
+			case r == 91 : // ['[','[']
+				return 83
 			case r == 92 : // ['\','\']
+				return 83
+			case r == 93 : // [']',']']
 				return 83
 			case r == 95 : // ['_','_']
 				return 85
@@ -3094,7 +3334,11 @@ var TransTab = TransitionTable{
 				return 83
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 87
+			case r == 91 : // ['[','[']
+				return 83
 			case r == 92 : // ['\','\']
+				return 83
+			case r == 93 : // [']',']']
 				return 83
 			case r == 95 : // ['_','_']
 				return 85
@@ -3137,7 +3381,11 @@ var TransTab = TransitionTable{
 				return 83
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 87
+			case r == 91 : // ['[','[']
+				return 83
 			case r == 92 : // ['\','\']
+				return 83
+			case r == 93 : // [']',']']
 				return 83
 			case r == 95 : // ['_','_']
 				return 85
@@ -3180,7 +3428,11 @@ var TransTab = TransitionTable{
 				return 83
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 87
+			case r == 91 : // ['[','[']
+				return 83
 			case r == 92 : // ['\','\']
+				return 83
+			case r == 93 : // [']',']']
 				return 83
 			case r == 95 : // ['_','_']
 				return 85
@@ -3227,7 +3479,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -3276,7 +3532,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -3321,7 +3581,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -3466,7 +3730,11 @@ var TransTab = TransitionTable{
 				return 110
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 113
+			case r == 91 : // ['[','[']
+				return 110
 			case r == 92 : // ['\','\']
+				return 110
+			case r == 93 : // [']',']']
 				return 110
 			case r == 95 : // ['_','_']
 				return 111
@@ -3509,7 +3777,11 @@ var TransTab = TransitionTable{
 				return 114
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 118
+			case r == 91 : // ['[','[']
+				return 114
 			case r == 92 : // ['\','\']
+				return 114
+			case r == 93 : // [']',']']
 				return 114
 			case r == 95 : // ['_','_']
 				return 116
@@ -3550,7 +3822,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -3591,7 +3867,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -3634,7 +3914,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -3679,7 +3963,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -3724,7 +4012,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -3857,7 +4149,11 @@ var TransTab = TransitionTable{
 				return 110
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 113
+			case r == 91 : // ['[','[']
+				return 110
 			case r == 92 : // ['\','\']
+				return 110
+			case r == 93 : // [']',']']
 				return 110
 			case r == 95 : // ['_','_']
 				return 111
@@ -3900,7 +4196,11 @@ var TransTab = TransitionTable{
 				return 110
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 113
+			case r == 91 : // ['[','[']
+				return 110
 			case r == 92 : // ['\','\']
+				return 110
+			case r == 93 : // [']',']']
 				return 110
 			case r == 95 : // ['_','_']
 				return 111
@@ -3943,7 +4243,11 @@ var TransTab = TransitionTable{
 				return 110
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 113
+			case r == 91 : // ['[','[']
+				return 110
 			case r == 92 : // ['\','\']
+				return 110
+			case r == 93 : // [']',']']
 				return 110
 			case r == 95 : // ['_','_']
 				return 111
@@ -3986,7 +4290,11 @@ var TransTab = TransitionTable{
 				return 110
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 113
+			case r == 91 : // ['[','[']
+				return 110
 			case r == 92 : // ['\','\']
+				return 110
+			case r == 93 : // [']',']']
 				return 110
 			case r == 95 : // ['_','_']
 				return 111
@@ -4029,7 +4337,11 @@ var TransTab = TransitionTable{
 				return 114
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 118
+			case r == 91 : // ['[','[']
+				return 114
 			case r == 92 : // ['\','\']
+				return 114
+			case r == 93 : // [']',']']
 				return 114
 			case r == 95 : // ['_','_']
 				return 116
@@ -4089,7 +4401,11 @@ var TransTab = TransitionTable{
 				return 114
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 118
+			case r == 91 : // ['[','[']
+				return 114
 			case r == 92 : // ['\','\']
+				return 114
+			case r == 93 : // [']',']']
 				return 114
 			case r == 95 : // ['_','_']
 				return 116
@@ -4132,7 +4448,11 @@ var TransTab = TransitionTable{
 				return 114
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 118
+			case r == 91 : // ['[','[']
+				return 114
 			case r == 92 : // ['\','\']
+				return 114
+			case r == 93 : // [']',']']
 				return 114
 			case r == 95 : // ['_','_']
 				return 116
@@ -4175,7 +4495,11 @@ var TransTab = TransitionTable{
 				return 114
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 118
+			case r == 91 : // ['[','[']
+				return 114
 			case r == 92 : // ['\','\']
+				return 114
+			case r == 93 : // [']',']']
 				return 114
 			case r == 95 : // ['_','_']
 				return 116
@@ -4216,7 +4540,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -4261,7 +4589,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -4306,7 +4638,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -4357,7 +4693,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -4472,7 +4812,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -4517,7 +4861,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -4568,7 +4916,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -4668,7 +5020,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -4738,7 +5094,11 @@ var TransTab = TransitionTable{
 				return 142
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 145
+			case r == 91 : // ['[','[']
+				return 142
 			case r == 92 : // ['\','\']
+				return 142
+			case r == 93 : // [']',']']
 				return 142
 			case r == 95 : // ['_','_']
 				return 143
@@ -4781,7 +5141,11 @@ var TransTab = TransitionTable{
 				return 146
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 149
+			case r == 91 : // ['[','[']
+				return 146
 			case r == 92 : // ['\','\']
+				return 146
+			case r == 93 : // [']',']']
 				return 146
 			case r == 95 : // ['_','_']
 				return 147
@@ -4822,7 +5186,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -4865,7 +5233,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -4951,7 +5323,11 @@ var TransTab = TransitionTable{
 				return 142
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 145
+			case r == 91 : // ['[','[']
+				return 142
 			case r == 92 : // ['\','\']
+				return 142
+			case r == 93 : // [']',']']
 				return 142
 			case r == 95 : // ['_','_']
 				return 143
@@ -4994,7 +5370,11 @@ var TransTab = TransitionTable{
 				return 142
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 145
+			case r == 91 : // ['[','[']
+				return 142
 			case r == 92 : // ['\','\']
+				return 142
+			case r == 93 : // [']',']']
 				return 142
 			case r == 95 : // ['_','_']
 				return 143
@@ -5037,7 +5417,11 @@ var TransTab = TransitionTable{
 				return 142
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 145
+			case r == 91 : // ['[','[']
+				return 142
 			case r == 92 : // ['\','\']
+				return 142
+			case r == 93 : // [']',']']
 				return 142
 			case r == 95 : // ['_','_']
 				return 143
@@ -5080,7 +5464,11 @@ var TransTab = TransitionTable{
 				return 142
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 145
+			case r == 91 : // ['[','[']
+				return 142
 			case r == 92 : // ['\','\']
+				return 142
+			case r == 93 : // [']',']']
 				return 142
 			case r == 95 : // ['_','_']
 				return 143
@@ -5123,7 +5511,11 @@ var TransTab = TransitionTable{
 				return 146
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 149
+			case r == 91 : // ['[','[']
+				return 146
 			case r == 92 : // ['\','\']
+				return 146
+			case r == 93 : // [']',']']
 				return 146
 			case r == 95 : // ['_','_']
 				return 147
@@ -5166,7 +5558,11 @@ var TransTab = TransitionTable{
 				return 146
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 149
+			case r == 91 : // ['[','[']
+				return 146
 			case r == 92 : // ['\','\']
+				return 146
+			case r == 93 : // [']',']']
 				return 146
 			case r == 95 : // ['_','_']
 				return 147
@@ -5209,7 +5605,11 @@ var TransTab = TransitionTable{
 				return 146
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 149
+			case r == 91 : // ['[','[']
+				return 146
 			case r == 92 : // ['\','\']
+				return 146
+			case r == 93 : // [']',']']
 				return 146
 			case r == 95 : // ['_','_']
 				return 147
@@ -5252,7 +5652,11 @@ var TransTab = TransitionTable{
 				return 146
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 149
+			case r == 91 : // ['[','[']
+				return 146
 			case r == 92 : // ['\','\']
+				return 146
+			case r == 93 : // [']',']']
 				return 146
 			case r == 95 : // ['_','_']
 				return 147
@@ -5293,7 +5697,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -5338,7 +5746,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -5409,7 +5821,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -5454,7 +5870,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
@@ -5525,7 +5945,11 @@ var TransTab = TransitionTable{
 				return 3
 			case 65 <= r && r <= 90 : // ['A','Z']
 				return 8
+			case r == 91 : // ['[','[']
+				return 3
 			case r == 92 : // ['\','\']
+				return 3
+			case r == 93 : // [']',']']
 				return 3
 			case r == 95 : // ['_','_']
 				return 6
