@@ -9,7 +9,7 @@ info:
 
 build:
   - sh: "mkdir -p target/pack && touch target/pack/index.txt"
-  - sbt-pack: {}
+  - sbt: pack
   - sh: "echo 'Hello, World!'"
   - debian:
       daemon: "$APPLICATION_PATH/bin/start"
