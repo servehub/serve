@@ -71,10 +71,13 @@ func TestRunnerCommand() cli.Command {
 					counterOK += 1
 				}
 			}
+
 			log.Printf("in total: number of tests %d\n", (counterErr + counterOK))
+
 			if counterErr > 0 {
-				return fmt.Errorf("Tests with errors: %d\n", counterErr)
+				return fmt.Errorf(color.RedString("\nTests with errors: %d\n", counterErr))
 			}
+
 			return nil
 		},
 	}
