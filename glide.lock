@@ -1,5 +1,5 @@
 hash: ac291e99c20d1dbb47b1f872cbffe913d14196347afde99262d1b395443d6f3a
-updated: 2016-11-08T12:49:14.263344927+03:00
+updated: 2016-11-10T23:29:44.337178863+03:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -18,7 +18,7 @@ imports:
 - name: github.com/fatih/color
   version: bf82308e8c8546dc2b945157173eb8a959ae9505
 - name: github.com/gambol99/go-marathon
-  version: e6dc89572b363835b1222dce4810c83d7757514e
+  version: 40baf7476c1cc627a75039ce6d99a7c06c2dbdbe
 - name: github.com/ghodss/yaml
   version: bea76d6a4713e18b7f5321a2b020738552def3ea
 - name: github.com/google/go-querystring
@@ -26,13 +26,13 @@ imports:
   subpackages:
   - query
 - name: github.com/hashicorp/consul
-  version: eda05a4fccb4d8058b3500f975bff5e9b1a43beb
+  version: 5eb9074ec49ed071c69a7f34b99c2663625f068e
   subpackages:
   - api
 - name: github.com/hashicorp/go-cleanhttp
   version: ad28ea4487f05916463e2423a55166280e8254b5
 - name: github.com/hashicorp/serf
-  version: e0680ca729b018b791af1add413faebe3e1c147e
+  version: f679d7594a349263f6118db40d87122d3a474e7d
   subpackages:
   - coordinate
 - name: github.com/mattn/go-colorable
@@ -44,7 +44,7 @@ imports:
 - name: github.com/valyala/fasttemplate
   version: 3b874956e03f1636d171bda64b130f9135f42cff
 - name: golang.org/x/sys
-  version: 9bb9f0998d48b31547d975974935ae9b48c7a03c
+  version: b699b7032584f0953262cb2788a0ca19bb494703
   subpackages:
   - unix
 - name: gopkg.in/alecthomas/kingpin.v2

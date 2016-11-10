@@ -21,6 +21,10 @@ upload:
   - marathon: {}
 
 test:
+  - autotest:
+      repo: git@github.inn.ru:4game-qa/autotest.git
+      suite: delivery-pb-tests
+
   - integration:
       repo: git@github.com:InnovaCo/4game-feature-tests.git
       branch: master
