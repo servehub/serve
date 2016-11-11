@@ -51,6 +51,10 @@ func _template(s string, context *gabs.Container, modify bool) (string, error) {
 	if _, err := t.ExecuteFunc(w, func(w io.Writer, tag string) (int, error) {
 		tag = strings.TrimSpace(tag)
 		if value := context.Path(tag).Data(); value != nil {
+			if valueArr, ok := value.([]interface{}); ok && len(valueArr) > 0 {
+				value = valueArr[0]
+			}
+
 			return w.Write([]byte(fmt.Sprintf("%v", value)))
 		} else if modify && strings.Contains(tag, "|") {
 			if v, err := ModifyExec(tag, context); err == nil {

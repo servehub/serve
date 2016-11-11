@@ -60,6 +60,11 @@ func TestUtilsTemplater(t *testing.T) {
 			in: `{{ version | replace('[a-b]',  '*') }}`,
 			expect: `v*lue-unknown-v*lue-unknown`,
 		},
+
+		"array value must print first element": {
+			in: `{{ list }}`,
+			expect: `1`,
+		},
 	})
 }
 
@@ -74,7 +79,8 @@ func runAllProcessorTests(t *testing.T, cases map[string]processorTestCase) {
 		"var": {"var": "1"},
 		"version": "{{ feature }}-{{ feature-suffix }}",
 		"feature": "value-unknown",
-		"feature-suffix": "{{ feature }}"
+		"feature-suffix": "{{ feature }}",
+		"list": [1, 2, 3]
 	}`
 
 	tree, err := gabs.ParseJSON([]byte(json))
