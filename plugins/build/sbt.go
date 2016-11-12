@@ -12,5 +12,5 @@ func init() {
 type SbtBuild struct{}
 
 func (p SbtBuild) Run(data manifest.Manifest) error {
-  return utils.RunCmd(`sbt ';set version := "%s"' clean test %s`, data.GetString("version"), data.GetStringOr("sbt", ""))
+  return utils.RunCmd(`sbt ';set every version := "%s"' clean test %s`, data.GetString("version"), data.GetStringOr("sbt", ""))
 }
