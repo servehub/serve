@@ -28,6 +28,7 @@ func main() {
 				consul.NginxTemplateContextCommand(),
 				consul.RouteCommand(),
 				consul.KvPatchCommand(),
+				consul.DeregisterCommand(),
 			},
 		},
 		supervisor.SupervisorCommand(),
