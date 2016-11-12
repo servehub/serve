@@ -38,7 +38,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 	fullName := data.GetString("app-name")
 
-	bs, bf, bmax := 1.0, 2.0, 30.0
+	bs, bf, bmax := 5.0, 2.0, 60.0
 	app := &marathon.Application{
 		BackoffSeconds:        &bs,
 		BackoffFactor:         &bf,
@@ -59,10 +59,20 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		app.CPU(cpu)
 	}
 
-	if constrs := data.GetString("constraints"); constrs != "" {
-		cs := strings.SplitN(constrs, ":", 2)
+	if cluster := data.GetString("cluster"); cluster != "" {
+		cs := strings.SplitN(cluster, ":", 2)
 		app.AddConstraint(cs[0], "CLUSTER", cs[1])
 		app.AddLabel(cs[0], cs[1])
+	}
+
+	for _, cons := range data.GetArray("constraints") {
+		if consArr, ok := cons.Unwrap().([]interface{}); ok {
+			consStrings := make([]string, len(consArr))
+			for i, c := range consArr {
+				consStrings[i] = fmt.Sprintf("%s", c)
+			}
+			app.AddConstraint(consStrings...)
+		}
 	}
 
 	for _, port := range data.GetArray("ports") {
