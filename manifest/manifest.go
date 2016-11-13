@@ -14,6 +14,7 @@ import (
 	"github.com/InnovaCo/serve/manifest/processor"
 	"github.com/InnovaCo/serve/utils"
 	"github.com/InnovaCo/serve/utils/gabs"
+	"encoding/json"
 )
 
 type Manifest struct {
@@ -69,7 +70,7 @@ func (m Manifest) GetMap(path string) map[string]Manifest {
 	out := make(map[string]Manifest)
 	mmap, err := m.tree.Path(path).ChildrenMap()
 	if err != nil {
-		log.Printf("Error get map '%v' from: %v", path, m.tree.Path(path).Data())
+		log.Printf("Error get map '%v' from: %v. Error: %s", path, m.tree.Path(path).Data(), err)
 	}
 
 	for k, v := range mmap {
@@ -95,6 +96,10 @@ func (m Manifest) GetTree(path string) Manifest {
 	return Manifest{m.tree.Path(path)}
 }
 
+func (m Manifest) Set(path string, value interface{}) {
+	m.tree.SetP(value, path)
+}
+
 func (m Manifest) FindPlugins(plugin string) ([]PluginData, error) {
 	tree := m.tree.Path(plugin)
 	result := make([]PluginData, 0)
@@ -109,9 +114,13 @@ func (m Manifest) FindPlugins(plugin string) ([]PluginData, error) {
 			if _, ok := item.Data().(string); ok {
 				result = append(result, makePluginPair(plugin, item))
 			} else if res, err := item.ChildrenMap(); err == nil {
-				for subplugin, data := range res {
-					result = append(result, makePluginPair(plugin+"."+subplugin, data))
-					break
+				if len(res) == 1 {
+					for subplugin, data := range res {
+						result = append(result, makePluginPair(plugin+"."+subplugin, data))
+						break
+					}
+				} else {
+					result = append(result, makePluginPair(plugin, item))
 				}
 			}
 		}
@@ -184,6 +193,11 @@ func makePluginPair(plugin string, data *gabs.Container) PluginData {
 		ns := strings.Split(plugin, ".")
 		obj.Set(s, ns[len(ns)-1])
 		data = obj
+	} else {
+		var cpy interface{}
+		bs, _ := json.Marshal(data.Data())
+		json.Unmarshal(bs, &cpy)
+		data.Set(cpy)
 	}
 
 	return PluginData{plugin, PluginRegestry.Get(plugin), Manifest{data}}

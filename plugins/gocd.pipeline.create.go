@@ -40,11 +40,20 @@ type goCdCredents struct {
 type goCdPipelineCreate struct{}
 
 func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
+	if suffix := data.GetString("name-suffix"); suffix != "" {
+		data.Set("pipeline.pipeline.name", data.GetString("pipeline.pipeline.name") + suffix)
+		data.Set("pipeline.pipeline.envs.SERVE_EXTRA_ARGS.value", data.GetStringOr("pipeline.pipeline.envs.SERVE_EXTRA_ARGS.value", "") + " --var name-suffix=" + suffix)
+	}
+
 	name := data.GetString("pipeline.pipeline.name")
 	url := data.GetString("api-url")
 	if data.GetString("pipeline.pipeline.template") == "" {
 		data.DelTree("pipeline.pipeline.template")
 	}
+
+	replaceMapWithArray(data, "pipeline.pipeline.envs", "pipeline.pipeline.environment_variables")
+	replaceMapWithArray(data, "pipeline.pipeline.params", "pipeline.pipeline.parameters")
+
 	body := data.GetTree("pipeline").String()
 	branch := data.GetString("branch")
 
@@ -320,4 +329,14 @@ func ChangeJSON(resp *http.Response, addPipeline string, delPipeline string) (st
 	result.Set(tree.Path("environment_variables").Data(), "environment_variables")
 
 	return result.String(), nil
+}
+
+func replaceMapWithArray(data manifest.Manifest, mapPath string, arrPath string) {
+	arrs := make([]interface{}, 0)
+	for k, v := range data.GetMap(mapPath) {
+		v.Set("name", k)
+		arrs = append(arrs, v.Unwrap())
+	}
+	data.Set(arrPath, arrs)
+	data.DelTree(mapPath)
 }

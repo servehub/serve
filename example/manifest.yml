@@ -20,6 +20,16 @@ upload:
   - debian: {}
   - marathon: {}
 
+#gocd:
+#  pipeline:
+#    - create:
+#        pipeline:
+#          pipeline: { name: "one" }
+#
+#    - create:
+#        pipeline:
+#          pipeline: { name: "two" }
+
 test:
   - autotest:
       repo: git@github.inn.ru:4game-qa/autotest.git
