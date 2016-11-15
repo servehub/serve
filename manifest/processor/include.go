@@ -27,7 +27,7 @@ func (in Include) Process(tree *gabs.Container) error {
 		}
 
 		for i, _ := range items {
-			inc := items[len(items)-i-1] // loop in reverse order
+			inc := items[len(items)-i-1] // loop in reverse order for merge priority
 
 			if file, ok := inc.Search("file").Data().(string); ok {
 				if !strings.HasPrefix(file, "/") {
