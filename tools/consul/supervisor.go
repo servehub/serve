@@ -72,7 +72,7 @@ func SupervisorCommand() cli.Command {
 					// wait for child process compelete and unregister it from consul
 					go func() {
 						result := cmd.Wait()
-						log.Printf("Service finished with: %v %T", result, result)
+						log.Printf("Service finished with: %v", result)
 
 						log.Println("Deregister service", serviceId, "...")
 						if err := consul.Agent().ServiceDeregister(serviceId); err != nil {
