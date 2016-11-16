@@ -71,14 +71,14 @@ func SupervisorCommand() cli.Command {
 					// wait for child process compelete and unregister it from consul
 					go func() {
 						result := cmd.Wait()
-						log.Printf("Command finished with: %v", result)
+						log.Printf("Service finished with: %v %T", result, result)
 
 						log.Println("Deregister service", serviceId, "...")
 						if err := consul.Agent().ServiceDeregister(serviceId); err != nil {
-							log.Fatal(err)
+							log.Fatal("Error on deregistering service", err)
 						}
 
-						log.Println("Deregistered.")
+						log.Println("Successful deregistered.")
 
 						if exiterr, ok := result.(*exec.ExitError); ok {
 							if status, ok := exiterr.Sys().(syscall.WaitStatus); ok && status.Exited() {
@@ -87,7 +87,7 @@ func SupervisorCommand() cli.Command {
 						}
 
 						if result != nil {
-							os.Exit(2)
+							os.Exit(143)
 						} else {
 							os.Exit(0)
 						}
@@ -102,10 +102,14 @@ func SupervisorCommand() cli.Command {
 					// Handle shutdown signals and kill child process
 					ch := make(chan os.Signal)
 					signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
-					log.Println(<-ch)
+					log.Println("Receive signal", <-ch)
 
 					cmd.Process.Signal(syscall.SIGTERM)
-					time.Sleep(time.Second) // await while child stopped
+
+					result, err := cmd.Process.Wait()
+					log.Printf("Command finished with: %v, %v", result, err)
+
+					time.Sleep(10 * time.Second) // await while service deregistered from consul
 
 					log.Println("Stopped.")
 				},

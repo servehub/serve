@@ -47,14 +47,18 @@ func SupervisorCommand() cli.Command {
 			// Handle shutdown signals and kill child process
 			ch := make(chan os.Signal)
 			signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
-			log.Println("supervisor: signal", <-ch)
+			log.Println("supervisor: receive signal", <-ch)
 
 			if cmd != nil {
+				log.Println("supervisor: send SIGTERM to subprocess")
 				cmd.Process.Signal(syscall.SIGTERM)
-				time.Sleep(time.Second) // await while child stopped
+				res, err := cmd.Process.Wait()
+				log.Println("supervisor: subprocess stopped with", res, err)
 			}
 
 			log.Println(color.YellowString("supervisor: Stopped."))
+
+			os.Exit(143)
 			return nil
 		},
 	}
