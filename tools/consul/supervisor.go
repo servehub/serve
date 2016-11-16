@@ -55,8 +55,9 @@ func SupervisorCommand() cli.Command {
 							Name: c.GlobalString("service"),
 							Port: port,
 							Check: &api.AgentServiceCheck{
-								TCP:      "localhost:" + strconv.Itoa(port),
-								Interval: "5s",
+								TCP: "localhost:" + strconv.Itoa(port),
+								Interval: "10s",
+								DeregisterCriticalServiceAfter: "60m",
 							},
 						}
 					} else {
