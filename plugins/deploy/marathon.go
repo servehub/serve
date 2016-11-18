@@ -38,12 +38,16 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 	fullName := data.GetString("app-name")
 
-	bs, bf, bmax, grace := 5.0, 2.0, 60.0, 30.0
+	bs, bf, bmax, grace := 5.0, 2.0, 120.0, 30.0
 	app := &marathon.Application{
-		BackoffSeconds:             &bs,
-		BackoffFactor:              &bf,
-		MaxLaunchDelaySeconds:      &bmax,
+		BackoffSeconds: &bs,
+		BackoffFactor: &bf,
+		MaxLaunchDelaySeconds: &bmax,
 		TaskKillGracePeriodSeconds: &grace,
+		UpgradeStrategy: &marathon.UpgradeStrategy{
+			MinimumHealthCapacity: 0.0,
+			MaximumOverCapacity: 0.0,
+		},
 	}
 
 	portArgs := ""
