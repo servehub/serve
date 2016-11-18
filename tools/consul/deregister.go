@@ -1,9 +1,10 @@
 package consul
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"strings"
-	"encoding/json"
 
 	"github.com/codegangsta/cli"
 	"github.com/hashicorp/consul/api"
@@ -18,13 +19,13 @@ func DeregisterCommand() cli.Command {
 		},
 		Subcommands: []cli.Command{
 			{
-				Name:  "service",
+				Name: "service",
 				Action: func(c *cli.Context) error {
 					consul, _ := api.NewClient(api.DefaultConfig())
 
 					name := c.Args().First()
 					if name == "" {
-						return f
+						return fmt.Errorf("Service name is required!")
 					}
 
 					servs, err := consul.Agent().Services()
