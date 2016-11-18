@@ -3,7 +3,7 @@ import:
   - package: gopkg.in/alecthomas/kingpin.v2
   - package: github.com/urfave/cli
   - package: github.com/hashicorp/consul/api
-  - package: github.com/gambol99/go-marathon
+  - package: github.com/kulikov/go-marathon
   - package: github.com/ghodss/yaml
   - package: github.com/fatih/color
   - package: github.com/cenk/backoff

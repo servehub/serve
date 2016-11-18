@@ -10,7 +10,7 @@ import (
 
 	"github.com/cenk/backoff"
 	"github.com/fatih/color"
-	marathon "github.com/gambol99/go-marathon"
+	marathon "github.com/kulikov/go-marathon"
 
 	"github.com/InnovaCo/serve/manifest"
 	"github.com/InnovaCo/serve/utils"
@@ -38,11 +38,12 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 	fullName := data.GetString("app-name")
 
-	bs, bf, bmax := 5.0, 2.0, 60.0
+	bs, bf, bmax, grace := 5.0, 2.0, 60.0, 30.0
 	app := &marathon.Application{
-		BackoffSeconds:        &bs,
-		BackoffFactor:         &bf,
-		MaxLaunchDelaySeconds: &bmax,
+		BackoffSeconds:             &bs,
+		BackoffFactor:              &bf,
+		MaxLaunchDelaySeconds:      &bmax,
+		TaskKillGracePeriodSeconds: &grace,
 	}
 
 	portArgs := ""
