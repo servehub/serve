@@ -21,7 +21,7 @@ func main() {
 	app.Usage = "Serve tools"
 
 	app.Commands = []cli.Command{
-		cli.Command{
+		{
 			Name: "consul",
 			Subcommands: []cli.Command{
 				consul.SupervisorCommand(),
@@ -29,6 +29,13 @@ func main() {
 				consul.RouteCommand(),
 				consul.KvPatchCommand(),
 				consul.DeregisterCommand(),
+				{
+					Name: "kv",
+					Subcommands: []cli.Command{
+						consul.KvPatchCommand(),
+						consul.KvRenameCommand(),
+					},
+				},
 			},
 		},
 		supervisor.SupervisorCommand(),

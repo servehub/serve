@@ -10,7 +10,7 @@ import (
 
 	"github.com/cenk/backoff"
 	"github.com/fatih/color"
-	marathon "github.com/kulikov/go-marathon"
+	marathon "github.com/gambol99/go-marathon"
 
 	"github.com/InnovaCo/serve/manifest"
 	"github.com/InnovaCo/serve/utils"

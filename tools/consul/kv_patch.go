@@ -11,7 +11,7 @@ import (
 
 func KvPatchCommand() cli.Command {
 	return cli.Command{
-		Name:  "kv-patch",
+		Name:  "patch",
 		Usage: "Patch json values in consul kv",
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "key"},
