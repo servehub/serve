@@ -45,7 +45,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		MaxLaunchDelaySeconds: &bmax,
 		TaskKillGracePeriodSeconds: &grace,
 		UpgradeStrategy: &marathon.UpgradeStrategy{
-			MinimumHealthCapacity: 0.0, // required by samza-tasks (singleton)
+			MinimumHealthCapacity: 0.9, // rolling update
 			MaximumOverCapacity: 0.0,
 		},
 	}
