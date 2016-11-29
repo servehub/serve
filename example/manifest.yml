@@ -16,6 +16,14 @@ build:
       daemon-args: "--port=$PORT1 --env=${ENV_NAME}"
       daemon-port: 9040
 
+  - tarball:
+      files:
+        - bin
+        - manifest/processor: config    # with rename
+        - include.d
+        - plugins
+        - install.sh
+
 upload:
   - debian: {}
   - marathon: {}
@@ -57,6 +65,12 @@ deploy:
       cluster ? {{ vars.env }}:
         qa: cpb-new.qa.inn.ru
         live: cpb.lux.inn.eu
+
+  - tarball:
+      cluster: 4gamer{1..2}-lc.lux.inn.eu
+
+      hooks:
+        - postinstall: ./install.sh
 
 release:
   routes:

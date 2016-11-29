@@ -1,5 +1,7 @@
 package utils
 
+import "math/rand"
+
 func Substr(s string, pos, length int) string {
 	runes := []rune(s)
 	l := pos + length
@@ -57,3 +59,15 @@ type BySortIndex []map[string]string
 func (a BySortIndex) Len() int           { return len(a) }
 func (a BySortIndex) Less(i, j int) bool { return a[i]["sortIndex"] < a[j]["sortIndex"] }
 func (a BySortIndex) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+
+var allLetters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func RandomString(length int) string {
+    b := make([]rune, length)
+    for i := range b {
+        b[i] = allLetters[rand.Intn(len(allLetters))]
+    }
+    return string(b)
+}
+
