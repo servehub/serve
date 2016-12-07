@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"encoding/json"
 
 	"github.com/fatih/color"
 
@@ -14,7 +15,6 @@ import (
 	"github.com/InnovaCo/serve/manifest/processor"
 	"github.com/InnovaCo/serve/utils"
 	"github.com/InnovaCo/serve/utils/gabs"
-	"encoding/json"
 )
 
 type Manifest struct {
@@ -46,10 +46,18 @@ func (m Manifest) GetStringOr(path string, defaultVal string) string {
 	}
 }
 
+func (m Manifest) GetFloat(path string) float64 {
+	f, err := strconv.ParseFloat(m.GetString(path), 64);
+	if err != nil {
+		log.Fatalf("Error on parse float64 '%v' from: %v", path, m.GetString(path))
+	}
+	return f
+}
+
 func (m Manifest) GetInt(path string) int {
 	i, err := strconv.Atoi(m.GetString(path))
 	if err != nil {
-		log.Printf("Error on parse integer '%v' from: %v", path, m.GetString(path))
+		log.Fatalf("Error on parse integer '%v' from: %v", path, m.GetString(path))
 	}
 	return i
 }
@@ -70,7 +78,7 @@ func (m Manifest) GetMap(path string) map[string]Manifest {
 	out := make(map[string]Manifest)
 	mmap, err := m.tree.Path(path).ChildrenMap()
 	if err != nil {
-		log.Printf("Error get map '%v' from: %v. Error: %s", path, m.tree.Path(path).Data(), err)
+		log.Fatalf("Error get map '%v' from: %v. Error: %s", path, m.tree.Path(path).Data(), err)
 	}
 
 	for k, v := range mmap {
@@ -83,7 +91,7 @@ func (m Manifest) GetArray(path string) []Manifest {
 	out := make([]Manifest, 0)
 	arr, err := m.tree.Path(path).Children()
 	if err != nil {
-		log.Printf("Error get array `%v` from: %v", path, m.tree.Path(path).Data())
+		log.Fatalf("Error get array `%v` from: %v", path, m.tree.Path(path).Data())
 	}
 
 	for _, v := range arr {

@@ -45,8 +45,8 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		MaxLaunchDelaySeconds: &bmax,
 		TaskKillGracePeriodSeconds: &grace,
 		UpgradeStrategy: &marathon.UpgradeStrategy{
-			MinimumHealthCapacity: 0.5, // rolling update
-			MaximumOverCapacity: 0.0,
+			MinimumHealthCapacity: data.GetFloat("min-health-capacity"),
+			MaximumOverCapacity: data.GetFloat("max-over-capacity"),
 		},
 	}
 

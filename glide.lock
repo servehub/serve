@@ -1,5 +1,5 @@
 hash: ac291e99c20d1dbb47b1f872cbffe913d14196347afde99262d1b395443d6f3a
-updated: 2016-11-21T11:49:48.063009729+03:00
+updated: 2016-12-07T09:36:16.462062857+03:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -10,7 +10,7 @@ imports:
 - name: github.com/cenk/backoff
   version: b02f2bbce11d7ea6b97f282ef1771b0fe2f65ef3
 - name: github.com/codegangsta/cli
-  version: b6061c464d493dd94985211595687c862a0dd0bc
+  version: b4f4786f378c0c1d3336b5bb798094b166edf5a9
 - name: github.com/docker/engine-api
   version: 4290f40c056686fcaa5c9caf02eac1dde9315adf
 - name: github.com/donovanhide/eventsource
@@ -26,7 +26,7 @@ imports:
   subpackages:
   - query
 - name: github.com/hashicorp/consul
-  version: fb27534dc14e45c522dc7024d18455cbbee5d216
+  version: 460bf5f71ef03adba83ed2b85c083a3f57b2f38e
   subpackages:
   - api
 - name: github.com/hashicorp/go-cleanhttp
@@ -40,7 +40,7 @@ imports:
 - name: github.com/mattn/go-isatty
   version: 66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8
 - name: github.com/urfave/cli
-  version: b6061c464d493dd94985211595687c862a0dd0bc
+  version: b4f4786f378c0c1d3336b5bb798094b166edf5a9
 - name: github.com/valyala/fasttemplate
   version: 3b874956e03f1636d171bda64b130f9135f42cff
 - name: golang.org/x/sys
