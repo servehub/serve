@@ -49,16 +49,11 @@ func (p BuildDebian) Run(data manifest.Manifest) error {
 	env["MANIFEST_BUILD_DEBIAN_DAEMON_USER"] = data.GetString("daemon-user")
 	env["MANIFEST_BUILD_DEBIAN_DAEMON_PORT"] = data.GetString("daemon-port")
 	env["MANIFEST_BUILD_DEBIAN_MAKE_PIDFILE"] = data.GetString("make-pidfile")
-
 	if d := data.GetString("depends"); d[0] == '[' {
-		println(d)
 		env["MANIFEST_BUILD_DEBIAN_DEPENDS"] = strings.Replace(string([]byte(d)[1:(len(d) - 1)]), " ", ", ", -1)
 	} else {
 		env["MANIFEST_BUILD_DEBIAN_DEPENDS"] = d
 	}
-
-	println(env["MANIFEST_BUILD_DEBIAN_DEPENDS"])
-
 	env["MANIFEST_BUILD_DEBIAN_DESCRIPTION"] = data.GetString("description")
 	env["MANIFEST_BUILD_DEBIAN_INIT"] = data.GetString("init")
 	env["MANIFEST_BUILD_DEBIAN_CRON"] = data.GetString("cron")
