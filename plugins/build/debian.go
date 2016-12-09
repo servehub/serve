@@ -2,6 +2,7 @@ package build
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/InnovaCo/serve/manifest"
 	"github.com/InnovaCo/serve/utils"
@@ -48,7 +49,11 @@ func (p BuildDebian) Run(data manifest.Manifest) error {
 	env["MANIFEST_BUILD_DEBIAN_DAEMON_USER"] = data.GetString("daemon-user")
 	env["MANIFEST_BUILD_DEBIAN_DAEMON_PORT"] = data.GetString("daemon-port")
 	env["MANIFEST_BUILD_DEBIAN_MAKE_PIDFILE"] = data.GetString("make-pidfile")
-	env["MANIFEST_BUILD_DEBIAN_DEPENDS"] = data.GetString("depends")
+	deps := data.GetString("depends")
+	if deps[0] == '[' {
+		deps = strings.Replace(strings.Trim(deps, "[]"), " ", ", ", -1)
+	}
+	env["MANIFEST_BUILD_DEBIAN_DEPENDS"] = deps
 	env["MANIFEST_BUILD_DEBIAN_DESCRIPTION"] = data.GetString("description")
 	env["MANIFEST_BUILD_DEBIAN_INIT"] = data.GetString("init")
 	env["MANIFEST_BUILD_DEBIAN_CRON"] = data.GetString("cron")
