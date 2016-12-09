@@ -66,6 +66,9 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 	if cluster := data.GetString("cluster"); cluster != "" {
 		cs := strings.SplitN(cluster, ":", 2)
+		if len(cs) < 2 {
+			cs = append(cs, "true")
+		}
 		app.AddConstraint(cs[0], "CLUSTER", cs[1])
 		app.AddLabel(cs[0], cs[1])
 	}
