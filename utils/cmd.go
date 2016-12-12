@@ -13,7 +13,7 @@ func RunCmd(cmdline string, a ...interface{}) error {
 	return RunCmdWithEnv(fmt.Sprintf(cmdline, a...), make(map[string]string, 0))
 }
 
-func RunCmdWithEnv(cmdline string, env map[string]string) error {
+var RunCmdWithEnv = func(cmdline string, env map[string]string) error {
 	log.Println(color.YellowString("> %s", cmdline))
 
 	cmd := exec.Command("/bin/bash", "-c", cmdline)
