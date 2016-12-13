@@ -1,5 +1,5 @@
 hash: ac291e99c20d1dbb47b1f872cbffe913d14196347afde99262d1b395443d6f3a
-updated: 2016-12-07T09:36:16.462062857+03:00
+updated: 2016-12-09T15:38:07.826827826+03:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -10,7 +10,7 @@ imports:
 - name: github.com/cenk/backoff
   version: b02f2bbce11d7ea6b97f282ef1771b0fe2f65ef3
 - name: github.com/codegangsta/cli
-  version: b4f4786f378c0c1d3336b5bb798094b166edf5a9
+  version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
 - name: github.com/docker/engine-api
   version: 4290f40c056686fcaa5c9caf02eac1dde9315adf
 - name: github.com/donovanhide/eventsource
@@ -20,31 +20,31 @@ imports:
 - name: github.com/gambol99/go-marathon
   version: 49e62333fe5b0cb965a41e5c16ca86db2415b9ce
 - name: github.com/ghodss/yaml
-  version: bea76d6a4713e18b7f5321a2b020738552def3ea
+  version: 04f313413ffd65ce25f2541bfd2b2ceec5c0908c
 - name: github.com/google/go-querystring
   version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
   subpackages:
   - query
 - name: github.com/hashicorp/consul
-  version: 460bf5f71ef03adba83ed2b85c083a3f57b2f38e
+  version: 17db4a572287f2b0cf93e47339a17db522f12d45
   subpackages:
   - api
 - name: github.com/hashicorp/go-cleanhttp
   version: ad28ea4487f05916463e2423a55166280e8254b5
 - name: github.com/hashicorp/serf
-  version: f679d7594a349263f6118db40d87122d3a474e7d
+  version: d3a67ab21bc8a4643fa53a3633f2d951dd50c6ca
   subpackages:
   - coordinate
 - name: github.com/mattn/go-colorable
   version: d228849504861217f796da67fae4f6e347643f15
 - name: github.com/mattn/go-isatty
-  version: 66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8
+  version: 30a891c33c7cde7b02a981314b4228ec99380cca
 - name: github.com/urfave/cli
-  version: b4f4786f378c0c1d3336b5bb798094b166edf5a9
+  version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
 - name: github.com/valyala/fasttemplate
   version: 3b874956e03f1636d171bda64b130f9135f42cff
 - name: golang.org/x/sys
-  version: 9bb9f0998d48b31547d975974935ae9b48c7a03c
+  version: 478fcf54317e52ab69f40bb4c7a1520288d7f7ea
   subpackages:
   - unix
 - name: gopkg.in/alecthomas/kingpin.v2
