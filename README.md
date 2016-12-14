@@ -341,3 +341,7 @@ target: <str> //target database name
 source: <str> // source database name
 host: <str> // host name
 ```
+
+## License
+
+serve is licensed under BSD 3-clause as stated in file LICENSE
