@@ -34,7 +34,7 @@ func DelConsulKv(client *consul.Client, key string) error {
 	return err
 }
 
-func RegisterPluginData(plugin string, packageName string, data string, consulAddress string) error {
+var RegisterPluginData = func(plugin string, packageName string, data string, consulAddress string) error {
 	consulApi, err := ConsulClient(consulAddress)
 	if err != nil {
 		return err
@@ -43,7 +43,7 @@ func RegisterPluginData(plugin string, packageName string, data string, consulAd
 	return PutConsulKv(consulApi, "services/data/"+packageName+"/"+plugin, data)
 }
 
-func DeletePluginData(plugin string, packageName string, consulAddress string) error {
+var DeletePluginData = func(plugin string, packageName string, consulAddress string) error {
 	log.Println(color.YellowString("Delete %s for %s package in consul", plugin, packageName))
 	consulApi, err := ConsulClient(consulAddress)
 	if err != nil {

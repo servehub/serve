@@ -91,9 +91,12 @@ func NginxTemplateContextCommand() cli.Command {
 						putUpstream(routeUpstream, inst, upstreams)
 					}
 
+					proxyUri := route["proxyUri"]
+
 					delete(route, "host")
 					delete(route, "location")
 					delete(route, "upstream")
+					delete(route, "proxyUri")
 
 					if _, ok := services[host]; !ok {
 						services[host] = make(map[string][]map[string]string, 0)
@@ -122,6 +125,7 @@ func NginxTemplateContextCommand() cli.Command {
 						"staticHost":  staticHost,
 						"routeKeys":   routeKeys,
 						"routeValues": routeValues,
+						"proxyUri":    proxyUri,
 						"sortIndex":   strconv.Itoa(len(route)),
 					})
 				}
