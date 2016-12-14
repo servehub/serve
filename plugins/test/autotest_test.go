@@ -24,7 +24,7 @@ type processorTestCase struct {
 	expect map[string]interface{}
 }
 
-func TestAutotest_Run(t *testing.T) {
+func TestTestAutotest(t *testing.T) {
 	runAllMultiCmdTests(t, map[string]processorTestCase{
 		"simple": {
 			in: `---
