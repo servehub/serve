@@ -63,7 +63,7 @@ func (a BySortIndex) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 var allLetters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
-func RandomString(length int) string {
+var RandomString = func(length int) string {
     b := make([]rune, length)
     for i := range b {
         b[i] = allLetters[rand.Intn(len(allLetters))]
