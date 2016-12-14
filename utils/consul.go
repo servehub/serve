@@ -10,13 +10,13 @@ import (
 	consul "github.com/hashicorp/consul/api"
 )
 
-var ConsulClient = func(consulAddress string) (*consul.Client, error) {
+func ConsulClient(consulAddress string) (*consul.Client, error) {
 	conf := consul.DefaultConfig()
 	conf.Address = consulAddress
 	return consul.NewClient(conf)
 }
 
-var PutConsulKv = func(client *consul.Client, key string, value string) error {
+func PutConsulKv(client *consul.Client, key string, value string) error {
 	log.Printf("consul put `%s`: %s", key, value)
 	_, err := client.KV().Put(&consul.KVPair{Key: strings.TrimPrefix(key, "/"), Value: []byte(value)}, nil)
 	return err
@@ -28,13 +28,13 @@ func ListConsulKv(client *consul.Client, prefix string, q *consul.QueryOptions) 
 	return list, err
 }
 
-var DelConsulKv = func(client *consul.Client, key string) error {
+func DelConsulKv(client *consul.Client, key string) error {
 	log.Printf("consul delete `%s`", key)
 	_, err := client.KV().Delete(strings.TrimPrefix(key, "/"), nil)
 	return err
 }
 
-var RegisterPluginData = func(plugin string, packageName string, data string, consulAddress string) error {
+func RegisterPluginData(plugin string, packageName string, data string, consulAddress string) error {
 	consulApi, err := ConsulClient(consulAddress)
 	if err != nil {
 		return err
@@ -43,7 +43,7 @@ var RegisterPluginData = func(plugin string, packageName string, data string, co
 	return PutConsulKv(consulApi, "services/data/"+packageName+"/"+plugin, data)
 }
 
-var DeletePluginData = func(plugin string, packageName string, consulAddress string) error {
+func DeletePluginData(plugin string, packageName string, consulAddress string) error {
 	log.Println(color.YellowString("Delete %s for %s package in consul", plugin, packageName))
 	consulApi, err := ConsulClient(consulAddress)
 	if err != nil {
