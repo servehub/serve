@@ -11,10 +11,10 @@ import (
 	"reflect"
 	"strings"
 
+	"errors"
 	"github.com/codegangsta/cli"
 	"github.com/fatih/color"
 	"github.com/ghodss/yaml"
-	"errors"
 )
 
 func TestRunnerCommand() cli.Command {

@@ -1,35 +1,31 @@
 package testrunner
 
 import (
-	"testing"
-
 	"github.com/fatih/color"
 	"reflect"
+	"testing"
 )
 
-
 type testrunnerTestCase struct {
-	first   map[string]interface{}
-	second  map[string]interface{}
-	expect  map[string]interface{}
+	first  map[string]interface{}
+	second map[string]interface{}
+	expect map[string]interface{}
 }
 
 func TestPlugin(t *testing.T) {
 	color.NoColor = false
 
 	casses := map[string]testrunnerTestCase{
-		"simple":
-			{
-				first: map[string]interface{}{"name": "value"},
-				second: map[string]interface{}{"name": "value"},
-				expect:  make(map[string]interface{}),
-			},
-		"diff":
-			{
-				first: map[string]interface{}{"name1": "value"},
-				second: map[string]interface{}{"name": "value"},
-				expect: map[string]interface{}{"name": "<nil> != value", "name1": "value != <nil>"},
-			},
+		"simple": {
+			first:  map[string]interface{}{"name": "value"},
+			second: map[string]interface{}{"name": "value"},
+			expect: make(map[string]interface{}),
+		},
+		"diff": {
+			first:  map[string]interface{}{"name1": "value"},
+			second: map[string]interface{}{"name": "value"},
+			expect: map[string]interface{}{"name": "<nil> != value", "name1": "value != <nil>"},
+		},
 	}
 
 	for name, test := range casses {
