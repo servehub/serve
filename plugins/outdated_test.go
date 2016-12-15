@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"testing"
-	"time"
 
 	consul "github.com/hashicorp/consul/api"
 
@@ -21,7 +20,7 @@ consul-address: "127.0.0.1"
 full-name: "test"`,
 				expect: map[string]interface{}{
 					"cmdline":  []string{""},
-					"consulKV": []string{fmt.Sprintf(`services/outdated/test={"endOfLife":%d}`, time.Now().Add(0).UnixNano()/int64(time.Millisecond))},
+					"consulKV": []string{`services/outdated/test`},
 				},
 			},
 		},
@@ -43,11 +42,11 @@ func runAllConsulTests(t *testing.T, cases map[string]processorTestCase, plugin 
 
 		utils.PutConsulKv = func(client *consul.Client, key string, value string) error {
 			for _, v := range test.expect["consulKV"].([]string) {
-				if v == fmt.Sprintf("%v=%v", key, value) {
+				if v == key {
 					return nil
 				}
 			}
-			return fmt.Errorf("consulKV: %v=%v not found in %v", key, value, test.expect["consulKV"].([]string))
+			return fmt.Errorf("consulKV: %v not found in %v", key, test.expect["consulKV"].([]string))
 		}
 
 		utils.DelConsulKv = func(client *consul.Client, key string) error {

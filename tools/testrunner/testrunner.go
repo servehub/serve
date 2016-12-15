@@ -122,8 +122,6 @@ func serveCommand(serve string, params ...string) (map[string]interface{}, error
 	}
 	result := make(map[string]interface{})
 
-	println(buf.String())
-
 	if b := strings.Index(buf.String(), "{"); b != -1 {
 		if e := strings.Index(buf.String(), "}\n\n"); e != -1 {
 			if err := json.Unmarshal(buf.Bytes()[b:e+1], &result); err != nil {
