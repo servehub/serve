@@ -1,11 +1,12 @@
 package testrunner
 
 import (
-	"github.com/fatih/color"
 	"io/ioutil"
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/fatih/color"
 )
 
 type testrunnerTestCase struct {

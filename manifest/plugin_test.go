@@ -1,8 +1,9 @@
 package manifest
 
 import (
-	"github.com/fatih/color"
 	"testing"
+
+	"github.com/fatih/color"
 )
 
 type testPlugin struct{}

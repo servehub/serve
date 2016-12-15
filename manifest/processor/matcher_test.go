@@ -1,6 +1,8 @@
 package processor
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMatcher(t *testing.T) {
 	runAllProcessorTests(t, func() Processor { return Matcher{} }, map[string]processorTestCase{

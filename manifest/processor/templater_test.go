@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/fatih/color"
+	"github.com/ghodss/yaml"
 
 	"github.com/InnovaCo/serve/utils/gabs"
-	"github.com/ghodss/yaml"
 )
 
 func TestTemplater(t *testing.T) {
