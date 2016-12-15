@@ -33,7 +33,9 @@ func (m Matcher) Process(tree *gabs.Container) error {
 					}
 
 					for k, v := range valmap {
-						if k == "*" { continue }
+						if k == "*" {
+							continue
+						}
 
 						re, err := regexp.Compile("^" + strings.Trim(k, "^$") + "$")
 						if err != nil {

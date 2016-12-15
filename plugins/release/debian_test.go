@@ -2,8 +2,8 @@ package release
 
 import (
 	"fmt"
-	"testing"
 	"github.com/fatih/color"
+	"testing"
 
 	"github.com/ghodss/yaml"
 
@@ -25,21 +25,22 @@ type processorTestCase struct {
 }
 
 func TestReleaseDebian(t *testing.T) {
-	runAllMultiCmdTests(t, map[string]processorTestCase{
-		"simple": {
-			in: `---
+	runAllMultiCmdTests(t,
+		map[string]processorTestCase{
+			"simple": {
+				in: `---
 cluster: "test.ru"
 ssh-user: test_user
 ci-tools-path: /var/test
 package: package
 site: test-site
 mode: stage`,
-			expect: map[string]interface{}{
-				"cmdline": []string{"dig +short test.ru | sort | uniq | parallel --tag --line-buffer -j 1 ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null test_user@{} \"sudo /var/test/debian-way/release.sh --package='package' --site='test-site' --mode='stage'\""},
+				expect: map[string]interface{}{
+					"cmdline": []string{"dig +short test.ru | sort | uniq | parallel --tag --line-buffer -j 1 ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null test_user@{} \"sudo /var/test/debian-way/release.sh --package='package' --site='test-site' --mode='stage'\""},
 				},
+			},
 		},
-	},
-	ReleaseDebian{})
+		ReleaseDebian{})
 }
 
 func runAllMultiCmdTests(t *testing.T, cases map[string]processorTestCase, plugin manifest.Plugin) {

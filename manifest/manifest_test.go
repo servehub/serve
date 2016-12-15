@@ -1,8 +1,8 @@
 package manifest
 
 import (
-	"testing"
 	"strings"
+	"testing"
 
 	"github.com/fatih/color"
 
@@ -51,14 +51,14 @@ func TestManifest(t *testing.T) {
 	}
 
 	if !utils.MapsEqual(m.ToEnvMap("SERVE_"), map[string]string{
-		"SERVE_FLAG":"true",
-		"SERVE_FOO_ARRAY_0":"10",
-		"SERVE_FOO_ARRAY_1":"20",
-		"SERVE_FOO_ARRAY_2":"30",
-		"SERVE_FOO_ARRAY_3":"one",
-		"SERVE_FOO_ARRAY_4_SUB":"obj",
-		"SERVE_INFO_NAME":"dima",
-		"SERVE_COUNT":"1",
+		"SERVE_FLAG":            "true",
+		"SERVE_FOO_ARRAY_0":     "10",
+		"SERVE_FOO_ARRAY_1":     "20",
+		"SERVE_FOO_ARRAY_2":     "30",
+		"SERVE_FOO_ARRAY_3":     "one",
+		"SERVE_FOO_ARRAY_4_SUB": "obj",
+		"SERVE_INFO_NAME":       "dima",
+		"SERVE_COUNT":           "1",
 	}) {
 		color.Red("Error in ToEnvArray method")
 		t.Error("Error in ToEnvArray method")

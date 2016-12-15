@@ -2,8 +2,8 @@ package plugins
 
 import (
 	"fmt"
-	"testing"
 	"github.com/fatih/color"
+	"testing"
 
 	"github.com/ghodss/yaml"
 
@@ -25,47 +25,48 @@ type processorTestCase struct {
 }
 
 func TestDBCreatePostgresql(t *testing.T) {
-	runAllMultiCmdTests(t, map[string]processorTestCase{
-		"create": {
-			in: `---
+	runAllMultiCmdTests(t,
+		map[string]processorTestCase{
+			"create": {
+				in: `---
 purge: false
 ssh-user: "test_user"
 target: "target_db_test"`,
-			expect: map[string]interface{}{
-				"cmdline": []string{"ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null test_user@<nil> \"sudo -Hu postgres createdb -O postgres \"target_db_test\"\""},
+				expect: map[string]interface{}{
+					"cmdline": []string{"ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null test_user@<nil> \"sudo -Hu postgres createdb -O postgres \"target_db_test\"\""},
 				},
-		},
-		"create with source": {
-			in: `---
+			},
+			"create with source": {
+				in: `---
 purge: false
 ssh-user: "test_user"
 source: "source_db_test"
 target: "target_db_test"`,
-			expect: map[string]interface{}{
-				"cmdline": []string{"ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null test_user@<nil> \"sudo -Hu postgres createdb -O postgres \"target_db_test\" && sudo -Hu postgres pg_dump \"source_db_test\" | sudo -Hu postgres psql \"target_db_test\"\""},
+				expect: map[string]interface{}{
+					"cmdline": []string{"ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null test_user@<nil> \"sudo -Hu postgres createdb -O postgres \"target_db_test\" && sudo -Hu postgres pg_dump \"source_db_test\" | sudo -Hu postgres psql \"target_db_test\"\""},
 				},
-		},
-		"drop": {
-			in: `---
+			},
+			"drop": {
+				in: `---
 purge: true
 ssh-user: "test_user"
 target: "target_db_test"`,
-			expect: map[string]interface{}{
-				"cmdline": []string{"ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null test_user@<nil> \"sudo -Hu postgres psql -c \\\"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='target_db_test';\\\" && sudo -Hu postgres dropdb --if-exists \"target_db_test\"\""},
+				expect: map[string]interface{}{
+					"cmdline": []string{"ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null test_user@<nil> \"sudo -Hu postgres psql -c \\\"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='target_db_test';\\\" && sudo -Hu postgres dropdb --if-exists \"target_db_test\"\""},
 				},
-		},
-		"drop with source": {
-			in: `---
+			},
+			"drop with source": {
+				in: `---
 purge: true
 ssh-user: "test_user"
 source: "source_db_test"
 target: "target_db_test"`,
-			expect: map[string]interface{}{
-				"cmdline": []string{"ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null test_user@<nil> \"sudo -Hu postgres psql -c \\\"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='target_db_test';\\\" && sudo -Hu postgres dropdb --if-exists \"target_db_test\"\""},
+				expect: map[string]interface{}{
+					"cmdline": []string{"ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null test_user@<nil> \"sudo -Hu postgres psql -c \\\"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='target_db_test';\\\" && sudo -Hu postgres dropdb --if-exists \"target_db_test\"\""},
 				},
+			},
 		},
-	},
-	DBCreatePostgresql{})
+		DBCreatePostgresql{})
 }
 
 func runAllMultiCmdTests(t *testing.T, cases map[string]processorTestCase, plugin manifest.Plugin) {

@@ -1,4 +1,4 @@
-package test
+package upload
 
 import (
 	"fmt"
@@ -24,22 +24,22 @@ type processorTestCase struct {
 	expect map[string]interface{}
 }
 
-func TestTestAutotest(t *testing.T) {
+func TestUploadDebian(t *testing.T) {
 	runAllMultiCmdTests(t,
 		map[string]processorTestCase{
 			"simple": {
 				in: `---
-project: "test"
-version: "0.0.0"
-repo: "git@test.ru:test.git"
-suite: "test-test"`,
+ssh-connection: "-i ~/.ssh/id_rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no test@test.ru"
+script: "/usr/local/bin/apt_moving_packages.sh"
+changes-file: "package_name"
+src-repo: unstable
+dst-repo: stable`,
 				expect: map[string]interface{}{
-					"cmdline": []string{"rm -rf tests && git clone --depth 1 --single-branch --recursive git@test.ru:test.git tests",
-						"cd tests/ && ./test.sh --project=test --version=0.0.0 --suite=test-test"},
+					"cmdline": []string{"ssh -i ~/.ssh/id_rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no test@test.ru \"/usr/local/bin/apt_moving_packages.sh package_name unstable stable\""},
 				},
 			},
 		},
-		TestAutotest{})
+		UploadDebian{})
 }
 
 func runAllMultiCmdTests(t *testing.T, cases map[string]processorTestCase, plugin manifest.Plugin) {

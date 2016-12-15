@@ -27,11 +27,11 @@ func (p DBCreatePostgresql) Create(data manifest.Manifest) error {
 	if data.Has("source") {
 		t := data.GetString("target")
 		cmd = fmt.Sprintf("sudo -Hu postgres createdb -O %s \"%s\" && sudo -Hu postgres pg_dump \"%s\" | sudo -Hu postgres psql \"%s\"",
-			              data.GetStringOr("db-user", "postgres"), t, data.GetString("source"), t)
+			data.GetStringOr("db-user", "postgres"), t, data.GetString("source"), t)
 
 	} else {
 		cmd = fmt.Sprintf("sudo -Hu postgres createdb -O %s \"%s\"",
-			              data.GetStringOr("db-user", "postgres"), data.GetString("target"))
+			data.GetStringOr("db-user", "postgres"), data.GetString("target"))
 	}
 
 	return utils.RunSingleSshCmd(data.GetString("host"), data.GetString("ssh-user"), cmd)

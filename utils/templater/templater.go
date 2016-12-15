@@ -1,14 +1,14 @@
 package templater
 
 import (
+	"bytes"
+	"fmt"
 	"io"
 	"strings"
-	"fmt"
-	"bytes"
 	"sync"
 
-	"github.com/valyala/fasttemplate"
 	"github.com/InnovaCo/serve/utils/gabs"
+	"github.com/valyala/fasttemplate"
 )
 
 var bytesBufferPool = sync.Pool{New: func() interface{} {

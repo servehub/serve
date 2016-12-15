@@ -16,7 +16,7 @@ func ConsulClient(consulAddress string) (*consul.Client, error) {
 	return consul.NewClient(conf)
 }
 
-func PutConsulKv(client *consul.Client, key string, value string) error {
+var PutConsulKv = func(client *consul.Client, key string, value string) error {
 	log.Printf("consul put `%s`: %s", key, value)
 	_, err := client.KV().Put(&consul.KVPair{Key: strings.TrimPrefix(key, "/"), Value: []byte(value)}, nil)
 	return err
@@ -28,7 +28,7 @@ func ListConsulKv(client *consul.Client, prefix string, q *consul.QueryOptions) 
 	return list, err
 }
 
-func DelConsulKv(client *consul.Client, key string) error {
+var DelConsulKv = func(client *consul.Client, key string) error {
 	log.Printf("consul delete `%s`", key)
 	_, err := client.KV().Delete(strings.TrimPrefix(key, "/"), nil)
 	return err

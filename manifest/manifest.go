@@ -1,13 +1,13 @@
 package manifest
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
-	"encoding/json"
 
 	"github.com/fatih/color"
 
@@ -47,7 +47,7 @@ func (m Manifest) GetStringOr(path string, defaultVal string) string {
 }
 
 func (m Manifest) GetFloat(path string) float64 {
-	f, err := strconv.ParseFloat(m.GetString(path), 64);
+	f, err := strconv.ParseFloat(m.GetString(path), 64)
 	if err != nil {
 		log.Fatalf("Error on parse float64 '%v' from: %v", path, m.GetString(path))
 	}

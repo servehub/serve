@@ -1,32 +1,33 @@
-package build
+package plugins
 
 import (
 	"fmt"
 	"github.com/fatih/color"
 	"testing"
 
+	consul "github.com/hashicorp/consul/api"
+
 	"github.com/InnovaCo/serve/manifest"
 	"github.com/InnovaCo/serve/utils"
 )
 
-func TestMarathonBuild(t *testing.T) {
-	runAllMultiCmdTests(t,
+func TestOutdated(t *testing.T) {
+	runAllConsulTests(t,
 		map[string]processorTestCase{
 			"simple": {
 				in: `---
-source: target/pack
-registry-url: test.ru`,
+consul-address: "127.0.0.1"
+full-name: "test"`,
 				expect: map[string]interface{}{
-					"cmdline": []string{"tar -zcf marathon.tar.gz -C target/pack/ .",
-						"curl -vsSf -XPUT -T marathon.tar.gz test.ru",
-					},
+					"cmdline":  []string{""},
+					"consulKV": []string{`services/outdated/test`},
 				},
 			},
 		},
-		MarathonBuild{})
+		Outdated{})
 }
 
-func runAllMultiCmdTests(t *testing.T, cases map[string]processorTestCase, plugin manifest.Plugin) {
+func runAllConsulTests(t *testing.T, cases map[string]processorTestCase, plugin manifest.Plugin) {
 	color.NoColor = false
 
 	for name, test := range cases {
@@ -37,6 +38,19 @@ func runAllMultiCmdTests(t *testing.T, cases map[string]processorTestCase, plugi
 				}
 			}
 			return fmt.Errorf("cmd: %v not found in %v", cmdline, test.expect["cmdline"].([]string))
+		}
+
+		utils.PutConsulKv = func(client *consul.Client, key string, value string) error {
+			for _, v := range test.expect["consulKV"].([]string) {
+				if v == key {
+					return nil
+				}
+			}
+			return fmt.Errorf("consulKV: %v not found in %v", key, test.expect["consulKV"].([]string))
+		}
+
+		utils.DelConsulKv = func(client *consul.Client, key string) error {
+			return nil
 		}
 
 		if err := loadTestData(test.in, plugin); err == nil {
