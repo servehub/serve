@@ -2,8 +2,8 @@ package deploy
 
 import (
 	"fmt"
-	"testing"
 	"github.com/fatih/color"
+	"testing"
 
 	"github.com/ghodss/yaml"
 
@@ -25,9 +25,10 @@ type processorTestCase struct {
 }
 
 func TestDeployDebian(t *testing.T) {
-	runAllMultiCmdTests(t, map[string]processorTestCase{
-		"install": {
-			in: `---
+	runAllMultiCmdTests(t,
+		map[string]processorTestCase{
+			"install": {
+				in: `---
 parallel: 1
 consul-address: "consul.test.ru"
 cluster: "test.ru"
@@ -36,12 +37,12 @@ ci-tools-path: "/var/test"
 app-name: "test/package"
 package: "package"
 version: "0.0.0"`,
-			expect: map[string]interface{}{
-				"cmdline": []string{"dig +short test.ru | sort | uniq | parallel --tag --line-buffer -j 1 ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null test_user@{} \"sudo /var/test/debian-way/deploy.sh --package='package' --version='0.0.0'\""},
+				expect: map[string]interface{}{
+					"cmdline": []string{"dig +short test.ru | sort | uniq | parallel --tag --line-buffer -j 1 ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null test_user@{} \"sudo /var/test/debian-way/deploy.sh --package='package' --version='0.0.0'\""},
 				},
-		},
-		"uninstall": {
-			in: `---
+			},
+			"uninstall": {
+				in: `---
 parallel: 1
 consul-address: "consul.test.ru"
 cluster: "test.ru"
@@ -51,12 +52,12 @@ app-name: "test/package"
 package: "package"
 version: "0.0.0"
 purge: true`,
-			expect: map[string]interface{}{
-				"cmdline": []string{"dig +short test.ru | sort | uniq | parallel --tag --line-buffer -j 1 ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null test_user@{} \"sudo apt-get purge package -y\""},
+				expect: map[string]interface{}{
+					"cmdline": []string{"dig +short test.ru | sort | uniq | parallel --tag --line-buffer -j 1 ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null test_user@{} \"sudo apt-get purge package -y\""},
 				},
+			},
 		},
-	},
-	DeployDebian{})
+		DeployDebian{})
 }
 
 func runAllMultiCmdTests(t *testing.T, cases map[string]processorTestCase, plugin manifest.Plugin) {

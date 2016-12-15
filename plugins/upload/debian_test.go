@@ -2,8 +2,8 @@ package upload
 
 import (
 	"fmt"
-	"testing"
 	"github.com/fatih/color"
+	"testing"
 
 	"github.com/ghodss/yaml"
 
@@ -25,20 +25,21 @@ type processorTestCase struct {
 }
 
 func TestUploadDebian(t *testing.T) {
-	runAllMultiCmdTests(t, map[string]processorTestCase{
-		"simple": {
-			in: `---
+	runAllMultiCmdTests(t,
+		map[string]processorTestCase{
+			"simple": {
+				in: `---
 ssh-connection: "-i ~/.ssh/id_rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no test@test.ru"
 script: "/usr/local/bin/apt_moving_packages.sh"
 changes-file: "package_name"
 src-repo: unstable
 dst-repo: stable`,
-			expect: map[string]interface{}{
-				"cmdline": []string{"ssh -i ~/.ssh/id_rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no test@test.ru \"/usr/local/bin/apt_moving_packages.sh package_name unstable stable\""},
+				expect: map[string]interface{}{
+					"cmdline": []string{"ssh -i ~/.ssh/id_rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no test@test.ru \"/usr/local/bin/apt_moving_packages.sh package_name unstable stable\""},
 				},
+			},
 		},
-	},
-	UploadDebian{})
+		UploadDebian{})
 }
 
 func runAllMultiCmdTests(t *testing.T, cases map[string]processorTestCase, plugin manifest.Plugin) {

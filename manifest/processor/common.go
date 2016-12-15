@@ -53,7 +53,7 @@ func ProcessAll(tree *gabs.Container, visitor func(string, *gabs.Container, inte
 		}
 	}
 
-	if (len(errors) == 0) {
+	if len(errors) == 0 {
 		return nil
 	} else {
 		return fmt.Errorf(strings.Join(errors, "\n"))

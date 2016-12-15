@@ -41,8 +41,8 @@ type goCdPipelineCreate struct{}
 
 func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 	if suffix := data.GetString("name-suffix"); suffix != "" {
-		data.Set("pipeline.pipeline.name", data.GetString("pipeline.pipeline.name") + suffix)
-		data.Set("pipeline.pipeline.envs.SERVE_EXTRA_ARGS.value", data.GetStringOr("pipeline.pipeline.envs.SERVE_EXTRA_ARGS.value", "") + " --var name-suffix=" + suffix)
+		data.Set("pipeline.pipeline.name", data.GetString("pipeline.pipeline.name")+suffix)
+		data.Set("pipeline.pipeline.envs.SERVE_EXTRA_ARGS.value", data.GetStringOr("pipeline.pipeline.envs.SERVE_EXTRA_ARGS.value", "")+" --var name-suffix="+suffix)
 	}
 
 	name := data.GetString("pipeline.pipeline.name")

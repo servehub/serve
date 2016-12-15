@@ -2,8 +2,8 @@ package plugins
 
 import (
 	"fmt"
-	"testing"
 	"github.com/fatih/color"
+	"testing"
 	"time"
 
 	consul "github.com/hashicorp/consul/api"
@@ -12,20 +12,20 @@ import (
 	"github.com/InnovaCo/serve/utils"
 )
 
-
 func TestOutdated(t *testing.T) {
-	runAllConsulTests(t, map[string]processorTestCase{
-		"simple": {
-			in: `---
+	runAllConsulTests(t,
+		map[string]processorTestCase{
+			"simple": {
+				in: `---
 consul-address: "127.0.0.1"
 full-name: "test"`,
-			expect: map[string]interface{}{
-				"cmdline": []string{""},
-				"consulKV": []string{fmt.Sprintf(`services/outdated/test={"endOfLife":%d}`, time.Now().Add(0).UnixNano()/int64(time.Millisecond))},
+				expect: map[string]interface{}{
+					"cmdline":  []string{""},
+					"consulKV": []string{fmt.Sprintf(`services/outdated/test={"endOfLife":%d}`, time.Now().Add(0).UnixNano()/int64(time.Millisecond))},
 				},
+			},
 		},
-	},
-	Outdated{})
+		Outdated{})
 }
 
 func runAllConsulTests(t *testing.T, cases map[string]processorTestCase, plugin manifest.Plugin) {

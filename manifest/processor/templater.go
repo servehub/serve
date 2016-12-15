@@ -11,7 +11,7 @@ type Templater struct{}
 
 func (t Templater) Process(tree *gabs.Container) error {
 	return Repeat(3, func() error {
-		return ProcessAll(tree, func (ktype string, output *gabs.Container, value interface{}, key interface{}) error {
+		return ProcessAll(tree, func(ktype string, output *gabs.Container, value interface{}, key interface{}) error {
 			switch ktype {
 			case "map":
 				newKey, err := templater.Template(key.(string), tree)

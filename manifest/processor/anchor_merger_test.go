@@ -12,7 +12,7 @@ vars: &v
   env: qa
 deploy:
   <<: *v`,
-			in: "",
+			in:     "",
 			expect: `{"deploy":{"env":"qa"},"vars":{"env":"qa"}}`,
 		},
 		"empty": {
@@ -21,7 +21,7 @@ vars:
   env: qa
 deploy:
   env: live`,
-			in: "",
+			in:     "",
 			expect: `{"deploy":{"env":"live"},"vars":{"env":"qa"}}`,
 		},
 		"chain": {
@@ -32,10 +32,9 @@ deploy: &d
   <<: *v
 release:
   <<: *d`,
-			in: "",
+			in:     "",
 			expect: `{"deploy":{"env":"qa"},"release":{"env":"qa"},"vars":{"env":"qa"}}`,
 		},
-
 	},
 	)
 }

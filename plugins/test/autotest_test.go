@@ -2,8 +2,8 @@ package test
 
 import (
 	"fmt"
-	"testing"
 	"github.com/fatih/color"
+	"testing"
 
 	"github.com/ghodss/yaml"
 
@@ -25,20 +25,21 @@ type processorTestCase struct {
 }
 
 func TestTestAutotest(t *testing.T) {
-	runAllMultiCmdTests(t, map[string]processorTestCase{
-		"simple": {
-			in: `---
+	runAllMultiCmdTests(t,
+		map[string]processorTestCase{
+			"simple": {
+				in: `---
 project: "test"
 version: "0.0.0"
 repo: "git@test.ru:test.git"
 suite: "test-test"`,
-			expect: map[string]interface{}{
-				"cmdline": []string{"rm -rf tests && git clone --depth 1 --single-branch --recursive git@test.ru:test.git tests",
-									"cd tests/ && ./test.sh --project=test --version=0.0.0 --suite=test-test"},
+				expect: map[string]interface{}{
+					"cmdline": []string{"rm -rf tests && git clone --depth 1 --single-branch --recursive git@test.ru:test.git tests",
+						"cd tests/ && ./test.sh --project=test --version=0.0.0 --suite=test-test"},
 				},
+			},
 		},
-	},
-	TestAutotest{})
+		TestAutotest{})
 }
 
 func runAllMultiCmdTests(t *testing.T, cases map[string]processorTestCase, plugin manifest.Plugin) {
