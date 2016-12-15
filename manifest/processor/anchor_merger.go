@@ -8,7 +8,7 @@ type AnchorMerger struct{}
 
 func (t AnchorMerger) Process(tree *gabs.Container) error {
 	return Repeat(3, func() error {
-		return ProcessAll(tree, func (ktype string, output *gabs.Container, value interface{}, key interface{}) error {
+		return ProcessAll(tree, func(ktype string, output *gabs.Container, value interface{}, key interface{}) error {
 			if ktype == "map" && key == "<<" {
 				if mmap, ok := value.(map[string]interface{}); ok {
 					for k, v := range mmap {

@@ -1,13 +1,13 @@
 package manifest
 
 import (
-	"testing"
 	"github.com/fatih/color"
+	"testing"
 )
 
 type testPlugin struct{}
 
-func (t testPlugin)Run(_ Manifest) error {
+func (t testPlugin) Run(_ Manifest) error {
 	return nil
 }
 
@@ -25,7 +25,7 @@ func TestPlugin(t *testing.T) {
 		t.Fail()
 	}
 
-	if f := pd.Get("test_plugin"); f != nil  {
+	if f := pd.Get("test_plugin"); f != nil {
 		color.Green("\n%s: OK\n", "Get")
 	} else {
 		color.Red("Error Get register plugin")

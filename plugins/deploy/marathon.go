@@ -40,14 +40,14 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 	bs, bf, bmax, grace := 5.0, 2.0, 120.0, 30.0
 	app := &marathon.Application{
-		User: data.GetString("user"),
-		BackoffSeconds: &bs,
-		BackoffFactor: &bf,
-		MaxLaunchDelaySeconds: &bmax,
+		User:                       data.GetString("user"),
+		BackoffSeconds:             &bs,
+		BackoffFactor:              &bf,
+		MaxLaunchDelaySeconds:      &bmax,
 		TaskKillGracePeriodSeconds: &grace,
 		UpgradeStrategy: &marathon.UpgradeStrategy{
 			MinimumHealthCapacity: data.GetFloat("min-health-capacity"),
-			MaximumOverCapacity: data.GetFloat("max-over-capacity"),
+			MaximumOverCapacity:   data.GetFloat("max-over-capacity"),
 		},
 	}
 

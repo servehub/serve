@@ -41,7 +41,7 @@ func SupervisorCommand() cli.Command {
 						os.Exit(0)
 					}
 					return err
-				}, backoff.NewConstantBackOff(time.Second * 3))
+				}, backoff.NewConstantBackOff(time.Second*3))
 			}()
 
 			// Handle shutdown signals and kill child process

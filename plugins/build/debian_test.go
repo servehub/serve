@@ -2,8 +2,8 @@ package build
 
 import (
 	"fmt"
-	"testing"
 	"github.com/fatih/color"
+	"testing"
 
 	"github.com/ghodss/yaml"
 
@@ -25,9 +25,10 @@ type processorTestCase struct {
 }
 
 func TestBuildDebian(t *testing.T) {
-	runAllDebianTests(t, map[string]processorTestCase{
-		"empty depends": {
-			in: `---
+	runAllDebianTests(t,
+		map[string]processorTestCase{
+			"empty depends": {
+				in: `---
 name: "test-package"
 description: "test package"
 version: "0.0.0"
@@ -50,33 +51,33 @@ service-owner: "tester"
 daemon-user: "tester"
 depends: ""
 cron: ""`,
-			expect: map[string]interface{}{
-				"cmdline": "/var/go/inn-ci-tools/go/debian-build.sh --distribution=unstable",
-				"env": map[string]string{
-					"MANIFEST_PACKAGE": "package",
-					"MANIFEST_INFO_NAME": "test-package",
-					"MANIFEST_INFO_VERSION": "0.0.0",
-					"MANIFEST_BUILD_DEBIAN_SECTION": "test",
-					"MANIFEST_INFO_CATEGORY": "test",
-					"MANIFEST_BUILD_DEBIAN_MAINTAINER_NAME": "Continuous Integration",
-					"MANIFEST_BUILD_DEBIAN_MAINTAINER_EMAIL": "bamboo@inn.ru",
-					"MANIFEST_BUILD_DEBIAN_INSTALL_ROOT": "/local/test",
-					"MANIFEST_BUILD_DEBIAN_DAEMON": "",
-					"MANIFEST_BUILD_DEBIAN_DAEMON_ARGS": "",
-					"MANIFEST_BUILD_DEBIAN_SERVICE_OWNER": "tester",
-					"MANIFEST_BUILD_DEBIAN_DAEMON_USER": "tester",
-					"MANIFEST_BUILD_DEBIAN_DAEMON_PORT": "",
-					"MANIFEST_BUILD_DEBIAN_MAKE_PIDFILE": "yes",
-					"MANIFEST_BUILD_DEBIAN_DEPENDS": "",
-					"MANIFEST_BUILD_DEBIAN_DESCRIPTION": "test package",
-					"MANIFEST_BUILD_DEBIAN_INIT": "debian-way",
-					"MANIFEST_BUILD_DEBIAN_CRON": "",
-					"GO_PIPELINE_LABEL": "0",
-					"GO_STAGE_COUNTER": "1",
-				}},
-		},
-		"list depends": {
-			in: `---
+				expect: map[string]interface{}{
+					"cmdline": "/var/go/inn-ci-tools/go/debian-build.sh --distribution=unstable",
+					"env": map[string]string{
+						"MANIFEST_PACKAGE":                       "package",
+						"MANIFEST_INFO_NAME":                     "test-package",
+						"MANIFEST_INFO_VERSION":                  "0.0.0",
+						"MANIFEST_BUILD_DEBIAN_SECTION":          "test",
+						"MANIFEST_INFO_CATEGORY":                 "test",
+						"MANIFEST_BUILD_DEBIAN_MAINTAINER_NAME":  "Continuous Integration",
+						"MANIFEST_BUILD_DEBIAN_MAINTAINER_EMAIL": "bamboo@inn.ru",
+						"MANIFEST_BUILD_DEBIAN_INSTALL_ROOT":     "/local/test",
+						"MANIFEST_BUILD_DEBIAN_DAEMON":           "",
+						"MANIFEST_BUILD_DEBIAN_DAEMON_ARGS":      "",
+						"MANIFEST_BUILD_DEBIAN_SERVICE_OWNER":    "tester",
+						"MANIFEST_BUILD_DEBIAN_DAEMON_USER":      "tester",
+						"MANIFEST_BUILD_DEBIAN_DAEMON_PORT":      "",
+						"MANIFEST_BUILD_DEBIAN_MAKE_PIDFILE":     "yes",
+						"MANIFEST_BUILD_DEBIAN_DEPENDS":          "",
+						"MANIFEST_BUILD_DEBIAN_DESCRIPTION":      "test package",
+						"MANIFEST_BUILD_DEBIAN_INIT":             "debian-way",
+						"MANIFEST_BUILD_DEBIAN_CRON":             "",
+						"GO_PIPELINE_LABEL":                      "0",
+						"GO_STAGE_COUNTER":                       "1",
+					}},
+			},
+			"list depends": {
+				in: `---
 name: "test-package"
 description: "test package"
 version: "0.0.0"
@@ -101,33 +102,33 @@ depends:
   - python
   - go
 cron: ""`,
-			expect: map[string]interface{}{
-				"cmdline": "/var/go/inn-ci-tools/go/debian-build.sh --distribution=unstable",
-				"env": map[string]string{
-					"MANIFEST_PACKAGE": "package",
-					"MANIFEST_INFO_NAME": "test-package",
-					"MANIFEST_INFO_VERSION": "0.0.0",
-					"MANIFEST_BUILD_DEBIAN_SECTION": "test",
-					"MANIFEST_INFO_CATEGORY": "test",
-					"MANIFEST_BUILD_DEBIAN_MAINTAINER_NAME": "Continuous Integration",
-					"MANIFEST_BUILD_DEBIAN_MAINTAINER_EMAIL": "bamboo@inn.ru",
-					"MANIFEST_BUILD_DEBIAN_INSTALL_ROOT": "/local/test",
-					"MANIFEST_BUILD_DEBIAN_DAEMON": "",
-					"MANIFEST_BUILD_DEBIAN_DAEMON_ARGS": "",
-					"MANIFEST_BUILD_DEBIAN_SERVICE_OWNER": "tester",
-					"MANIFEST_BUILD_DEBIAN_DAEMON_USER": "tester",
-					"MANIFEST_BUILD_DEBIAN_DAEMON_PORT": "",
-					"MANIFEST_BUILD_DEBIAN_MAKE_PIDFILE": "yes",
-					"MANIFEST_BUILD_DEBIAN_DEPENDS": "python, go",
-					"MANIFEST_BUILD_DEBIAN_DESCRIPTION": "test package",
-					"MANIFEST_BUILD_DEBIAN_INIT": "debian-way",
-					"MANIFEST_BUILD_DEBIAN_CRON": "",
-					"GO_PIPELINE_LABEL": "0",
-					"GO_STAGE_COUNTER": "1",
-				}},
-		},
-		"string depends": {
-			in: `---
+				expect: map[string]interface{}{
+					"cmdline": "/var/go/inn-ci-tools/go/debian-build.sh --distribution=unstable",
+					"env": map[string]string{
+						"MANIFEST_PACKAGE":                       "package",
+						"MANIFEST_INFO_NAME":                     "test-package",
+						"MANIFEST_INFO_VERSION":                  "0.0.0",
+						"MANIFEST_BUILD_DEBIAN_SECTION":          "test",
+						"MANIFEST_INFO_CATEGORY":                 "test",
+						"MANIFEST_BUILD_DEBIAN_MAINTAINER_NAME":  "Continuous Integration",
+						"MANIFEST_BUILD_DEBIAN_MAINTAINER_EMAIL": "bamboo@inn.ru",
+						"MANIFEST_BUILD_DEBIAN_INSTALL_ROOT":     "/local/test",
+						"MANIFEST_BUILD_DEBIAN_DAEMON":           "",
+						"MANIFEST_BUILD_DEBIAN_DAEMON_ARGS":      "",
+						"MANIFEST_BUILD_DEBIAN_SERVICE_OWNER":    "tester",
+						"MANIFEST_BUILD_DEBIAN_DAEMON_USER":      "tester",
+						"MANIFEST_BUILD_DEBIAN_DAEMON_PORT":      "",
+						"MANIFEST_BUILD_DEBIAN_MAKE_PIDFILE":     "yes",
+						"MANIFEST_BUILD_DEBIAN_DEPENDS":          "python, go",
+						"MANIFEST_BUILD_DEBIAN_DESCRIPTION":      "test package",
+						"MANIFEST_BUILD_DEBIAN_INIT":             "debian-way",
+						"MANIFEST_BUILD_DEBIAN_CRON":             "",
+						"GO_PIPELINE_LABEL":                      "0",
+						"GO_STAGE_COUNTER":                       "1",
+					}},
+			},
+			"string depends": {
+				in: `---
 name: "test-package"
 description: "test package"
 version: "0.0.0"
@@ -150,40 +151,40 @@ service-owner: "tester"
 daemon-user: "tester"
 depends: "python, go"
 cron: ""`,
-			expect: map[string]interface{}{
-				"cmdline": "/var/go/inn-ci-tools/go/debian-build.sh --distribution=unstable",
-				"env": map[string]string{
-					"MANIFEST_PACKAGE": "package",
-					"MANIFEST_INFO_NAME": "test-package",
-					"MANIFEST_INFO_VERSION": "0.0.0",
-					"MANIFEST_BUILD_DEBIAN_SECTION": "test",
-					"MANIFEST_INFO_CATEGORY": "test",
-					"MANIFEST_BUILD_DEBIAN_MAINTAINER_NAME": "Continuous Integration",
-					"MANIFEST_BUILD_DEBIAN_MAINTAINER_EMAIL": "bamboo@inn.ru",
-					"MANIFEST_BUILD_DEBIAN_INSTALL_ROOT": "/local/test",
-					"MANIFEST_BUILD_DEBIAN_DAEMON": "",
-					"MANIFEST_BUILD_DEBIAN_DAEMON_ARGS": "",
-					"MANIFEST_BUILD_DEBIAN_SERVICE_OWNER": "tester",
-					"MANIFEST_BUILD_DEBIAN_DAEMON_USER": "tester",
-					"MANIFEST_BUILD_DEBIAN_DAEMON_PORT": "",
-					"MANIFEST_BUILD_DEBIAN_MAKE_PIDFILE": "yes",
-					"MANIFEST_BUILD_DEBIAN_DEPENDS": "python, go",
-					"MANIFEST_BUILD_DEBIAN_DESCRIPTION": "test package",
-					"MANIFEST_BUILD_DEBIAN_INIT": "debian-way",
-					"MANIFEST_BUILD_DEBIAN_CRON": "",
-					"GO_PIPELINE_LABEL": "0",
-					"GO_STAGE_COUNTER": "1",
-				}},
+				expect: map[string]interface{}{
+					"cmdline": "/var/go/inn-ci-tools/go/debian-build.sh --distribution=unstable",
+					"env": map[string]string{
+						"MANIFEST_PACKAGE":                       "package",
+						"MANIFEST_INFO_NAME":                     "test-package",
+						"MANIFEST_INFO_VERSION":                  "0.0.0",
+						"MANIFEST_BUILD_DEBIAN_SECTION":          "test",
+						"MANIFEST_INFO_CATEGORY":                 "test",
+						"MANIFEST_BUILD_DEBIAN_MAINTAINER_NAME":  "Continuous Integration",
+						"MANIFEST_BUILD_DEBIAN_MAINTAINER_EMAIL": "bamboo@inn.ru",
+						"MANIFEST_BUILD_DEBIAN_INSTALL_ROOT":     "/local/test",
+						"MANIFEST_BUILD_DEBIAN_DAEMON":           "",
+						"MANIFEST_BUILD_DEBIAN_DAEMON_ARGS":      "",
+						"MANIFEST_BUILD_DEBIAN_SERVICE_OWNER":    "tester",
+						"MANIFEST_BUILD_DEBIAN_DAEMON_USER":      "tester",
+						"MANIFEST_BUILD_DEBIAN_DAEMON_PORT":      "",
+						"MANIFEST_BUILD_DEBIAN_MAKE_PIDFILE":     "yes",
+						"MANIFEST_BUILD_DEBIAN_DEPENDS":          "python, go",
+						"MANIFEST_BUILD_DEBIAN_DESCRIPTION":      "test package",
+						"MANIFEST_BUILD_DEBIAN_INIT":             "debian-way",
+						"MANIFEST_BUILD_DEBIAN_CRON":             "",
+						"GO_PIPELINE_LABEL":                      "0",
+						"GO_STAGE_COUNTER":                       "1",
+					}},
+			},
 		},
-	},
-	BuildDebian{})
+		BuildDebian{})
 }
 
 func runAllDebianTests(t *testing.T, cases map[string]processorTestCase, plugin manifest.Plugin) {
 	color.NoColor = false
 
 	for name, test := range cases {
-		utils.RunCmdWithEnv = func (cmdline string, env map[string]string) error {
+		utils.RunCmdWithEnv = func(cmdline string, env map[string]string) error {
 			if cmdline != test.expect["cmdline"] {
 				return fmt.Errorf("%v != %v", cmdline, test.expect["cmdline"])
 			}

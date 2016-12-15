@@ -78,7 +78,8 @@ func RouteCommand() cli.Command {
 						return err
 					}
 
-					OuterLoop: for _, route := range routes {
+				OuterLoop:
+					for _, route := range routes {
 						for _, oldRoute := range oldRoutes {
 							if utils.MapsEqual(route, oldRoute) {
 								log.Println(color.GreenString("Found %s with same routes %v. Remove it!", strings.TrimPrefix(existsRoute.Key, "services/routes/"), string(existsRoute.Value)))

@@ -1,10 +1,10 @@
 package loader
 
 import (
-	"testing"
-	"os"
-	"io/ioutil"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"testing"
 
 	"github.com/fatih/color"
 )
@@ -16,10 +16,10 @@ func TestAnchorMerger(t *testing.T) {
 vars: &v
   env: qa
 deploy:
-  env: live`,)
+  env: live`)
 	expect := `{"deploy":{"env":"live"},"vars":{"env":"qa"}}`
 
-    if err := ioutil.WriteFile("/tmp/test", in, 0644); err != nil {
+	if err := ioutil.WriteFile("/tmp/test", in, 0644); err != nil {
 		color.Red("Error file not create")
 		t.Error("Error file not create")
 		t.Fail()

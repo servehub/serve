@@ -11,10 +11,10 @@ import (
 	"reflect"
 	"strings"
 
+	"errors"
 	"github.com/codegangsta/cli"
 	"github.com/fatih/color"
 	"github.com/ghodss/yaml"
-	"errors"
 )
 
 func TestRunnerCommand() cli.Command {
@@ -121,8 +121,6 @@ func serveCommand(serve string, params ...string) (map[string]interface{}, error
 		return nil, err
 	}
 	result := make(map[string]interface{})
-
-	println(buf.String())
 
 	if b := strings.Index(buf.String(), "{"); b != -1 {
 		if e := strings.Index(buf.String(), "}\n\n"); e != -1 {

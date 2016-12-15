@@ -12,10 +12,10 @@ func init() {
 type SbtBuild struct{}
 
 func (p SbtBuild) Run(data manifest.Manifest) error {
-  return utils.RunCmd(
-	  `sbt ';set every version := "%s"' clean "%s" %s`,
-	  data.GetString("version"),
-	  data.GetString("test"),
-	  data.GetStringOr("sbt", ""),
-  )
+	return utils.RunCmd(
+		`sbt ';set every version := "%s"' clean "%s" %s`,
+		data.GetString("version"),
+		data.GetString("test"),
+		data.GetStringOr("sbt", ""),
+	)
 }
