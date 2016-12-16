@@ -2,9 +2,9 @@ package plugins
 
 import (
 	"fmt"
-	"github.com/fatih/color"
 	"testing"
 
+	"github.com/fatih/color"
 	consul "github.com/hashicorp/consul/api"
 
 	"github.com/InnovaCo/serve/manifest"

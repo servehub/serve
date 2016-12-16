@@ -2,8 +2,9 @@ package build
 
 import (
 	"fmt"
-	"github.com/fatih/color"
 	"testing"
+
+	"github.com/fatih/color"
 
 	"github.com/InnovaCo/serve/manifest"
 	"github.com/InnovaCo/serve/utils"

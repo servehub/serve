@@ -1,9 +1,15 @@
 package utils
 
-import "math/rand"
+import (
+	"math/rand"
+	"reflect"
+)
 
 func Substr(s string, pos, length int) string {
 	runes := []rune(s)
+	if pos < 0 {
+		pos = 0
+	}
 	l := pos + length
 	if l > len(runes) {
 		l = len(runes)
@@ -41,17 +47,7 @@ func MergeMaps(maps ...map[string]string) map[string]string {
 }
 
 func MapsEqual(a, b map[string]string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-
-	for k, v := range a {
-		if w, ok := b[k]; !ok || v != w {
-			return false
-		}
-	}
-
-	return true
+	return reflect.DeepEqual(a, b)
 }
 
 type BySortIndex []map[string]string
@@ -62,7 +58,7 @@ func (a BySortIndex) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 var allLetters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
-var RandomString = func(length int) string {
+var RandomString = func(length uint) string {
 	b := make([]rune, length)
 	for i := range b {
 		b[i] = allLetters[rand.Intn(len(allLetters))]

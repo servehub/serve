@@ -2,9 +2,9 @@ package deploy
 
 import (
 	"fmt"
-	"github.com/fatih/color"
 	"testing"
 
+	"github.com/fatih/color"
 	"github.com/ghodss/yaml"
 
 	"github.com/InnovaCo/serve/manifest"
@@ -81,7 +81,7 @@ func runAllMultiCmdTests(t *testing.T, cases map[string]processorTestCase, plugi
 			return nil
 		}
 
-		utils.RandomString = func(length int) string {
+		utils.RandomString = func(length uint) string {
 			return "RANDOM_NAME"
 		}
 
