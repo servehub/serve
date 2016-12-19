@@ -117,7 +117,7 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 							return err
 						}
 
-						if err := utils.MarkAsOutdated(consul, outdated, time.Duration(data.GetIntOr("outdated-timeout-sec", 300)) * time.Minute); err != nil {
+						if err := utils.MarkAsOutdated(consul, outdated, time.Duration(data.GetIntOr("outdated-timeout-sec", 300)) * time.Second); err != nil {
 							return err
 						}
 
