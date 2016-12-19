@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/fatih/color"
 	"github.com/ghodss/yaml"
 
 	"github.com/InnovaCo/serve/manifest"
@@ -181,8 +180,6 @@ cron: ""`,
 }
 
 func runAllDebianTests(t *testing.T, cases map[string]processorTestCase, plugin manifest.Plugin) {
-	color.NoColor = false
-
 	for name, test := range cases {
 
 		t.Run(name, func(t *testing.T) {
@@ -203,7 +200,7 @@ func runAllDebianTests(t *testing.T, cases map[string]processorTestCase, plugin 
 			}
 
 			if err := loadTestData(test.in, plugin); err != nil {
-				color.Red("error %v\n: failed!", err)
+				t.Errorf("Error: %v", err)
 				t.Fail()
 			}
 		})

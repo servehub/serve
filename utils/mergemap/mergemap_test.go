@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
-
-	"github.com/fatih/color"
 )
 
 func TestMerge(t *testing.T) {
@@ -123,7 +121,7 @@ func TestMerge(t *testing.T) {
 
 func assert(t *testing.T, expected, got map[string]interface{}) {
 	if !reflect.DeepEqual(expected, got) {
-		color.Red("expected %v, \ngot %v", expected, got)
+		t.Errorf("Error:\nexpected %v, \ngot %v", expected, got)
 		t.Fail()
 	}
 }

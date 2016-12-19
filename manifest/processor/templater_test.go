@@ -3,7 +3,6 @@ package processor
 import (
 	"testing"
 
-	"github.com/fatih/color"
 	"github.com/ghodss/yaml"
 
 	"github.com/InnovaCo/serve/utils/gabs"
@@ -59,8 +58,6 @@ func TestTemplater(t *testing.T) {
 }
 
 func runAllProcessorTests(t *testing.T, processor func() Processor, cases map[string]processorTestCase) {
-	color.NoColor = false
-
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
 			if test.yaml != "" {
@@ -85,8 +82,7 @@ func runAllProcessorTests(t *testing.T, processor func() Processor, cases map[st
 			}
 
 			if tree.String() != test.expect {
-				color.Red("\n\nTest `%s` failed!", name)
-				color.Yellow("\n\nexpected:  %s\n\ngiven: %s\n\n", test.expect, tree.String())
+				t.Errorf("Error:\nexpected:  %s\n\ngiven: %s\n\n", test.expect, tree.String())
 				t.Fail()
 			}
 		})

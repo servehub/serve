@@ -2,7 +2,6 @@ package upload
 
 import (
 	"fmt"
-	"github.com/fatih/color"
 	"testing"
 
 	"github.com/ghodss/yaml"
@@ -43,8 +42,6 @@ dst-repo: stable`,
 }
 
 func runAllMultiCmdTests(t *testing.T, cases map[string]processorTestCase, plugin manifest.Plugin) {
-	color.NoColor = false
-
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
 			utils.RunCmdWithEnv = func(cmdline string, env map[string]string) error {
@@ -57,7 +54,7 @@ func runAllMultiCmdTests(t *testing.T, cases map[string]processorTestCase, plugi
 			}
 
 			if err := loadTestData(test.in, plugin); err != nil {
-				color.Red("error %v\n: failed!", err)
+				t.Errorf("Error %v", err)
 				t.Fail()
 			}
 		})

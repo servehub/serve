@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/fatih/color"
 	consul "github.com/hashicorp/consul/api"
 
 	"github.com/InnovaCo/serve/manifest"
@@ -28,8 +27,6 @@ full-name: "test"`,
 }
 
 func runAllConsulTests(t *testing.T, cases map[string]processorTestCase, plugin manifest.Plugin) {
-	color.NoColor = false
-
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
 			utils.RunCmdWithEnv = func(cmdline string, env map[string]string) error {
@@ -55,7 +52,7 @@ func runAllConsulTests(t *testing.T, cases map[string]processorTestCase, plugin 
 			}
 
 			if err := loadTestData(test.in, plugin); err != nil {
-				color.Red("error %v\n: failed!", err)
+				t.Errorf("Error: %v", err)
 				t.Fail()
 			}
 		})
