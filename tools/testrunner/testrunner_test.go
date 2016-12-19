@@ -30,15 +30,14 @@ func TestDiff(t *testing.T) {
 			expect: map[string]interface{}{"name": "<nil> != value", "name1": "value != <nil>"},
 		},
 	}
-
 	for name, test := range casses {
-		if d := diff(test.first, test.second); !reflect.DeepEqual(d, test.expect) {
-			color.Red("\n\nTest `%s` failed!", name)
-			color.Yellow("\n\nexpected:  %v\n\ngiven: %v\n\n", test.expect, d)
-			t.Fail()
-		} else {
-			color.Green("\nTest `%s`: OK\n", name)
-		}
+		t.Run(name, func(t *testing.T) {
+			if d := diff(test.first, test.second); !reflect.DeepEqual(d, test.expect) {
+				color.Red("\n\nTest `%s` failed!", name)
+				color.Yellow("\n\nexpected:  %v\n\ngiven: %v\n\n", test.expect, d)
+				t.Fail()
+			}
+		})
 	}
 }
 
@@ -66,9 +65,6 @@ tests: plugin`)
 			color.Red("\n\nTest `load data` failed!")
 			color.Yellow("\n\ndiff: %v\n", d)
 			t.Fail()
-
-		} else {
-			color.Green("\nTest `load data`: OK\n")
 		}
 	}
 }

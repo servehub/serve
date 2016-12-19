@@ -73,20 +73,20 @@ func runAllMultiCmdTests(t *testing.T, cases map[string]processorTestCase, plugi
 	color.NoColor = false
 
 	for name, test := range cases {
-		utils.RunCmdWithEnv = func(cmdline string, env map[string]string) error {
-			for _, v := range test.expect["cmdline"].([]string) {
-				if v == cmdline {
-					return nil
+		t.Run(name, func(t *testing.T) {
+			utils.RunCmdWithEnv = func(cmdline string, env map[string]string) error {
+				for _, v := range test.expect["cmdline"].([]string) {
+					if v == cmdline {
+						return nil
+					}
 				}
+				return fmt.Errorf("cmd: %v not found in %v", cmdline, test.expect["cmdline"].([]string))
 			}
-			return fmt.Errorf("cmd: %v not found in %v", cmdline, test.expect["cmdline"].([]string))
-		}
 
-		if err := loadTestData(test.in, plugin); err == nil {
-			color.Green("%v: Ok\n", name)
-		} else {
-			color.Red("error %v\n: failed!", err)
-			t.Fail()
-		}
+			if err := loadTestData(test.in, plugin); err != nil {
+				color.Red("error %v\n: failed!", err)
+				t.Fail()
+			}
+		})
 	}
 }

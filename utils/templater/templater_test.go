@@ -85,18 +85,14 @@ func runAllProcessorTests(t *testing.T, cases map[string]processorTestCase) {
 		color.Red("%v: failed!\n", err)
 		t.Fail()
 	}
-
 	for name, test := range cases {
-		if res, err := Template(test.in, tree); err == nil {
-			if test.expect == res {
-				color.Green("%v: Ok\n", name)
-			} else {
-				color.Red("%v: %v != %v: failed!\n", name, test.expect, res)
-				t.Fail()
+		t.Run(name, func(t *testing.T) {
+			if res, err := Template(test.in, tree); err == nil {
+				if test.expect != res {
+					color.Red("%v: %v != %v: failed!\n", name, test.expect, res)
+					t.Fail()
+				}
 			}
-		} else {
-			color.Red("error %v\n: failed!", err)
-			t.Fail()
-		}
+		})
 	}
 }

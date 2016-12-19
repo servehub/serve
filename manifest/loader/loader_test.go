@@ -32,9 +32,7 @@ deploy:
 		t.Error(err)
 		t.Fail()
 	} else {
-		if g.String() == expect {
-			color.Green("\n%s: OK\n", "FileLoad")
-		} else {
+		if g.String() != expect {
 			color.Red("%s != %s", g.String(), expect)
 			t.Error(fmt.Errorf("%s != %s", g.String(), expect))
 			t.Fail()

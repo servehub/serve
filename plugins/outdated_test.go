@@ -31,33 +31,33 @@ func runAllConsulTests(t *testing.T, cases map[string]processorTestCase, plugin 
 	color.NoColor = false
 
 	for name, test := range cases {
-		utils.RunCmdWithEnv = func(cmdline string, env map[string]string) error {
-			for _, v := range test.expect["cmdline"].([]string) {
-				if v == cmdline {
-					return nil
+		t.Run(name, func(t *testing.T) {
+			utils.RunCmdWithEnv = func(cmdline string, env map[string]string) error {
+				for _, v := range test.expect["cmdline"].([]string) {
+					if v == cmdline {
+						return nil
+					}
 				}
+				return fmt.Errorf("cmd: %v not found in %v", cmdline, test.expect["cmdline"].([]string))
 			}
-			return fmt.Errorf("cmd: %v not found in %v", cmdline, test.expect["cmdline"].([]string))
-		}
 
-		utils.PutConsulKv = func(client *consul.Client, key string, value string) error {
-			for _, v := range test.expect["consulKV"].([]string) {
-				if v == key {
-					return nil
+			utils.PutConsulKv = func(client *consul.Client, key string, value string) error {
+				for _, v := range test.expect["consulKV"].([]string) {
+					if v == key {
+						return nil
+					}
 				}
+				return fmt.Errorf("consulKV: %v not found in %v", key, test.expect["consulKV"].([]string))
 			}
-			return fmt.Errorf("consulKV: %v not found in %v", key, test.expect["consulKV"].([]string))
-		}
 
-		utils.DelConsulKv = func(client *consul.Client, key string) error {
-			return nil
-		}
+			utils.DelConsulKv = func(client *consul.Client, key string) error {
+				return nil
+			}
 
-		if err := loadTestData(test.in, plugin); err == nil {
-			color.Green("%v: Ok\n", name)
-		} else {
-			color.Red("error %v\n: failed!", err)
-			t.Fail()
-		}
+			if err := loadTestData(test.in, plugin); err != nil {
+				color.Red("error %v\n: failed!", err)
+				t.Fail()
+			}
+		})
 	}
 }

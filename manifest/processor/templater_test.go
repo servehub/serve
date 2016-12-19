@@ -62,34 +62,34 @@ func runAllProcessorTests(t *testing.T, processor func() Processor, cases map[st
 	color.NoColor = false
 
 	for name, test := range cases {
-		if test.yaml != "" {
-			s, err := yaml.YAMLToJSON([]byte(test.yaml))
+		t.Run(name, func(t *testing.T) {
+			if test.yaml != "" {
+				s, err := yaml.YAMLToJSON([]byte(test.yaml))
+				if err != nil {
+					t.Fatal(err)
+				}
+				test.in = string(s)
+			}
+
+			tree, err := gabs.ParseJSON([]byte(test.in))
+
 			if err != nil {
 				t.Fatal(err)
 			}
-			test.in = string(s)
-		}
 
-		tree, err := gabs.ParseJSON([]byte(test.in))
+			proc := processor()
+			err = proc.Process(tree)
 
-		if err != nil {
-			t.Fatal(err)
-		}
+			if err != nil {
+				t.Fatal(err)
+			}
 
-		proc := processor()
-		err = proc.Process(tree)
-
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if tree.String() != test.expect {
-			color.Red("\n\nTest `%s` failed!", name)
-			color.Yellow("\n\nexpected:  %s\n\ngiven: %s\n\n", test.expect, tree.String())
-			t.Fail()
-		} else {
-			color.Green("\n%s: OK\n", name)
-		}
+			if tree.String() != test.expect {
+				color.Red("\n\nTest `%s` failed!", name)
+				color.Yellow("\n\nexpected:  %s\n\ngiven: %s\n\n", test.expect, tree.String())
+				t.Fail()
+			}
+		})
 	}
 }
 
