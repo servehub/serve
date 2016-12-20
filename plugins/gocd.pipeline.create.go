@@ -56,14 +56,26 @@ func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 	replaceMapWithArray(data, "pipeline.pipeline.params", "pipeline.pipeline.parameters")
 
 	depends := []string{}
+	if !data.Has("pipeline.pipeline.materials") {
+		data.Set("pipeline.pipeline.materials", []interface{}{})
+	}
 	for _, dep := range data.GetArray("depends") {
-		depends = append(depends, dep.GetString("pipeline"))
-		data.Set("pipeline.materials", map[string]interface{}{"type": "dependency",
-			"attributes": map[string]string{}})
+		pipeline := dep.GetString("pipeline")
+		depends = append(depends, pipeline)
+		data.ArrayAppend("pipeline.pipeline.materials",
+			map[string]interface{}{"type": "dependency",
+				"attributes": map[string]interface{}{
+					"name":        dep.GetStringOr("name", pipeline),
+					"pipeline":    pipeline,
+					"stage":       data.GetStringOr("stage", "Build"),
+					"auto_update": true}})
 	}
 
 	body := data.GetTree("pipeline").String()
 	branch := data.GetString("branch")
+
+	fmt.Println(body)
+	fmt.Println(depends)
 
 	m := false
 	for _, b := range data.GetArray("allowed-branches") {
@@ -272,7 +284,7 @@ func goCdFindEnv(resource string, pipeline string, depends []string) (string, er
 		}
 	}
 
-	if len(depends) == 0 {
+	if len(depends) != 0 {
 		return curEnvName, fmt.Errorf("not found depends: %v", depends)
 	}
 
