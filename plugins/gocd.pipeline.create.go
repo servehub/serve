@@ -74,9 +74,6 @@ func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 	body := data.GetTree("pipeline").String()
 	branch := data.GetString("branch")
 
-	fmt.Println(body)
-	fmt.Println(depends)
-
 	m := false
 	for _, b := range data.GetArray("allowed-branches") {
 		re := b.Unwrap().(string)
