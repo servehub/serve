@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/fatih/color"
 	"github.com/ghodss/yaml"
 
 	"github.com/InnovaCo/serve/manifest"
@@ -181,30 +180,29 @@ cron: ""`,
 }
 
 func runAllDebianTests(t *testing.T, cases map[string]processorTestCase, plugin manifest.Plugin) {
-	color.NoColor = false
-
 	for name, test := range cases {
-		utils.RunCmdWithEnv = func(cmdline string, env map[string]string) error {
-			if cmdline != test.expect["cmdline"] {
-				return fmt.Errorf("%v != %v", cmdline, test.expect["cmdline"])
-			}
-			tv := test.expect["env"].(map[string]string)
-			for k, v := range env {
-				if v != tv[k] {
-					return fmt.Errorf("%v: %v != %v", k, v, tv[k])
-				}
-			}
-			if len(env) != len(tv) {
-				return fmt.Errorf("env len error: %v != %v", len(env), len(tv))
-			}
-			return nil
-		}
 
-		if err := loadTestData(test.in, plugin); err == nil {
-			color.Green("%v: Ok\n", name)
-		} else {
-			color.Red("error %v\n: failed!", err)
-			t.Fail()
-		}
+		t.Run(name, func(t *testing.T) {
+			utils.RunCmdWithEnv = func(cmdline string, env map[string]string) error {
+				if cmdline != test.expect["cmdline"] {
+					return fmt.Errorf("%v != %v", cmdline, test.expect["cmdline"])
+				}
+				tv := test.expect["env"].(map[string]string)
+				for k, v := range env {
+					if v != tv[k] {
+						return fmt.Errorf("%v: %v != %v", k, v, tv[k])
+					}
+				}
+				if len(env) != len(tv) {
+					return fmt.Errorf("env len error: %v != %v", len(env), len(tv))
+				}
+				return nil
+			}
+
+			if err := loadTestData(test.in, plugin); err != nil {
+				t.Errorf("Error: %v", err)
+				t.Fail()
+			}
+		})
 	}
 }
