@@ -38,7 +38,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 	fullName := data.GetString("app-name")
 
-	bs, bf, bmax, grace := 5.0, 2.0, 120.0, 30.0
+	bs, bf, bmax, grace := 2.0, 2.0, 120.0, 30.0
 	app := &marathon.Application{
 		User:                       data.GetString("user"),
 		BackoffSeconds:             &bs,
