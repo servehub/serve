@@ -54,7 +54,7 @@ func runAllMultiCmdTests(t *testing.T, cases map[string]processorTestCase, plugi
 			}
 
 			if err := loadTestData(test.in, plugin); err != nil {
-				t.Errorf("Error %v", err)
+				t.Errorf("Error: %v", err)
 				t.Fail()
 			}
 		})
