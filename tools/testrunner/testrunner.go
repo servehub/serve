@@ -102,7 +102,7 @@ func runTest(serve, configPath string, data map[string]interface{}) error {
 
 	if d := diff(result, data["expect"].(map[string]interface{})); !reflect.DeepEqual(d, make(map[string]interface{})) {
 		log.Println(color.RedString("diff %v\n", d))
-		return fmt.Errorf("Error diff: %v\n", d)
+		return fmt.Errorf("Error: diff %v\n", d)
 	}
 	return nil
 }

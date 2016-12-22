@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"sort"
 
 	"github.com/InnovaCo/serve/manifest"
 	"github.com/InnovaCo/serve/utils/gabs"
@@ -54,6 +55,22 @@ func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 	replaceMapWithArray(data, "pipeline.pipeline.envs", "pipeline.pipeline.environment_variables")
 	replaceMapWithArray(data, "pipeline.pipeline.params", "pipeline.pipeline.parameters")
 
+	depends := []string{}
+	if !data.Has("pipeline.pipeline.materials") {
+		data.Set("pipeline.pipeline.materials", []interface{}{})
+	}
+	for _, dep := range data.GetArray("depends") {
+		pipeline := dep.GetString("pipeline")
+		depends = append(depends, pipeline)
+		data.ArrayAppend("pipeline.pipeline.materials",
+			map[string]interface{}{"type": "dependency",
+				"attributes": map[string]interface{}{
+					"name":        dep.GetStringOr("name", pipeline),
+					"pipeline":    pipeline,
+					"stage":       data.GetStringOr("stage", "Build"),
+					"auto_update": true}})
+	}
+
 	body := data.GetTree("pipeline").String()
 	branch := data.GetString("branch")
 
@@ -86,7 +103,7 @@ func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 
 	if resp.StatusCode == http.StatusOK {
 		err = goCdUpdate(name, data.GetString("environment"), url, body,
-			map[string]string{"If-Match": resp.Header.Get("ETag"), "Accept": "application/vnd.go.cd.v2+json"})
+			map[string]string{"If-Match": resp.Header.Get("ETag"), "Accept": "application/vnd.go.cd.v2+json"}, depends)
 	} else if resp.StatusCode == http.StatusNotFound {
 		err = goCdCreate(name, data.GetString("environment"), url, body,
 			map[string]string{"Accept": "application/vnd.go.cd.v2+json"})
@@ -119,17 +136,20 @@ func goCdCreate(name string, env string, resource string, body string, headers m
 		return fmt.Errorf("Operation error: %s", resp.Status)
 	}
 
-	if resp, err := goCdRequest("POST", resource+"/go/api/pipelines/"+name+"/unpause", "",
+	return goCdUnpause(resource+"/go/api/pipelines/"+name)
+}
+
+func goCdUnpause(resource string) error {
+	if resp, err := goCdRequest("POST", resource+"/unpause", "",
 		map[string]string{"Confirm": "true"}); err != nil {
 		return err
 	} else if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("Operation error: %s", resp.Status)
 	}
-
 	return nil
 }
 
-func goCdUpdate(name string, env string, resource string, body string, headers map[string]string) error {
+func goCdUpdate(name string, env string, resource string, body string, headers map[string]string, depends []string) error {
 	fmt.Println(env)
 
 	if resp, err := goCdRequest("PUT", resource+"/go/api/admin/pipelines/"+name, body, headers); err != nil {
@@ -138,7 +158,7 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 		return fmt.Errorf("Operation error: %s", resp.Status)
 	}
 
-	if cEnv, err := goCdFindEnv(resource, name); err == nil {
+	if cEnv, err := goCdFindEnv(resource, name, depends); err == nil {
 		if env != cEnv && cEnv != "" {
 
 			data, tag, err := goCdChangeEnv(resource, cEnv, "", name)
@@ -168,14 +188,7 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 		return err
 	}
 
-	if resp, err := goCdRequest("POST", resource+"/go/api/pipelines/"+name+"/unpause", "",
-		map[string]string{"Confirm": "true"}); err != nil {
-		return err
-	} else if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Operation error: %s", resp.Status)
-	}
-
-	return nil
+	return goCdUnpause(resource+"/go/api/pipelines/"+name)
 }
 
 func goCdDelete(name string, env string, resource string, headers map[string]string) error {
@@ -183,8 +196,6 @@ func goCdDelete(name string, env string, resource string, headers map[string]str
 	if err != nil {
 		return err
 	}
-
-	log.Println(data)
 
 	if resp, err := goCdRequest("PUT", resource+"/go/api/admin/environments/"+env, data,
 		map[string]string{"If-Match": tag, "Accept": "application/vnd.go.cd.v1+json"}); err != nil {
@@ -220,7 +231,7 @@ func goCdChangeEnv(resource string, env string, addPipeline string, delPipeline 
 	return data, resp.Header.Get("ETag"), nil
 }
 
-func goCdFindEnv(resource string, pipeline string) (string, error) {
+func goCdFindEnv(resource string, pipeline string, depends []string) (string, error) {
 	resp, err := goCdRequest("GET", resource+"/go/api/admin/environments", "",
 		map[string]string{"Accept": "application/vnd.go.cd.v1+json"})
 	if err != nil {
@@ -240,28 +251,44 @@ func goCdFindEnv(resource string, pipeline string) (string, error) {
 		return "", err
 	}
 
+	sort.Strings(depends)
 	envs, _ := tree.Path("_embedded.environments").Children()
+	curEnvName := ""
 	for _, env := range envs {
 		envName := env.Path("name").Data().(string)
 		pipelines, _ := env.Path("pipelines").Children()
+
+		if len(depends) > 0 {
+			if i := sort.SearchStrings(depends, envName); i != len(depends) {
+				depends = append(depends[:i], depends[i+1:]...)
+			}
+		} else {
+			if curEnvName != "" {
+				break
+			}
+		}
+
 		for _, pline := range pipelines {
 			if pline.Path("name").Data().(string) == pipeline {
-				return envName, nil
+				curEnvName = envName
 			}
 		}
 	}
 
-	return "", nil
+	if len(depends) != 0 {
+		return curEnvName, fmt.Errorf("not found depends: %v", depends)
+	}
+
+	return curEnvName, nil
 }
 
-func goCdRequest(method string, resource string, body string, headers map[string]string) (*http.Response, error) {
+var goCdRequest = func(method string, resource string, body string, headers map[string]string) (*http.Response, error) {
 	req, _ := http.NewRequest(method, resource, bytes.NewReader([]byte(body)))
 
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}
 
-	//req.Header.Set("Accept", "application/vnd.go.cd.v1+json")
 	req.Header.Set("Content-Type", "application/json")
 
 	data, err := ioutil.ReadFile("/etc/serve/gocd_credentials")

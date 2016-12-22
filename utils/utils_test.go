@@ -3,101 +3,89 @@ package utils
 import (
 	"reflect"
 	"testing"
-
-	"github.com/fatih/color"
 )
 
-func TestUtilits(t *testing.T) {
-	color.NoColor = false
+func TestUtils(t *testing.T) {
+	t.Run("Substing", func(t *testing.T) {
+		if s := Substr("test string", 2, 3); s != "st " {
+			t.Errorf("Error: %v != 'st '", s)
+			t.Fail()
+		}
+	})
 
-	if s := Substr("test string", 2, 3); s != "st " {
-		color.Red("Error in Substr")
-		t.Errorf("Error %v != 'st '", s)
-		t.Fail()
-	} else {
-		color.Green("\n%s: OK\n", "substing")
-	}
-
-	if s := Substr("test string", -2, 100); s != "test string" {
-		color.Red("Error in Substr")
-		t.Errorf("Error %v != 'test string'", s)
-		t.Fail()
-	} else {
-		color.Green("\n%s: OK\n", "substing non correct data")
-	}
+	t.Run("SubstingNotCorrectData", func(t *testing.T) {
+		if s := Substr("test string", -2, 100); s != "test string" {
+			t.Errorf("Error: %v != 'test string'", s)
+			t.Fail()
+		}
+	})
 
 	em := map[string]string{"param1": "value1", "param2": "value2"}
 
-	if m := MergeMaps(map[string]string{"param1": "value1"}, map[string]string{"param2": "value2"}); !reflect.DeepEqual(m, em) {
-		color.Red("Error in MergeMaps")
-		t.Errorf("Error %v != %v", m, em)
-		t.Fail()
-	} else {
-		color.Green("\n%s: OK\n", "merge maps")
-	}
+	t.Run("MergeMaps", func(t *testing.T) {
+		if m := MergeMaps(map[string]string{"param1": "value1"}, map[string]string{"param2": "value2"}); !reflect.DeepEqual(m, em) {
+			t.Errorf("Error: %v != %v", m, em)
+			t.Fail()
+		}
+	})
 
 	em = map[string]string{"param1": "value2"}
 
-	if m := MergeMaps(map[string]string{"param1": "value1"}, map[string]string{"param1": "value2"}); !reflect.DeepEqual(m, em) {
-		color.Red("Error in MergeMaps")
-		t.Errorf("Error %v != %v", m, em)
-		t.Fail()
-	} else {
-		color.Green("\n%s: OK\n", "merge maps with rewrite")
-	}
+	t.Run("MergeMapsWithRewrite", func(t *testing.T) {
+		if m := MergeMaps(map[string]string{"param1": "value1"}, map[string]string{"param1": "value2"}); !reflect.DeepEqual(m, em) {
+			t.Errorf("Error: %v != %v", m, em)
+			t.Fail()
+		}
+	})
 
 	em = map[string]string{"param1": "value1"}
 
-	if m := MergeMaps(map[string]string{"param1": "value1"}, map[string]string{}); !reflect.DeepEqual(m, em) {
-		color.Red("Error in MergeMaps")
-		t.Errorf("Error %v != %v", m, em)
-		t.Fail()
-	} else {
-		color.Green("\n%s: OK\n", "merge maps with empty")
-	}
+	t.Run("MergeMapsWithEmpty", func(t *testing.T) {
+		if m := MergeMaps(map[string]string{"param1": "value1"}, map[string]string{}); !reflect.DeepEqual(m, em) {
+			t.Errorf("Error: %v != %v", m, em)
+			t.Fail()
+		}
+	})
 
-	if MapsEqual(map[string]string{"param1": "value1"}, map[string]string{"param1": "value2"}) {
-		color.Red("Error in MapsEqual")
-		t.Fail()
-	} else {
-		color.Green("\n%s: OK\n", "maps not equal")
-	}
+	t.Run("MapsNotEqual", func(t *testing.T) {
+		if MapsEqual(map[string]string{"param1": "value1"}, map[string]string{"param1": "value2"}) {
+			t.Error("Error in MapsEqual")
+			t.Fail()
+		}
+	})
 
-	if !MapsEqual(map[string]string{"param1": "value1"}, map[string]string{"param1": "value1"}) {
-		color.Red("Error in MapsEqual")
-		t.Fail()
-	} else {
-		color.Green("\n%s: OK\n", "maps equal")
-	}
+	t.Run("MapsEqual", func(t *testing.T) {
+		if !MapsEqual(map[string]string{"param1": "value1"}, map[string]string{"param1": "value1"}) {
+			t.Error("Error in MapsEqual")
+			t.Fail()
+		}
+	})
 
-	if MapsEqual(map[string]string{"param1": "value1"}, map[string]string{"param1": "value1", "param2": "value2"}) {
-		color.Red("Error in MapsEqual")
-		t.Fail()
-	} else {
-		color.Green("\n%s: OK\n", "maps not equal len")
-	}
+	t.Run("MapsNotEqualLen", func(t *testing.T) {
+		if MapsEqual(map[string]string{"param1": "value1"}, map[string]string{"param1": "value1", "param2": "value2"}) {
+			t.Error("Error in MapsEqual")
+			t.Fail()
+		}
+	})
 
-	if !Contains("s", []string{"s", "t", "r"}) {
-		color.Red("Error in Contains")
-		t.Errorf("Error 's' != %v", []string{"s", "t", "r"})
-		t.Fail()
-	} else {
-		color.Green("\n%s: OK\n", "contain")
-	}
+	t.Run("Contain", func(t *testing.T) {
+		if !Contains("s", []string{"s", "t", "r"}) {
+			t.Errorf("Error: 's' != %v", []string{"s", "t", "r"})
+			t.Fail()
+		}
+	})
 
-	if Contains("s", []string{"t", "r"}) {
-		color.Red("Error in Contains")
-		t.Errorf("Error 's' != %v", []string{"t", "r"})
-		t.Fail()
-	} else {
-		color.Green("\n%s: OK\n", "not contain")
-	}
+	t.Run("ContainNot", func(t *testing.T) {
+		if Contains("s", []string{"t", "r"}) {
+			t.Errorf("Error: 's' != %v", []string{"t", "r"})
+			t.Fail()
+		}
+	})
 
-	if l := RandomString(10); len(l) != 10 {
-		color.Red("Error in RandomString")
-		t.Errorf("Error %v != 10", len(l))
-		t.Fail()
-	} else {
-		color.Green("\n%s: OK\n", "random string")
-	}
+	t.Run("RandomString", func(t *testing.T) {
+		if l := RandomString(10); len(l) != 10 {
+			t.Errorf("Error: %v != 10", len(l))
+			t.Fail()
+		}
+	})
 }

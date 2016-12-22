@@ -108,6 +108,10 @@ func (m Manifest) Set(path string, value interface{}) {
 	m.tree.SetP(value, path)
 }
 
+func (m Manifest) ArrayAppend(path string, value interface{}) {
+	m.tree.ArrayAppendP(value, path)
+}
+
 func (m Manifest) FindPlugins(plugin string) ([]PluginData, error) {
 	tree := m.tree.Path(plugin)
 	result := make([]PluginData, 0)

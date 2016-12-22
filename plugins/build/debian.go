@@ -50,7 +50,7 @@ func (p BuildDebian) Run(data manifest.Manifest) error {
 	env["MANIFEST_BUILD_DEBIAN_DAEMON_PORT"] = data.GetString("daemon-port")
 	env["MANIFEST_BUILD_DEBIAN_MAKE_PIDFILE"] = data.GetString("make-pidfile")
 	deps := data.GetString("depends")
-	if deps != "" && deps[0] == '[' {
+	if strings.HasPrefix(deps, "[") {
 		deps = strings.Replace(strings.Trim(deps, "[]"), " ", ", ", -1)
 	}
 	env["MANIFEST_BUILD_DEBIAN_DEPENDS"] = deps

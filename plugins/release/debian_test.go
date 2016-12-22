@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/fatih/color"
 	"github.com/ghodss/yaml"
 
 	"github.com/InnovaCo/serve/manifest"
@@ -44,23 +43,21 @@ mode: stage`,
 }
 
 func runAllMultiCmdTests(t *testing.T, cases map[string]processorTestCase, plugin manifest.Plugin) {
-	color.NoColor = false
-
 	for name, test := range cases {
-		utils.RunCmdWithEnv = func(cmdline string, env map[string]string) error {
-			for _, v := range test.expect["cmdline"].([]string) {
-				if v == cmdline {
-					return nil
+		t.Run(name, func(t *testing.T) {
+			utils.RunCmdWithEnv = func(cmdline string, env map[string]string) error {
+				for _, v := range test.expect["cmdline"].([]string) {
+					if v == cmdline {
+						return nil
+					}
 				}
+				return fmt.Errorf("cmd: %v not found in %v", cmdline, test.expect["cmdline"].([]string))
 			}
-			return fmt.Errorf("cmd: %v not found in %v", cmdline, test.expect["cmdline"].([]string))
-		}
 
-		if err := loadTestData(test.in, plugin); err == nil {
-			color.Green("%v: Ok\n", name)
-		} else {
-			color.Red("error %v\n: failed!", err)
-			t.Fail()
-		}
+			if err := loadTestData(test.in, plugin); err != nil {
+				t.Errorf("Error: %v", err)
+				t.Fail()
+			}
+		})
 	}
 }
