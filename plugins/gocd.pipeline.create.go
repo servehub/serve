@@ -122,6 +122,10 @@ func goCdCreate(name string, env string, resource string, body string, headers m
 	if resp, err := goCdRequest("POST", resource+"/go/api/admin/pipelines", body, headers); err != nil {
 		return err
 	} else if resp.StatusCode != http.StatusOK {
+		defer resp.Body.Close()
+		if body, err := ioutil.ReadAll(resp.Body); err == nil {
+			fmt.Errorf("Operation body: %s", body)
+		}
 		return fmt.Errorf("Operation error: %s", resp.Status)
 	}
 	data, tag, err := goCdChangeEnv(resource, env, name, "")
@@ -136,7 +140,7 @@ func goCdCreate(name string, env string, resource string, body string, headers m
 		return fmt.Errorf("Operation error: %s", resp.Status)
 	}
 
-	return goCdUnpause(resource+"/go/api/pipelines/"+name)
+	return goCdUnpause(resource + "/go/api/pipelines/" + name)
 }
 
 func goCdUnpause(resource string) error {
@@ -155,6 +159,10 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 	if resp, err := goCdRequest("PUT", resource+"/go/api/admin/pipelines/"+name, body, headers); err != nil {
 		return err
 	} else if resp.StatusCode != http.StatusOK {
+		defer resp.Body.Close()
+		if body, err := ioutil.ReadAll(resp.Body); err == nil {
+			fmt.Errorf("Operation body: %s", body)
+		}
 		return fmt.Errorf("Operation error: %s", resp.Status)
 	}
 
@@ -188,7 +196,7 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 		return err
 	}
 
-	return goCdUnpause(resource+"/go/api/pipelines/"+name)
+	return goCdUnpause(resource + "/go/api/pipelines/" + name)
 }
 
 func goCdDelete(name string, env string, resource string, headers map[string]string) error {
