@@ -38,13 +38,17 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 	fullName := data.GetString("app-name")
 
-	bs, bf, bmax, grace := 2.0, 2.0, 120.0, 30.0
+	backoffSeconds := data.GetFloat("backoff-seconds")
+	backoffFactor := data.GetFloat("backoff-factor")
+	maxLaunchDelaySeconds := data.GetFloat("max-launch-delay-seconds")
+	taskKillGracePeriodSeconds := data.GetFloat("task-kill-grace-period-seconds")
+
 	app := &marathon.Application{
 		User:                       data.GetString("user"),
-		BackoffSeconds:             &bs,
-		BackoffFactor:              &bf,
-		MaxLaunchDelaySeconds:      &bmax,
-		TaskKillGracePeriodSeconds: &grace,
+		BackoffSeconds:             &backoffSeconds,
+		BackoffFactor:              &backoffFactor,
+		MaxLaunchDelaySeconds:      &maxLaunchDelaySeconds,
+		TaskKillGracePeriodSeconds: &taskKillGracePeriodSeconds,
 		UpgradeStrategy: &marathon.UpgradeStrategy{
 			MinimumHealthCapacity: data.GetFloat("min-health-capacity"),
 			MaximumOverCapacity:   data.GetFloat("max-over-capacity"),
@@ -96,16 +100,11 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 	app.AddUris(data.GetString("package-uri"))
 
-	// todo: в манифесте задавать массив healthchecks, их использовтаь в марафоне и консул-супервизоре
-	// todo: открыть сетевой доступ от марафона до мезос-агентов, чтобы марафон мог хелсчеки посылать
-
-	//if portArgs != "" {
-	//	health := marathon.NewDefaultHealthCheck()
-	//	health.Protocol = "TCP"
-	//	health.IntervalSeconds = 5
-	//	*health.PortIndex = 0
-	//	app.AddHealthCheck(*health)
-	//}
+	if data.GetString("listen-port") == "$PORT0" {
+		health := marathon.NewDefaultHealthCheck()
+		health.Protocol = "TCP"
+		app.AddHealthCheck(*health)
+	}
 
 	if _, err := marathonApi.UpdateApplication(app, false); err != nil {
 		color.Yellow("marathon <- %s", app)
