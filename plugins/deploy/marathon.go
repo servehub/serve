@@ -100,6 +100,31 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 	app.AddUris(data.GetString("package-uri"))
 
+	if data.GetBool("docker.use") {
+		app.Command("")
+		app.EmptyUris()
+		app.EmptyPortDefinitions()
+
+		doc := marathon.NewDockerContainer()
+		doc.Docker.Image = data.GetString("docker.image")
+		doc.Docker.Network = data.GetString("docker.network")
+		doc.EmptyVolumes()
+
+		for _, port := range data.GetArray("ports") {
+			doc.Docker.ExposePort(marathon.PortMapping{
+				ContainerPort: port.GetInt("containerPort"),
+				HostPort:      port.GetIntOr("hostPort", 0),
+				Protocol:      "tcp",
+			})
+		}
+
+		for _, vol := range data.GetArray("volumes") {
+			doc.Volume(vol.GetString("hostPath"), vol.GetString("containerPath"), vol.GetString("mode"))
+		}
+
+		app.Container = doc
+	}
+
 	if data.GetString("listen-port") == "$PORT0" {
 		health := marathon.NewDefaultHealthCheck()
 		health.Protocol = "TCP"

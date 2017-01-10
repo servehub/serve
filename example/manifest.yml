@@ -16,6 +16,8 @@ build:
       daemon-args: "--port=$PORT1 --env=${ENV_NAME}"
       daemon-port: 9040
 
+  - docker: {}
+
   - tarball:
       files:
         - bin
@@ -60,6 +62,14 @@ deploy:
       cpu: 1
       cmd: "bin/mesos-start"
       constraints: "kidz:true"
+      docker:
+        use: true
+        image: "{{ build.docker.image }}"
+        network: BRIDGE
+        ports:
+          - { containerPort: 80 }
+        volumes:
+          - { "containerPath": "/app/secures", "hostPath": "/local/config/secure", "mode": "RO" }
 
   - debian:
       cluster ? {{ vars.env }}:
