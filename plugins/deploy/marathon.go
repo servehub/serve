@@ -101,7 +101,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 	app.AddUris(data.GetString("package-uri"))
 
 	if data.GetBool("docker.use") {
-		app.Command("")
+		app.Cmd = nil
 		app.EmptyUris()
 		app.EmptyPortDefinitions()
 
@@ -110,7 +110,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		doc.Docker.Network = data.GetString("docker.network")
 		doc.EmptyVolumes()
 
-		for _, port := range data.GetArray("ports") {
+		for _, port := range data.GetArray("docker.ports") {
 			doc.Docker.ExposePort(marathon.PortMapping{
 				ContainerPort: port.GetInt("containerPort"),
 				HostPort:      port.GetIntOr("hostPort", 0),
@@ -118,7 +118,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 			})
 		}
 
-		for _, vol := range data.GetArray("volumes") {
+		for _, vol := range data.GetArray("docker.volumes") {
 			doc.Volume(vol.GetString("hostPath"), vol.GetString("containerPath"), vol.GetString("mode"))
 		}
 
