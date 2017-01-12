@@ -105,7 +105,8 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		app.EmptyUris()
 		app.EmptyPortDefinitions()
 
-		app.AddEnv("SERVICE_NAME", fullName) // override for docker registry for consul Name
+		app.AddEnv("SERVICE_NAME", fullName) // docker-registrator: use for consul Name
+		app.AddEnv("SERVICE_CHECK_TCP", "true") // docker-registrator: consul TCP health check
 
 		doc := marathon.NewDockerContainer()
 		doc.Docker.Image = data.GetString("docker.image")
