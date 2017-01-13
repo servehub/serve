@@ -12,7 +12,7 @@ func init() {
 type BuildDocker struct{}
 
 func (p BuildDocker) Run(data manifest.Manifest) error {
-	if err := utils.RunCmd("docker build -t %s .", data.GetString("image")); err != nil {
+	if err := utils.RunCmd("docker build --pull -t %s .", data.GetString("image")); err != nil {
 		return err
 	}
 
