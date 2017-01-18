@@ -31,7 +31,8 @@ func TestTestAutotest(t *testing.T) {
 project: "test"
 version: "0.0.0"
 repo: "git@test.ru:test.git"
-suite: "test-test"`,
+suite: "test-test"
+environment: {}`,
 				expect: map[string]interface{}{
 					"cmdline": []string{"rm -rf tests && git clone --depth 1 --single-branch --recursive git@test.ru:test.git tests",
 						"cd tests/ && ./test.sh --project=test --version=0.0.0 --suite=test-test"},

@@ -24,10 +24,17 @@ func (p TestAutotest) Run(data manifest.Manifest) error {
 		return fmt.Errorf("Error on clone test git repo: %v", err)
 	}
 
-	return utils.RunCmd(
-		"cd tests/ && ./test.sh --project=%s --version=%s --suite=%s",
-		data.GetString("project"),
-		data.GetString("version"),
-		data.GetString("suite"),
+	envs := make(map[string]string, 0)
+	for k, v := range data.GetMap("environment") {
+		envs[k] = fmt.Sprintf("%s", v.Unwrap())
+	}
+
+	return utils.RunCmdWithEnv(fmt.Sprintf(
+			"cd tests/ && ./test.sh --project=%s --version=%s --suite=%s",
+			data.GetString("project"),
+			data.GetString("version"),
+			data.GetString("suite"),
+		),
+		envs,
 	)
 }
