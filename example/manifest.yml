@@ -45,6 +45,10 @@ test:
       repo: git@github.inn.ru:4game-qa/autotest.git
       suite: delivery-pb-tests
 
+  - autotest:
+      repo: git@github.inn.ru:4game-qa/autotest.git
+      suite: delivery-pb-tests-12312
+
   - integration:
       repo: git@github.com:InnovaCo/4game-feature-tests.git
       branch: master
