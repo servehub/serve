@@ -24,12 +24,9 @@ func main() {
 	kingpin.Version(version)
 	kingpin.Parse()
 
-	var plugins []manifest.PluginData
-	var err error
-	var manifestData *manifest.Manifest
-
 	color.NoColor = *noColor
 
+	var manifestData *manifest.Manifest
 	if *pluginData != "" {
 		manifestData = manifest.LoadJSON(*pluginData)
 	} else {
@@ -44,14 +41,15 @@ func main() {
 		return
 	}
 
+	var plugins []manifest.PluginData
 	if *pluginData != "" {
 		plugins = []manifest.PluginData{manifestData.GetPluginWithData(*plugin)}
 	} else {
-		plugins, err = manifestData.FindPlugins(*plugin)
-	}
-
-	if err != nil {
-		log.Fatalln(color.RedString("Error find plugins for '%s': %v", *plugin, err))
+		if result, err := manifestData.FindPlugins(*plugin); err != nil {
+			log.Fatalln(color.RedString("Error find plugins for '%s': %v", *plugin, err))
+		} else {
+			plugins = result
+		}
 	}
 
 	for _, pair := range plugins {
