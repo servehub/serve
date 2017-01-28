@@ -41,9 +41,8 @@ func (m Manifest) GetString(path string) string {
 func (m Manifest) GetStringOr(path string, defaultVal string) string {
 	if m.tree.ExistsP(path) {
 		return m.GetString(path)
-	} else {
-		return defaultVal
 	}
+	return defaultVal
 }
 
 func (m Manifest) GetFloat(path string) float64 {
@@ -65,9 +64,8 @@ func (m Manifest) GetInt(path string) int {
 func (m Manifest) GetIntOr(path string, defaultVal int) int {
 	if m.tree.ExistsP(path) {
 		return m.GetInt(path)
-	} else {
-		return defaultVal
 	}
+	return defaultVal
 }
 
 func (m Manifest) GetBool(path string) bool {

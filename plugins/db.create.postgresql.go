@@ -16,9 +16,8 @@ type DBCreatePostgresql struct{}
 func (p DBCreatePostgresql) Run(data manifest.Manifest) error {
 	if data.GetBool("purge") {
 		return p.Drop(data)
-	} else {
-		return p.Create(data)
 	}
+	return p.Create(data)
 }
 
 func (p DBCreatePostgresql) Create(data manifest.Manifest) error {

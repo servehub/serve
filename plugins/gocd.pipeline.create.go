@@ -124,7 +124,7 @@ func goCdCreate(name string, env string, resource string, body string, headers m
 	} else if resp.StatusCode != http.StatusOK {
 		defer resp.Body.Close()
 		if body, err := ioutil.ReadAll(resp.Body); err == nil {
-			fmt.Errorf("Operation body: %s", body)
+			log.Printf("Operation body: %s", body)
 		}
 		return fmt.Errorf("Operation error: %s", resp.Status)
 	}
@@ -161,7 +161,7 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 	} else if resp.StatusCode != http.StatusOK {
 		defer resp.Body.Close()
 		if body, err := ioutil.ReadAll(resp.Body); err == nil {
-			fmt.Errorf("Operation body: %s", body)
+			log.Printf("Operation body: %s", body)
 		}
 		return fmt.Errorf("Operation error: %s", resp.Status)
 	}
@@ -312,13 +312,11 @@ var goCdRequest = func(method string, resource string, body string, headers map[
 	log.Printf(" --> %s %s:\n%s\n%s\n\n", method, resource, req.Header, body)
 
 	resp, err := http.DefaultClient.Do(req)
-
 	if err != nil {
 		return nil, err
-	} else {
-		log.Printf("<-- %s\n", resp.Status)
 	}
 
+	log.Printf("<-- %s\n", resp.Status)
 	return resp, nil
 }
 
