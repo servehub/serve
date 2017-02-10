@@ -10,8 +10,8 @@ import (
 	"github.com/cenk/backoff"
 	"github.com/fatih/color"
 
-	"github.com/InnovaCo/serve/manifest"
-	"github.com/InnovaCo/serve/utils"
+	"github.com/servehub/serve/manifest"
+	"github.com/servehub/serve/utils"
 )
 
 func init() {

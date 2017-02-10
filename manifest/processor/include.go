@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/InnovaCo/serve/manifest/loader"
-	"github.com/InnovaCo/serve/utils/gabs"
-	"github.com/InnovaCo/serve/utils/mergemap"
+	"github.com/servehub/serve/manifest/loader"
+	"github.com/servehub/serve/utils/gabs"
+	"github.com/servehub/serve/utils/mergemap"
 )
 
 const ConfigPath = "/etc/serve"

@@ -16,7 +16,13 @@ build:
       daemon-args: "--port=$PORT1 --env=${ENV_NAME}"
       daemon-port: 9040
 
+  - gradle: build
+
   - docker: {}
+
+  - npm:
+      image: node:6-alpine
+
 
   - tarball:
       files:
@@ -68,7 +74,6 @@ deploy:
       constraints: "kidz:true"
       docker:
         use: true
-        image: "{{ build.docker.image }}"
         network: BRIDGE
         ports:
           - { containerPort: 80 }

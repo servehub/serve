@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/InnovaCo/serve/manifest"
-	"github.com/InnovaCo/serve/utils"
+	"github.com/servehub/serve/manifest"
+	"github.com/servehub/serve/utils"
 )
 
 func init() {

@@ -2,6 +2,7 @@ package plugins
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -10,8 +11,8 @@ import (
 	"regexp"
 	"sort"
 
-	"github.com/InnovaCo/serve/manifest"
-	"github.com/InnovaCo/serve/utils/gabs"
+	"github.com/servehub/serve/manifest"
+	"github.com/servehub/serve/utils/gabs"
 )
 
 func init() {
@@ -290,6 +291,10 @@ func goCdFindEnv(resource string, pipeline string, depends []string) (string, er
 	return curEnvName, nil
 }
 
+var httpClient = &http.Client{Transport: &http.Transport{
+	TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+}}
+
 var goCdRequest = func(method string, resource string, body string, headers map[string]string) (*http.Response, error) {
 	req, _ := http.NewRequest(method, resource, bytes.NewReader([]byte(body)))
 
@@ -311,7 +316,7 @@ var goCdRequest = func(method string, resource string, body string, headers map[
 
 	log.Printf(" --> %s %s:\n%s\n%s\n\n", method, resource, req.Header, body)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}

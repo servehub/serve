@@ -6,7 +6,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/hashicorp/consul/api"
 
-	"github.com/InnovaCo/serve/utils/mergemap"
+	"github.com/servehub/serve/utils/mergemap"
 )
 
 func KvPatchCommand() cli.Command {

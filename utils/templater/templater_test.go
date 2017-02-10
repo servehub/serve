@@ -3,7 +3,7 @@ package templater
 import (
 	"testing"
 
-	"github.com/InnovaCo/serve/utils/gabs"
+	"github.com/servehub/serve/utils/gabs"
 )
 
 type processorTestCase struct {

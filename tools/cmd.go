@@ -7,9 +7,9 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/fatih/color"
 
-	"github.com/InnovaCo/serve/tools/consul"
-	"github.com/InnovaCo/serve/tools/supervisor"
-	"github.com/InnovaCo/serve/tools/testrunner"
+	"github.com/servehub/serve/tools/consul"
+	"github.com/servehub/serve/tools/supervisor"
+	"github.com/servehub/serve/tools/testrunner"
 )
 
 var version = "0.0"

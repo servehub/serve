@@ -12,8 +12,8 @@ import (
 	"github.com/fatih/color"
 	marathon "github.com/gambol99/go-marathon"
 
-	"github.com/InnovaCo/serve/manifest"
-	"github.com/InnovaCo/serve/utils"
+	"github.com/servehub/serve/manifest"
+	"github.com/servehub/serve/utils"
 )
 
 func init() {

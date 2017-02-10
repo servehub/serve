@@ -5,9 +5,9 @@ package lexer
 import (
 
 	// "fmt"
-	// "github.com/InnovaCo/serve/utils/templater/util"
+	// "github.com/servehub/serve/utils/templater/util"
 
-	"github.com/InnovaCo/serve/utils/templater/token"
+	"github.com/servehub/serve/utils/templater/token"
 	"io/ioutil"
 	"unicode/utf8"
 )

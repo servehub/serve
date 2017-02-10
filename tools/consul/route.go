@@ -11,7 +11,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/hashicorp/consul/api"
 
-	"github.com/InnovaCo/serve/utils"
+	"github.com/servehub/serve/utils"
 )
 
 func RouteCommand() cli.Command {

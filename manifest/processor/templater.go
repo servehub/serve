@@ -3,8 +3,8 @@ package processor
 import (
 	"fmt"
 
-	"github.com/InnovaCo/serve/utils/gabs"
-	"github.com/InnovaCo/serve/utils/templater"
+	"github.com/servehub/serve/utils/gabs"
+	"github.com/servehub/serve/utils/templater"
 )
 
 type Templater struct{}

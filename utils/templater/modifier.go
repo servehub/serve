@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/InnovaCo/serve/utils/gabs"
-	"github.com/InnovaCo/serve/utils/templater/lexer"
-	"github.com/InnovaCo/serve/utils/templater/token"
+	"github.com/servehub/serve/utils/gabs"
+	"github.com/servehub/serve/utils/templater/lexer"
+	"github.com/servehub/serve/utils/templater/token"
 )
 
 var ModifyFuncs = map[string]interface{}{

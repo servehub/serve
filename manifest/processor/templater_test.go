@@ -5,7 +5,7 @@ import (
 
 	"github.com/ghodss/yaml"
 
-	"github.com/InnovaCo/serve/utils/gabs"
+	"github.com/servehub/serve/utils/gabs"
 )
 
 func TestTemplater(t *testing.T) {

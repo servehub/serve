@@ -6,8 +6,8 @@ import (
 
 	consul "github.com/hashicorp/consul/api"
 
-	"github.com/InnovaCo/serve/manifest"
-	"github.com/InnovaCo/serve/utils"
+	"github.com/servehub/serve/manifest"
+	"github.com/servehub/serve/utils"
 )
 
 func TestOutdated(t *testing.T) {

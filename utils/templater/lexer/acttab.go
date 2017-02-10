@@ -4,7 +4,7 @@ package lexer
 
 import (
 	"fmt"
-	"github.com/InnovaCo/serve/utils/templater/token"
+	"github.com/servehub/serve/utils/templater/token"
 )
 
 type ActionTable [NumStates]ActionRow

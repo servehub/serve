@@ -7,8 +7,8 @@ import (
 	"github.com/fatih/color"
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"github.com/InnovaCo/serve/manifest"
-	_ "github.com/InnovaCo/serve/plugins"
+	"github.com/servehub/serve/manifest"
+	_ "github.com/servehub/serve/plugins"
 )
 
 var version = "0.0"

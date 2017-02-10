@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/InnovaCo/serve/utils/gabs"
+	"github.com/servehub/serve/utils/gabs"
 	"github.com/valyala/fasttemplate"
 )
 

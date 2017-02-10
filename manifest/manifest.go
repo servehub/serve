@@ -11,10 +11,10 @@ import (
 
 	"github.com/fatih/color"
 
-	"github.com/InnovaCo/serve/manifest/loader"
-	"github.com/InnovaCo/serve/manifest/processor"
-	"github.com/InnovaCo/serve/utils"
-	"github.com/InnovaCo/serve/utils/gabs"
+	"github.com/servehub/serve/manifest/loader"
+	"github.com/servehub/serve/manifest/processor"
+	"github.com/servehub/serve/utils"
+	"github.com/servehub/serve/utils/gabs"
 )
 
 type Manifest struct {
