@@ -1,9 +1,11 @@
 package release
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -64,11 +66,16 @@ func runIngress(kube *kubernetes.Clientset, data manifest.Manifest) error {
 
 	ingressSpec := &v1beta1.Ingress{
 		TypeMeta: metav1.TypeMeta{
-			Kind: "Ingress",
+			Kind:       "Ingress",
 			APIVersion: "extensions/v1beta1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name: appName,
+			Labels: map[string]string{
+				"service": data.GetString("service"),
+				"stage":   data.GetString("stage"),
+				"version": data.GetString("version"),
+			},
 		},
 		Spec: v1beta1.IngressSpec{
 			Rules: rules,
@@ -76,6 +83,30 @@ func runIngress(kube *kubernetes.Clientset, data manifest.Manifest) error {
 	}
 
 	ingresses := kube.Extensions().Ingresses(data.GetString("namespace"))
+
+	if exists, err := ingresses.List(metav1.ListOptions{
+		LabelSelector: "service=" + data.GetString("service") + ",stage=" + data.GetString("stage") + ",version!=" + data.GetString("version"),
+	}); err != nil {
+		return err
+	} else if len(exists.Items) > 0 {
+		items, _ := json.MarshalIndent(exists.Items, "", "  ")
+		log.Println("Exists ingress: ", string(items))
+		log.Println("Mark as outdated!")
+
+		for _, ing := range exists.Items {
+			ing.Labels["stage"] = "outdated"
+
+			if ing.Annotations == nil {
+				ing.Annotations = make(map[string]string, 0)
+			}
+			ing.Annotations["endOfLife"] = time.Now().Add(15 * time.Minute).String()
+
+			if _, err := ingresses.Update(&ing); err != nil {
+				return err
+			}
+		}
+	}
+
 	_, err := ingresses.Update(ingressSpec)
 
 	switch {

@@ -40,11 +40,8 @@ func (p DeployKube) Run(data manifest.Manifest) error {
 func runDeployment(kube *kubernetes.Clientset, data manifest.Manifest) error {
 	appName := data.GetString("name")
 
-	// support only oe container yet
-	cont := data.GetTree("container")
-
 	ports := make([]v1.ContainerPort, 0)
-	for _, port := range cont.GetArray("ports") {
+	for _, port := range data.GetArray("ports") {
 		ports = append(ports, v1.ContainerPort{
 			ContainerPort: int32(port.GetInt("containerPort")),
 			Protocol:      v1.ProtocolTCP,
@@ -58,10 +55,10 @@ func runDeployment(kube *kubernetes.Clientset, data manifest.Manifest) error {
 	}
 
 	resReqs := v1.ResourceRequirements{}
-	if cont.GetStringOr("cpu", "") != "" || cont.GetStringOr("mem", "") != "" {
+	if data.GetStringOr("cpu", "") != "" || data.GetStringOr("mem", "") != "" {
 		res := v1.ResourceList{
-			v1.ResourceCPU:    resource.MustParse(cont.GetString("cpu")),
-			v1.ResourceMemory: resource.MustParse(cont.GetString("mem")),
+			v1.ResourceCPU:    resource.MustParse(data.GetString("cpu")),
+			v1.ResourceMemory: resource.MustParse(data.GetString("mem")),
 		}
 		resReqs = v1.ResourceRequirements{Limits: res, Requests: res}
 	}
@@ -69,7 +66,7 @@ func runDeployment(kube *kubernetes.Clientset, data manifest.Manifest) error {
 	containers := []v1.Container{
 		{
 			Name:            appName,
-			Image:           cont.GetString("image"),
+			Image:           data.GetString("image"),
 			Ports:           ports,
 			Resources:       resReqs,
 			ImagePullPolicy: v1.PullIfNotPresent,

@@ -57,11 +57,16 @@ func runService(kube *kubernetes.Clientset, data manifest.Manifest) error {
 		Spec: v1.ServiceSpec{
 			Ports:    ports,
 			Selector: map[string]string{"app": appName},
-			Type:     v1.ServiceTypeLoadBalancer,
 		},
 	}
 
 	services := kube.Services(data.GetString("namespace"))
+
+	if serv, err := services.Get(appName, metav1.GetOptions{}); err == nil {
+		log.Printf("Service `%s` already exists!\n", serv.Name)
+		return nil
+	}
+
 	_, err := services.Update(serviceSpec)
 
 	switch {
