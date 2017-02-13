@@ -1,5 +1,5 @@
-hash: a902abaf87acb5aa0c445eaaf8e2ca7941d7be6e31ac14d909bed3f65c671c25
-updated: 2017-02-09T17:18:45.180852967+03:00
+hash: ea9e81840f842f310a806cd2a7af3247357d158b3ccc28decd4faeb39f146b1a
+updated: 2017-02-10T16:50:50.785765901+03:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -51,7 +51,7 @@ imports:
 - name: github.com/gambol99/go-marathon
   version: 4233de4119f7a91ca732262104c768e4c872b872
 - name: github.com/ghodss/yaml
-  version: 04f313413ffd65ce25f2541bfd2b2ceec5c0908c
+  version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/go-openapi/jsonpointer
   version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
 - name: github.com/go-openapi/jsonreference
@@ -76,15 +76,15 @@ imports:
   subpackages:
   - query
 - name: github.com/google/gofuzz
-  version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
+  version: fd52762d25a41827db7ef64c43756fd4b9f7e382
 - name: github.com/hashicorp/consul
-  version: d3f7a68b2f0fc0a3a4df7aee3286f423f8749941
+  version: 7e52e95c47f412eea64df8812837cf8ca32351a7
   subpackages:
   - api
 - name: github.com/hashicorp/go-cleanhttp
   version: ad28ea4487f05916463e2423a55166280e8254b5
 - name: github.com/hashicorp/serf
-  version: 108042a1e8e28500398db462216584627169bf74
+  version: cb45b412ee4f9d6cc2eeb2b2b7dd0f6cfd7545c1
   subpackages:
   - coordinate
 - name: github.com/howeyc/gopass
@@ -104,13 +104,13 @@ imports:
 - name: github.com/mattn/go-colorable
   version: d228849504861217f796da67fae4f6e347643f15
 - name: github.com/mattn/go-isatty
-  version: 30a891c33c7cde7b02a981314b4228ec99380cca
+  version: 281032e84ae07510239465db46bf442aa44b953a
 - name: github.com/PuerkitoBio/purell
   version: 8a290539e2e8629dbc4e6bad948158f790ec31f4
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/spf13/pflag
-  version: 5ccb023bc27df288a957c5e994cd44fd19619465
+  version: 7f60f83a2c81bc3c3c0d5297f61ddfa68da9d3b7
 - name: github.com/ugorji/go
   version: ded73eae5db7e7a0ef6f55aace87a2873c5d2b74
   subpackages:
@@ -177,7 +177,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: a3f3340b5840cee44f372bddb5880fcbc419b46a
 - name: k8s.io/apimachinery
-  version: 7080e31e90e981181435294bca96c80a37db8941
+  version: 21807b270ec15d19215659a5caa08b17f66d6f44
   subpackages:
   - pkg/api/errors
   - pkg/api/meta
@@ -218,17 +218,8 @@ imports:
   - pkg/watch
   - third_party/forked/golang/reflect
 - name: k8s.io/client-go
-  version: 7ac12361944b3b98074594cf00977861b9b41e4b
+  version: 49948ae0ca8eb31d632fbf346e25ee0eb6762d5b
   subpackages:
-  - 1.5/kubernetes
-  - 1.5/kubernetes/typed/core/v1
-  - 1.5/pkg/api/errors
-  - 1.5/pkg/api/resource
-  - 1.5/pkg/api/unversioned
-  - 1.5/pkg/api/v1
-  - 1.5/pkg/apis/extensions/v1beta1
-  - 1.5/pkg/util/intstr
-  - 1.5/rest
   - discovery
   - kubernetes
   - kubernetes/typed/apps/v1beta1

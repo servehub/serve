@@ -1,20 +1,20 @@
 package deploy
 
 import (
+	"fmt"
+	"log"
 	"os"
 
+	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"fmt"
 	"github.com/servehub/serve/manifest"
-	"k8s.io/apimachinery/pkg/api/resource"
-	"k8s.io/apimachinery/pkg/util/intstr"
-	"log"
-	"k8s.io/apimachinery/pkg/api/errors"
 )
 
 func init() {
@@ -39,40 +39,42 @@ func (p DeployKube) Run(data manifest.Manifest) error {
 
 func runDeployment(kube *kubernetes.Clientset, data manifest.Manifest) error {
 	appName := data.GetString("name")
-	allPorts := make([]v1.ContainerPort, 0)
 
-	containers := make([]v1.Container, 0)
-	for _, cont := range data.GetArray("containers") {
+	// support only oe container yet
+	cont := data.GetTree("container")
 
-		ports := make([]v1.ContainerPort, 0)
-		for _, port := range cont.GetArray("ports") {
-			ports = append(ports, v1.ContainerPort{
-				ContainerPort: port.GetString("containerPort"),
-				Protocol:      v1.ProtocolTCP,
-				Name:          port.GetStringOr("name", nil),
-			})
-		}
-
-		allPorts = append(allPorts, ports...)
-
-		envs := make([]v1.EnvVar, 0)
-		for k, v := range data.GetMap("environment") {
-			envs = append(envs, v1.EnvVar{Name: k, Value: fmt.Sprintf("%s", v.Unwrap())})
-		}
-
-		containers = append(containers, v1.Container{
-			Name:  appName,
-			Image: cont.GetString("image"),
-			Ports: ports,
-			Resources: v1.ResourceRequirements{
-				Limits: v1.ResourceList{
-					v1.ResourceCPU:    resource.MustParse(cont.GetString("cpu")),
-					v1.ResourceMemory: resource.MustParse(cont.GetString("mem")),
-				},
-			},
-			ImagePullPolicy: v1.PullAlways,
-			Env:             envs,
+	ports := make([]v1.ContainerPort, 0)
+	for _, port := range cont.GetArray("ports") {
+		ports = append(ports, v1.ContainerPort{
+			ContainerPort: int32(port.GetInt("containerPort")),
+			Protocol:      v1.ProtocolTCP,
+			Name:          port.GetStringOr("name", ""),
 		})
+	}
+
+	envs := make([]v1.EnvVar, 0)
+	for k, v := range data.GetMap("environment") {
+		envs = append(envs, v1.EnvVar{Name: k, Value: fmt.Sprintf("%s", v.Unwrap())})
+	}
+
+	resReqs := v1.ResourceRequirements{}
+	if cont.GetStringOr("cpu", "") != "" || cont.GetStringOr("mem", "") != "" {
+		res := v1.ResourceList{
+			v1.ResourceCPU:    resource.MustParse(cont.GetString("cpu")),
+			v1.ResourceMemory: resource.MustParse(cont.GetString("mem")),
+		}
+		resReqs = v1.ResourceRequirements{Limits: res, Requests: res}
+	}
+
+	containers := []v1.Container{
+		{
+			Name:            appName,
+			Image:           cont.GetString("image"),
+			Ports:           ports,
+			Resources:       resReqs,
+			ImagePullPolicy: v1.PullIfNotPresent,
+			Env:             envs,
+		},
 	}
 
 	deploySpec := &v1beta1.Deployment{
@@ -80,11 +82,11 @@ func runDeployment(kube *kubernetes.Clientset, data manifest.Manifest) error {
 			Kind:       "Deployment",
 			APIVersion: "extensions/v1beta1",
 		},
-		ObjectMeta: v1.ObjectMeta{
+		ObjectMeta: metav1.ObjectMeta{
 			Name: appName,
 		},
 		Spec: v1beta1.DeploymentSpec{
-			Replicas: int32p(data.GetInt("replicas")),
+			Replicas: int32p(int32(data.GetInt("replicas"))),
 			Strategy: v1beta1.DeploymentStrategy{
 				Type: v1beta1.RollingUpdateDeploymentStrategyType,
 				RollingUpdate: &v1beta1.RollingUpdateDeployment{
@@ -100,7 +102,7 @@ func runDeployment(kube *kubernetes.Clientset, data manifest.Manifest) error {
 			},
 			RevisionHistoryLimit: int32p(3),
 			Template: v1.PodTemplateSpec{
-				ObjectMeta: v1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:   appName,
 					Labels: map[string]string{"app": appName},
 				},

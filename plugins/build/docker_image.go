@@ -6,12 +6,12 @@ import (
 )
 
 func init() {
-	manifest.PluginRegestry.Add("build.docker", BuildDocker{})
+	manifest.PluginRegestry.Add("build.docker-image", BuildDockerImage{})
 }
 
-type BuildDocker struct{}
+type BuildDockerImage struct{}
 
-func (p BuildDocker) Run(data manifest.Manifest) error {
+func (p BuildDockerImage) Run(data manifest.Manifest) error {
 	if err := utils.RunCmd("docker build --pull -t %s .", data.GetString("image")); err != nil {
 		return err
 	}

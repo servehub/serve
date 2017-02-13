@@ -9,13 +9,4 @@ import:
   - package: github.com/cenk/backoff
   - package: github.com/valyala/fasttemplate
   - package: k8s.io/client-go
-    subpackages:
-      - 1.5/kubernetes
-      - 1.5/kubernetes/typed/core/v1
-      - 1.5/pkg/api/errors
-      - 1.5/pkg/api/resource
-      - 1.5/pkg/api/unversioned
-      - 1.5/pkg/api/v1
-      - 1.5/pkg/apis/extensions/v1beta1
-      - 1.5/pkg/util/intstr
-      - 1.5/rest
+    version: 49948ae0ca8eb31d632fbf346e25ee0eb6762d5b
