@@ -3,6 +3,7 @@ package utils
 import (
 	"math/rand"
 	"reflect"
+	"strings"
 )
 
 func Substr(s string, pos, length int) string {
@@ -64,4 +65,25 @@ var RandomString = func(length uint) string {
 		b[i] = allLetters[rand.Intn(len(allLetters))]
 	}
 	return string(b)
+}
+
+func StripLeftMargin(data string) string {
+	lines := strings.Split(strings.TrimSpace(strings.Replace(data, "\t", "  ", -1)), "\n")
+	minPrefix := len(data)
+
+	for _, l := range lines[1:] {
+		if subs := len(strings.TrimSpace(l)); subs > 0 {
+			if curPrefix := len(l) - subs; curPrefix < minPrefix {
+				minPrefix = curPrefix
+			}
+		}
+	}
+
+	for i, l := range lines {
+		if len(l) > minPrefix {
+			lines[i] = l[minPrefix:]
+		}
+	}
+
+	return strings.Join(lines, "\n")
 }

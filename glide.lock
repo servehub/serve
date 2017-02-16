@@ -1,5 +1,5 @@
-hash: ea9e81840f842f310a806cd2a7af3247357d158b3ccc28decd4faeb39f146b1a
-updated: 2017-02-10T16:50:50.785765901+03:00
+hash: 5266a2546c4b655bbf28953360141fdb5fdfcb997da67428b08ba468188a2b9d
+updated: 2017-02-15T15:40:36.166959279+03:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -93,6 +93,8 @@ imports:
   version: 6633656539c1639d9d78127b7d47c622b5d7b6dc
 - name: github.com/jonboulle/clockwork
   version: 72f9bd7c4e0c2a40055ab3d0f09654f730cce982
+- name: github.com/jteeuwen/go-bindata
+  version: a0ff2567cfb70903282db057e799fd826784d41d
 - name: github.com/juju/ratelimit
   version: 77ed1c8a01217656d2080ad51981f6e99adaa177
 - name: github.com/mailru/easyjson

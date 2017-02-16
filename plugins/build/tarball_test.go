@@ -2,20 +2,22 @@ package build
 
 import (
 	"testing"
+
+	"github.com/servehub/serve/utils/tests"
 )
 
 func TestTarballBuild(t *testing.T) {
-	runAllMultiCmdTests(t,
-		map[string]processorTestCase{
+	tests.RunAllMultiCmdTests(t,
+		map[string]tests.TestCase{
 			"simple": {
-				in: `---
-files: []
-registry-url: test.ru`,
-				expect: map[string]interface{}{
-					"cmdline": []string{"rm -rf ./tarball.tmp && mkdir ./tarball.tmp",
-						"tar -zcf tarball.tar.gz -C ./tarball.tmp/ .",
-						"curl -vsSf -XPUT -T tarball.tar.gz test.ru",
-					},
+				In: `---
+					files: []
+					registry-url: test.ru
+				`,
+				Expects: []string{
+					"rm -rf ./tarball.tmp && mkdir ./tarball.tmp",
+					"tar -zcf tarball.tar.gz -C ./tarball.tmp/ .",
+					"curl -vsSf -XPUT -T tarball.tar.gz test.ru",
 				},
 			},
 		},

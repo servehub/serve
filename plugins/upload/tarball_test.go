@@ -2,18 +2,21 @@ package upload
 
 import (
 	"testing"
+
+	"github.com/servehub/serve/utils/tests"
 )
 
 func TestUploadTarball(t *testing.T) {
-	runAllMultiCmdTests(t,
-		map[string]processorTestCase{
+	tests.RunAllMultiCmdTests(t,
+		map[string]tests.TestCase{
 			"simple": {
-				in: `---
-unstable-url: "http://unstable.test.ru"
-stable-url: "http://stable.test.ru"`,
-				expect: map[string]interface{}{
-					"cmdline": []string{"curl -vsSf -o tarball.tar.gz http://unstable.test.ru",
-						"curl -vsSf -XPUT -T tarball.tar.gz http://stable.test.ru"},
+				In: `---
+					unstable-url: "http://unstable.test.ru"
+					stable-url: "http://stable.test.ru"
+				`,
+				Expects: []string{
+					"curl -vsSf -o tarball.tar.gz http://unstable.test.ru",
+					"curl -vsSf -XPUT -T tarball.tar.gz http://stable.test.ru",
 				},
 			},
 		},

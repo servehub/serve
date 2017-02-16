@@ -1,0 +1,243 @@
+info:
+  version: "0.0"
+  description: "{{ info.name }}"
+
+  build-version: "{{ info.version }}.{{ vars.build-number }}"
+
+  feature ? {{ vars.branch }}:
+     "": ""
+     "master": ""
+     "feature-(?P<feature>.+)": "{{ match.feature }}"
+     "*": "{{ vars.branch }}"
+
+  feature-suffix ? {{ info.feature }}:
+     "": ""
+     "*": "-{{ info.feature }}"
+
+  feature-prefix ? {{ info.feature }}:
+     "": ""
+     "*": "{{ info.feature }}-"
+
+  full-name: "{{ info.category }}/{{ info.name }}{{ info.feature-suffix }}"
+
+vars:
+  env: qa
+  build-number: 0
+  stage-counter: 0
+  purge: false
+  stage: staging
+
+conf:
+  marathon:
+    app-name: "{{ info.full-name }}"
+    address: marathon
+    registry-host-qa: task-registry.marathon
+    registry-host-live: task-registry.marathon
+
+    registry-host ? {{ vars.env }}:
+      qa: "{{ conf.marathon.registry-host-qa }}"
+      live: "{{ conf.marathon.registry-host-live }}"
+
+    registry-path: "/{{ info.category }}/{{ info.name }}/{{ info.name }}{{ info.feature-suffix }}-v{{ info.build-version }}.tar.gz"
+    registry-url: "http://{{ conf.marathon.registry-host }}{{ conf.marathon.registry-path }}"
+
+  consul:
+    address: consul
+
+  kube:
+    namespace: default
+    name: "{{ info.full-name | replace('\\W', '-') }}"
+
+  docker:
+    registry: ""
+    image: "{{ conf.docker.registry }}{{ info.category }}/{{ info.name }}{{ info.feature-suffix }}:v{{ info.build-version }}"
+
+  gocd:
+    api-url: https://localhost:8154
+    environment: dev
+    pipeline-name: "{{ info.name }}{{ info.feature-suffix }}"
+    template ? {{ info.feature }}:
+      "": "serve-service-tpl"
+      "*": "serve-featured-tpl"
+
+  graphite:
+    host: graphite
+
+gocd:
+  pipeline:
+    create:
+      purge: "{{ vars.purge }}"
+      api-url: "{{ conf.gocd.api-url }}"
+      environment: "{{ conf.gocd.environment }}"
+      branch: "{{ vars.branch }}"
+      name-suffix: ""
+      allowed-branches: ["master"]
+      depends: []
+
+      pipeline:
+        group: "{{ info.category | replace('\\W', '-') }}"
+        pipeline:
+          name: "{{ conf.gocd.pipeline-name }}"
+          template: "{{ conf.gocd.template }}"
+          label_template: "{{ info.version }}.${COUNT}"
+          envs: {}
+
+          params:
+            repo.url: { value: "{{ vars.ssh-repo }}" }
+            branch: { value: "{{ vars.branch }}" }
+
+          materials:
+            - type: "git"
+              attributes:
+                url: "#{repo.url}"
+                destination: "sources"
+                branch: "{{ vars.branch }}"
+                shallow_clone: true
+
+build:
+  sbt:
+    version: "{{ info.build-version }}"
+    test: "testOnly -- -l Integration"
+
+  marathon:
+    source: "target/pack"
+    registry-url: "{{ conf.marathon.registry-url }}"
+
+  tarball:
+    files: []
+    registry-url: "{{ conf.marathon.registry-url }}"
+
+  docker-image:
+    image: "{{ conf.docker.image }}"
+
+  docker-run:
+    image: alpine
+    cmd: "test"
+    envs: {}
+
+upload:
+  marathon:
+    unstable-url: "http://{{ conf.marathon.registry-host-qa }}{{ conf.marathon.registry-path }}"
+    stable-url: "http://{{ conf.marathon.registry-host-live }}{{ conf.marathon.registry-path }}"
+
+  tarball:
+    unstable-url: "http://{{ conf.marathon.registry-host-qa }}{{ conf.marathon.registry-path }}"
+    stable-url: "http://{{ conf.marathon.registry-host-live }}{{ conf.marathon.registry-path }}"
+
+deploy:
+  marathon:
+    consul-address: "{{ conf.consul.address }}"
+    marathon-address: "{{ conf.marathon.address }}"
+    app-name: "{{ conf.marathon.app-name }}"
+    package-uri: "{{ conf.marathon.registry-url }}"
+    instances: 1
+    mem: 256
+    cpu: 0.1
+    cmd: "bin/start"
+    user: "root"
+    cluster: ""
+    constraints:
+      - [hostname, UNIQUE]
+    listen-port: "$PORT0"
+    min-health-capacity: 0.0
+    max-over-capacity: 0.0
+    backoff-seconds: 2
+    backoff-factor: 2.0
+    max-launch-delay-seconds: 120
+    task-kill-grace-period-seconds: 60
+    ports:
+      - { port: 0, name: "" }
+    docker:
+      enabled: false
+      image: "{{ conf.docker.image }}"
+      network: BRIDGE
+      ports: []
+      volumes: []
+    environment:
+      ENV: "{{ vars.env }}"
+      SERVICE_NAME: "{{ info.name }}{{ info.feature-suffix }}"
+      SERVICE_VERSION: "{{ info.build-version }}"
+      SERVICE_BUILD_NUMBER: "{{ vars.build-number }}"
+      MEMORY: "{{ deploy.marathon.mem }}"
+      PACKAGE_URI: "{{ conf.marathon.registry-url }}"
+      JMX_PORT: "$(($PORT0 + 10200))"
+      JAVA_OPTS: "-Xmx{{ deploy.marathon.mem }}m -Dfile.encoding=UTF-8 -XX:+AggressiveOpts -XX:hashCode=5 -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+UseParNewGC -XX:+HeapDumpOnOutOfMemoryError"
+
+  kube:
+    namespace: "{{ conf.kube.namespace }}"
+    name: "{{ conf.kube.name }}"
+    image: "{{ conf.docker.image }}"
+    replicas: 1
+    mem: ""
+    cpu: ""
+    ports: []
+    environment:
+      ENV: "{{ vars.env }}"
+      SERVICE_NAME: "{{ info.name }}{{ info.feature-suffix }}"
+      SERVICE_VERSION: "{{ info.build-version }}"
+      SERVICE_BUILD_NUMBER: "{{ vars.build-number }}"
+      MEMORY: "{{ deploy.kube.mem }}"
+
+  tarball:
+    cluster: "localhost"
+    ssh-user: "root"
+    package-name: "{{ info.full-name }}"
+    package-uri: "{{ conf.marathon.registry-url }}"
+    install-root: "/local/app/tarball"
+    user: "root"
+    group: "root"
+    consul-address: "{{ conf.consul.address }}"
+    hooks: []
+      # - postinstall: ./install.sh
+
+release:
+  http:
+    consul-address: "{{ conf.consul.address }}"
+    name-prefix: "{{ info.full-name }}"
+    full-name: "{{ info.full-name }}"
+    outdated-timeout-sec ? {{ vars.env }}: { qa: 60, live: 600 }
+    route: "{{ vars.route }}"
+    routes: []
+
+  kube-service:
+    namespace: "{{ conf.kube.namespace }}"
+    name: "{{ conf.kube.name }}"
+    ports: [port: 80]
+
+  ingress:
+    namespace: "{{ conf.kube.namespace }}"
+    name: "{{ conf.kube.name }}"
+    service: "{{ info.full-name | replace('\\W', '-') }}"
+    version: "{{ info.build-version }}"
+    ports: [port: 80]
+    stage: "{{ vars.stage }}"
+    routes:
+      - host: "localhost"
+        port: 80
+        location: "/"
+
+outdated:
+  consul-address: "{{ conf.consul.address }}"
+  full-name: "{{ info.full-name }}"
+
+test:
+  autotest:
+    project: "{{ info.full-name }}"
+    version: "{{ info.build-version }}"
+    repo: "git@github.com:example/test.git"
+    suite: "{{ info.name }}-test"
+    current-env: "{{ vars.env }}"
+    env: "qa"
+    environment: {}
+
+  integration:
+    command: "sbt 'testOnly -- -n Integration'"
+    current-env: "{{ vars.env }}"
+    env: "qa"
+
+db:
+  create:
+    postgresql:
+      purge: "{{ vars.purge }}"
+      ssh-user: ""
+      target: "feature_{{ info.name | replace('\\W', '_') }}{{ info.feature-suffix | replace('\\W', '_') }}"

@@ -2,16 +2,19 @@ package build
 
 import (
 	"testing"
+
+	"github.com/servehub/serve/utils/tests"
 )
 
 func TestShBuild(t *testing.T) {
-	runAllMultiCmdTests(t,
-		map[string]processorTestCase{
+	tests.RunAllMultiCmdTests(t,
+		map[string]tests.TestCase{
 			"simple": {
-				in: `---
-sh: "bash -c test.sh"`,
-				expect: map[string]interface{}{
-					"cmdline": []string{"bash -c test.sh"},
+				In: `---
+					sh: "bash -c test.sh"
+				`,
+				Expects: []string{
+					"bash -c test.sh",
 				},
 			},
 		},

@@ -54,13 +54,13 @@ func runDeployment(kube *kubernetes.Clientset, data manifest.Manifest) error {
 		envs = append(envs, v1.EnvVar{Name: k, Value: fmt.Sprintf("%s", v.Unwrap())})
 	}
 
-	resReqs := v1.ResourceRequirements{}
-	if data.GetStringOr("cpu", "") != "" || data.GetStringOr("mem", "") != "" {
-		res := v1.ResourceList{
-			v1.ResourceCPU:    resource.MustParse(data.GetString("cpu")),
-			v1.ResourceMemory: resource.MustParse(data.GetString("mem")),
-		}
-		resReqs = v1.ResourceRequirements{Limits: res, Requests: res}
+	resources := v1.ResourceList{}
+	if data.GetStringOr("cpu", "") != "" {
+		resources[v1.ResourceCPU] = resource.MustParse(data.GetString("cpu"))
+	}
+
+	if data.GetStringOr("mem", "") != "" {
+		resources[v1.ResourceMemory] = resource.MustParse(data.GetString("mem"))
 	}
 
 	containers := []v1.Container{
@@ -68,7 +68,7 @@ func runDeployment(kube *kubernetes.Clientset, data manifest.Manifest) error {
 			Name:            appName,
 			Image:           data.GetString("image"),
 			Ports:           ports,
-			Resources:       resReqs,
+			Resources:       v1.ResourceRequirements{Limits: resources, Requests: resources},
 			ImagePullPolicy: v1.PullIfNotPresent,
 			Env:             envs,
 		},

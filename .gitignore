@@ -6,3 +6,4 @@ serve
 gocd_credentials
 /vendor/
 /*.yml
+/config/config.go
