@@ -3,7 +3,7 @@ package build
 import (
 	"testing"
 
-	"github.com/servehub/serve/utils/tests"
+	"github.com/servehub/serve/tests"
 )
 
 func TestTarballBuild(t *testing.T) {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/servehub/serve/utils/gabs"
+	"github.com/servehub/utils/gabs"
 )
 
 func GetAll() []Processor {

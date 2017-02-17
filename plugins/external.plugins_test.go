@@ -2,7 +2,7 @@ package plugins
 
 import (
 	"testing"
-	"github.com/servehub/serve/utils/tests"
+	"github.com/servehub/serve/tests"
 )
 
 func TestExternalPlugin(t *testing.T) {

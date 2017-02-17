@@ -13,7 +13,7 @@ import (
 	marathon "github.com/gambol99/go-marathon"
 
 	"github.com/servehub/serve/manifest"
-	"github.com/servehub/serve/utils"
+	"github.com/servehub/utils"
 )
 
 func init() {

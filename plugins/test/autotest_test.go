@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	"github.com/servehub/serve/utils/tests"
+	"github.com/servehub/serve/tests"
 )
 
 func TestTestAutotest(t *testing.T) {

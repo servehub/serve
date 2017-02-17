@@ -3,7 +3,7 @@ package plugins
 import (
 	"testing"
 
-	"github.com/servehub/serve/utils/tests"
+	"github.com/servehub/serve/tests"
 )
 
 func TestDBCreatePostgresql(t *testing.T) {

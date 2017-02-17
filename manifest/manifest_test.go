@@ -6,8 +6,8 @@ import (
 
 	"github.com/fatih/color"
 
-	"github.com/servehub/serve/utils"
-	"github.com/servehub/serve/utils/gabs"
+	"github.com/servehub/utils"
+	"github.com/servehub/utils/gabs"
 )
 
 func TestManifest(t *testing.T) {

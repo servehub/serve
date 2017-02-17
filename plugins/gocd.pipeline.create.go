@@ -12,7 +12,7 @@ import (
 	"sort"
 
 	"github.com/servehub/serve/manifest"
-	"github.com/servehub/serve/utils/gabs"
+	"github.com/servehub/utils/gabs"
 )
 
 func init() {

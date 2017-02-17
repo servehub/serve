@@ -3,12 +3,12 @@ package tests
 import (
 	"fmt"
 	"testing"
+	"strings"
 
 	"github.com/ghodss/yaml"
 
 	"github.com/servehub/serve/manifest"
-	"github.com/servehub/serve/utils"
-	"strings"
+	"github.com/servehub/utils"
 )
 
 type TestCase struct {

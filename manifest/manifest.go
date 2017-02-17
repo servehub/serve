@@ -13,8 +13,8 @@ import (
 
 	"github.com/servehub/serve/manifest/loader"
 	"github.com/servehub/serve/manifest/processor"
-	"github.com/servehub/serve/utils"
-	"github.com/servehub/serve/utils/gabs"
+	"github.com/servehub/utils"
+	"github.com/servehub/utils/gabs"
 )
 
 type Manifest struct {

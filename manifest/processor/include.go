@@ -7,8 +7,8 @@ import (
 
 	"github.com/servehub/serve/manifest/config"
 	"github.com/servehub/serve/manifest/loader"
-	"github.com/servehub/serve/utils/gabs"
-	"github.com/servehub/serve/utils/mergemap"
+	"github.com/servehub/utils/gabs"
+	"github.com/servehub/utils/mergemap"
 )
 
 const ConfigPath = "/etc/serve"

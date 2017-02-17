@@ -13,7 +13,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/hashicorp/consul/api"
 
-	"github.com/servehub/serve/utils"
+	"github.com/servehub/utils"
 )
 
 var upstreamNameRegex = regexp.MustCompile("[^\\w]+")

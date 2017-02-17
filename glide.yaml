@@ -1,7 +1,7 @@
 package: github.com/servehub/serve
 import:
+  - package: github.com/servehub/utils
   - package: gopkg.in/alecthomas/kingpin.v2
-  - package: github.com/urfave/cli
   - package: github.com/hashicorp/consul/api
   - package: github.com/gambol99/go-marathon
   - package: github.com/ghodss/yaml

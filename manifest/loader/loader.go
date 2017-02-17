@@ -8,7 +8,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/ghodss/yaml"
 
-	"github.com/servehub/serve/utils/gabs"
+	"github.com/servehub/utils/gabs"
 )
 
 func LoadFile(path string) (*gabs.Container, error) {

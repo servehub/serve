@@ -3,7 +3,7 @@ package upload
 import (
 	"testing"
 
-	"github.com/servehub/serve/utils/tests"
+	"github.com/servehub/serve/tests"
 )
 
 func TestUploadMarathon(t *testing.T) {

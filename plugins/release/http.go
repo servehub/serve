@@ -11,7 +11,7 @@ import (
 	"github.com/fatih/color"
 
 	"github.com/servehub/serve/manifest"
-	"github.com/servehub/serve/utils"
+	"github.com/servehub/utils"
 )
 
 func init() {
@@ -117,7 +117,7 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 							return err
 						}
 
-						if err := utils.MarkAsOutdated(consul, outdated, time.Duration(data.GetIntOr("outdated-timeout-sec", 600)) * time.Second); err != nil {
+						if err := utils.MarkAsOutdated(consul, outdated, time.Duration(data.GetIntOr("outdated-timeout-sec", 600))*time.Second); err != nil {
 							return err
 						}
 

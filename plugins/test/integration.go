@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/servehub/serve/manifest"
-	"github.com/servehub/serve/utils"
+	"github.com/servehub/utils"
 )
 
 func init() {

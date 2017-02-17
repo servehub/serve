@@ -3,7 +3,7 @@ package deploy
 import (
 	"testing"
 
-	"github.com/servehub/serve/utils/tests"
+	"github.com/servehub/serve/tests"
 )
 
 func TestDeployTarball(t *testing.T) {
