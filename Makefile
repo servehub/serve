@@ -17,7 +17,7 @@ deps:
 
 build-configs:
 	echo "==> Build configs..."
-	${GOPATH}/bin/go-bindata -pkg config -o config/config.go config/*.yml
+	${GOPATH}/bin/go-bindata -pkg config -o manifest/config/config.go config/*.yml
 
 build-serve:
 	echo "==> Build serve binaries..."

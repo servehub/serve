@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/servehub/serve/manifest/config"
 	"github.com/servehub/serve/manifest/loader"
 	"github.com/servehub/serve/utils/gabs"
 	"github.com/servehub/serve/utils/mergemap"
-	"github.com/servehub/serve/config"
 )
 
 const ConfigPath = "/etc/serve"
@@ -52,7 +52,7 @@ func (in Include) Process(tree *gabs.Container) error {
 	}
 
 	// include reference config
-	reference, err :=loader.ParseYaml(config.MustAsset("config/reference.yml"))
+	reference, err := loader.ParseYaml(config.MustAsset("config/reference.yml"))
 	if err != nil {
 		return err
 	}

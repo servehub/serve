@@ -1,9 +1,4 @@
 /bin/
-/project/
-/target/
-serve
 .idea/
-gocd_credentials
 /vendor/
-/*.yml
-/config/config.go
+/manifest/config/config.go
