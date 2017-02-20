@@ -1,14 +1,11 @@
 package processor
 
 import (
-	"log"
 	"path/filepath"
 	"strings"
 
 	"github.com/servehub/serve/manifest/config"
-	"github.com/servehub/serve/manifest/loader"
 	"github.com/servehub/utils/gabs"
-	"github.com/servehub/utils/mergemap"
 )
 
 const ConfigPath = "/etc/serve"
@@ -35,50 +32,20 @@ func (in Include) Process(tree *gabs.Container) error {
 					file = path + "/" + file
 				}
 
-				if err := includeFile(file, tree); err != nil {
+				if err := tree.WithFallbackYamlFile(file); err != nil {
 					return err
 				}
 			}
 		}
 	}
 
-	// include all base configs
 	if files, err := filepath.Glob(path + "/conf.d/*.yml"); err == nil {
 		for _, file := range files {
-			if err := includeFile(file, tree); err != nil {
+			if err := tree.WithFallbackYamlFile(file); err != nil {
 				return err
 			}
 		}
 	}
 
-	// include reference config
-	reference, err := loader.ParseYaml(config.MustAsset("config/reference.yml"))
-	if err != nil {
-		return err
-	}
-
-	merged, err := mergemap.Merge(reference.Data().(map[string]interface{}), tree.Data().(map[string]interface{}))
-	if err != nil {
-		return err
-	}
-
-	_, err = tree.Set(merged)
-	return err
-}
-
-func includeFile(file string, tree *gabs.Container) error {
-	loaded, err := loader.LoadFile(file)
-	if err != nil {
-		return err
-	}
-
-	log.Println("include:", file)
-
-	merged, err := mergemap.Merge(loaded.Data().(map[string]interface{}), tree.Data().(map[string]interface{}))
-	if err != nil {
-		return err
-	}
-
-	_, err = tree.Set(merged)
-	return err
+	return tree.WithFallbackYaml(config.MustAsset("config/reference.yml"))
 }

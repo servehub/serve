@@ -26,7 +26,6 @@ func main() {
 			Subcommands: []cli.Command{
 				consul.SupervisorCommand(),
 				consul.NginxTemplateContextCommand(),
-				consul.RouteCommand(),
 				consul.KvPatchCommand(),
 				consul.DeregisterCommand(),
 				{

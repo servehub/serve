@@ -11,7 +11,6 @@ import (
 
 	"github.com/fatih/color"
 
-	"github.com/servehub/serve/manifest/loader"
 	"github.com/servehub/serve/manifest/processor"
 	"github.com/servehub/utils"
 	"github.com/servehub/utils/gabs"
@@ -170,7 +169,7 @@ func (m Manifest) ToEnvMap(prefix string) map[string]string {
 }
 
 func Load(path string, vars map[string]string) *Manifest {
-	tree, err := loader.LoadFile(path)
+	tree, err := gabs.LoadYamlFile(path)
 	if err != nil {
 		log.Fatalln("Error on load file:", err)
 	}

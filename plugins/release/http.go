@@ -61,7 +61,7 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 	}
 
 	// collect routes
-	routes := make([]map[string]string, 0)
+	routes := consulRoutes{}
 	for _, route := range data.GetArray("routes") {
 		if !route.Has("host") {
 			log.Printf("Not found 'host': %s, skip...", route.String())
@@ -70,13 +70,19 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 
 		fields := make(map[string]string)
 		for k, v := range route.Unwrap().(map[string]interface{}) {
-			fields[k] = fmt.Sprintf("%v", v)
+			if k != "host" && k != "location" {
+				fields[k] = fmt.Sprintf("%v", v)
+			}
 		}
 
-		routes = append(routes, utils.MergeMaps(fields, routeVars))
+		routes.Routes = append(routes.Routes, consulRoute{
+			Host:     route.GetString("host"),
+			Location: route.GetStringOr("location", ""),
+			Vars:     utils.MergeMaps(fields, routeVars),
+		})
 	}
 
-	if len(routes) == 0 {
+	if len(routes.Routes) == 0 {
 		log.Println("No routes configured for release.")
 		return nil
 	}
@@ -101,15 +107,15 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 
 	for _, existsRoute := range existsRoutes {
 		if existsRoute.Key != fmt.Sprintf("services/routes/%s", fullName) { // skip current service
-			oldRoutes := make([]map[string]string, 0)
+			oldRoutes := consulRoutes{}
 			if err := json.Unmarshal(existsRoute.Value, &oldRoutes); err != nil {
 				return err
 			}
 
 		OuterLoop:
-			for _, route := range routes {
-				for _, oldRoute := range oldRoutes {
-					if utils.MapsEqual(route, oldRoute) {
+			for _, route := range routes.Routes {
+				for _, oldRoute := range oldRoutes.Routes {
+					if route.Host == oldRoute.Host && route.Location == oldRoute.Location && utils.MapsEqual(route.Vars, oldRoute.Vars) {
 						outdated := strings.TrimPrefix(existsRoute.Key, "services/routes/")
 						log.Println(color.GreenString("Found %s with the same routes %v. Remove it!", outdated, string(existsRoute.Value)))
 
@@ -129,4 +135,14 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 	}
 
 	return nil
+}
+
+type consulRoutes struct {
+	Routes []consulRoute `json:"routes"`
+}
+
+type consulRoute struct {
+	Host     string `json:"host"`
+	Location string `json:"location,omitempty"`
+	Vars     map[string]string `json:"vars,omitempty"`
 }

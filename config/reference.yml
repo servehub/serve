@@ -110,9 +110,10 @@ build:
   docker-image:
     image: "{{ conf.docker.image }}"
 
-  docker-run:
+  docker:
     image: alpine
     cmd: "test"
+    shell: "/bin/sh -c '%s'"
     envs: {}
 
 upload:
@@ -158,10 +159,7 @@ deploy:
       SERVICE_NAME: "{{ info.name }}{{ info.feature-suffix }}"
       SERVICE_VERSION: "{{ info.build-version }}"
       SERVICE_BUILD_NUMBER: "{{ vars.build-number }}"
-      MEMORY: "{{ deploy.marathon.mem }}"
-      PACKAGE_URI: "{{ conf.marathon.registry-url }}"
-      JMX_PORT: "$(($PORT0 + 10200))"
-      JAVA_OPTS: "-Xmx{{ deploy.marathon.mem }}m -Dfile.encoding=UTF-8 -XX:+AggressiveOpts -XX:hashCode=5 -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+UseParNewGC -XX:+HeapDumpOnOutOfMemoryError"
+      SERVICE_MEMORY: "{{ deploy.marathon.mem }}"
 
   kube:
     namespace: "{{ conf.kube.namespace }}"
