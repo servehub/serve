@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
+	"regexp"
 
 	"github.com/fatih/color"
-	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/servehub/serve/manifest"
 	_ "github.com/servehub/serve/plugins"
@@ -13,37 +14,59 @@ import (
 
 var version = "0.0"
 
+var flagRegex = regexp.MustCompile("--([a-z0-9-]+)(=(.+))?")
+var pluginNameRegex = regexp.MustCompile("^[a-z0-9-.]+$")
+
 func main() {
-	manifestFile := kingpin.Flag("manifest", "Path to manifest.yml file.").Default("manifest.yml").String()
-	plugin := kingpin.Arg("plugin", "Plugin name for run.").String()
-	vars := *kingpin.Flag("var", "key=value pairs with manifest vars.").StringMap()
-	dryRun := kingpin.Flag("dry-run", "Show manifest section only").Bool()
-	noColor := kingpin.Flag("no-color", "Disable colored output").Bool()
-	pluginData := kingpin.Flag("plugin-data", "Data for plugin").String()
-
-	kingpin.Version(version)
-	kingpin.Parse()
-
-	color.NoColor = *noColor
-
-	var manifestData *manifest.Manifest
-	if *pluginData != "" {
-		manifestData = manifest.LoadJSON(*pluginData)
-	} else {
-		manifestData = manifest.Load(*manifestFile, vars)
+	plugin := ""
+	if len(os.Args) > 1 && pluginNameRegex.MatchString(os.Args[1]) {
+		plugin = os.Args[1]
 	}
 
-	if *plugin == "" && *dryRun {
+	vars := make(map[string]string, 0)
+	for _, arg := range os.Args[1:] {
+		res := flagRegex.FindStringSubmatch(arg)
+
+		if len(res) > 0 {
+			if res[2] == "" {
+				vars[res[1]] = "true"
+			} else {
+				vars[res[1]] = res[3]
+			}
+		}
+	}
+
+	if _, ok := vars["no-color"]; ok {
+		color.NoColor = true
+	}
+
+	manifestFile := "manifest.yml"
+	if f, ok := vars["manifest"]; ok {
+		manifestFile = f
+	}
+
+	pluginData, pluginDataExists := vars["plugin-data"]
+
+	var manifestData *manifest.Manifest
+	if pluginDataExists {
+		manifestData = manifest.LoadJSON(pluginData)
+	} else {
+		manifestData = manifest.Load(manifestFile, vars)
+	}
+
+	_, dryRun := vars["dry-run"]
+
+	if dryRun && plugin == "" {
 		fmt.Printf("%s\n%s\n%s\n", color.GreenString(">>> manifest:"), manifestData.String(), color.GreenString("<<< manifest: OK\n"))
 		return
 	}
 
 	var plugins []manifest.PluginData
-	if *pluginData != "" {
-		plugins = []manifest.PluginData{manifestData.GetPluginWithData(*plugin)}
+	if pluginDataExists {
+		plugins = []manifest.PluginData{manifestData.GetPluginWithData(plugin)}
 	} else {
-		if result, err := manifestData.FindPlugins(*plugin); err != nil {
-			log.Fatalln(color.RedString("Error find plugins for '%s': %v", *plugin, err))
+		if result, err := manifestData.FindPlugins(plugin); err != nil {
+			log.Fatalln(color.RedString("Error find plugins for '%s': %v", plugin, err))
 		} else {
 			plugins = result
 		}
@@ -52,7 +75,7 @@ func main() {
 	for _, pair := range plugins {
 		log.Printf("%s\n%s\n\n", color.GreenString(">>> %s:", pair.PluginName), color.CyanString("%s", pair.Data))
 
-		if !*dryRun {
+		if !dryRun {
 			if err := pair.Plugin.Run(pair.Data); err != nil {
 				fmt.Println("")
 				log.Fatalln(color.RedString("Error on run plugin `%s`: %v", pair.PluginName, err))

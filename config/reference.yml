@@ -25,7 +25,6 @@ vars:
   build-number: 0
   stage-counter: 0
   purge: false
-  stage: staging
 
 conf:
   marathon:
@@ -194,7 +193,8 @@ release:
     name-prefix: "{{ info.full-name }}"
     full-name: "{{ info.full-name }}"
     outdated-timeout-sec ? {{ vars.env }}: { qa: 60, live: 600 }
-    route: "{{ vars.route }}"
+    stage: "{{ vars.stage }}"
+    route-vars: "{{ vars.route-vars }}"
     routes: []
 
   kube-service:

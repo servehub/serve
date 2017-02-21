@@ -53,11 +53,15 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 	}
 
 	routeVars := make(map[string]string, 0)
-	if data.Has("route") {
-		if err := json.Unmarshal([]byte(data.GetString("route")), &routeVars); err != nil {
+	if data.Has("route-vars") {
+		if err := json.Unmarshal([]byte(data.GetString("route-vars")), &routeVars); err != nil {
 			log.Println(color.RedString("Error parse route json: %v, %s", err, data.GetString("route")))
 			return err
 		}
+	}
+
+	if data.Has("stage") {
+		routeVars["stage"] = data.GetString("stage")
 	}
 
 	// collect routes
@@ -142,7 +146,7 @@ type consulRoutes struct {
 }
 
 type consulRoute struct {
-	Host     string `json:"host"`
-	Location string `json:"location,omitempty"`
+	Host     string            `json:"host"`
+	Location string            `json:"location,omitempty"`
 	Vars     map[string]string `json:"vars,omitempty"`
 }

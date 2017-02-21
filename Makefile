@@ -27,7 +27,7 @@ build-serve-tools:
 	echo "==> Build serve-tools binaries..."
 	go build -v -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve-tools tools/cmd.go
 
-install: build-serve
+install: build-configs build-serve
 	echo "==> Copy binaries to \$GOPATH/bin/..."
 	cp ${DEST}/* ${GOPATH}/bin/
 
