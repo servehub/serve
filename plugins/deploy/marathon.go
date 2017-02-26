@@ -105,13 +105,10 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		app.EmptyUris()
 		app.EmptyPortDefinitions()
 
-		app.AddEnv("SERVICE_NAME", fullName) // docker-registrator: consul Name
-		app.AddEnv("SERVICE_CHECK_TCP", "true") // docker-registrator: consul TCP health check
-
 		doc := marathon.NewDockerContainer()
 		doc.Docker.Image = data.GetString("docker.image")
 		doc.Docker.Network = data.GetString("docker.network")
-		doc.Docker.SetForcePullImage(true)
+		doc.Docker.SetForcePullImage(false) // todo: use true by default
 		doc.EmptyVolumes()
 
 		for _, port := range data.GetArray("docker.ports") {
@@ -147,7 +144,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		return err
 	}
 
-	if err := utils.RegisterPluginData("deploy.marathon", data.GetString("app-name"), data.String(), data.GetString("consul-address")); err != nil {
+	if err := utils.RegisterPluginData("deploy.marathon", fullName, data.String(), data.GetString("consul-address")); err != nil {
 		return err
 	}
 

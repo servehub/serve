@@ -35,7 +35,7 @@ conf:
 
     registry-host ? {{ vars.env }}:
       qa: "{{ conf.marathon.registry-host-qa }}"
-      live: "{{ conf.marathon.registry-host-live }}"
+      "*": "{{ conf.marathon.registry-host-live }}"
 
     registry-path: "/{{ info.category }}/{{ info.name }}/{{ info.name }}{{ info.feature-suffix }}-v{{ info.build-version }}.tar.gz"
     registry-url: "http://{{ conf.marathon.registry-host }}{{ conf.marathon.registry-path }}"
@@ -155,10 +155,11 @@ deploy:
       volumes: []
     environment:
       ENV: "{{ vars.env }}"
-      SERVICE_NAME: "{{ info.name }}{{ info.feature-suffix }}"
+      SERVICE_NAME: "{{ conf.marathon.app-name }}"
       SERVICE_VERSION: "{{ info.build-version }}"
       SERVICE_BUILD_NUMBER: "{{ vars.build-number }}"
       SERVICE_MEMORY: "{{ deploy.marathon.mem }}"
+      SERVICE_CHECK_TCP: true
 
   kube:
     namespace: "{{ conf.kube.namespace }}"
@@ -192,7 +193,7 @@ release:
     consul-address: "{{ conf.consul.address }}"
     name-prefix: "{{ info.full-name }}"
     full-name: "{{ info.full-name }}"
-    outdated-timeout-sec ? {{ vars.env }}: { qa: 60, live: 600 }
+    outdated-timeout-sec ? {{ vars.env }}: { qa: 60, "*": 600 }
     stage: "{{ vars.stage }}"
     route-vars: "{{ vars.route-vars }}"
     routes: []
