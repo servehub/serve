@@ -2,6 +2,7 @@ package build
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/servehub/serve/manifest"
@@ -14,16 +15,38 @@ func init() {
 
 type BuildDockerRun struct{}
 
+var nameRegepx = regexp.MustCompile("[^\\w.]+")
+
 func (p BuildDockerRun) Run(data manifest.Manifest) error {
 	envs := make([]string, 0)
 	for k, v := range data.GetTree("envs").ToEnvMap("") {
 		envs = append(envs, "-e "+k+"="+v)
 	}
 
+	cmds := make([]string, 0)
+	for _, s := range data.GetArrayForce("cmd") {
+		cmds = append(cmds, fmt.Sprintf("%s", s))
+	}
+
+	volumes := []string{`-v "$PWD":/src`}
+	for _, v := range data.GetArrayForce("volumes") {
+		volumes = append(volumes, fmt.Sprintf("-v %s", v))
+	}
+
+	image := data.GetString("image")
+
+	if data.Has("build") {
+		image += ":" + strings.ToLower(nameRegepx.ReplaceAllString(data.GetString("build"), ""))
+		if err := utils.RunCmd("docker build --pull -t %s -f %s .", image, data.GetString("build")); err != nil {
+			return err
+		}
+	}
+
 	return utils.RunCmd(
-		`docker run --rm %s -v "$PWD":/src -w /src %s %s`,
+		`docker run --rm %s %s -w /src %s %s`,
 		strings.Join(envs, " "),
-		data.GetString("image"),
-		fmt.Sprintf(data.GetString("shell"), data.GetString("cmd")),
+		strings.Join(volumes, " "),
+		image,
+		fmt.Sprintf(data.GetString("shell"), strings.Join(cmds, " && ")),
 	)
 }

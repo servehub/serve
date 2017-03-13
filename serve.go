@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"time"
 
 	"github.com/fatih/color"
 
@@ -72,6 +73,8 @@ func main() {
 		}
 	}
 
+	startTime := time.Now()
+
 	for _, pair := range plugins {
 		log.Printf("%s\n%s\n\n", color.GreenString(">>> %s:", pair.PluginName), color.CyanString("%s", pair.Data))
 
@@ -84,4 +87,6 @@ func main() {
 			}
 		}
 	}
+
+	log.Println(color.GreenString("Time: %d seconds", int(time.Now().Sub(startTime).Seconds())))
 }

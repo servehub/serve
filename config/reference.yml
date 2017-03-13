@@ -110,9 +110,11 @@ build:
     image: "{{ conf.docker.image }}"
 
   docker:
-    image: alpine
+    image: "{{ info.full-name }}"
+    build: ""
     cmd: "test"
     shell: "/bin/sh -c '%s'"
+    volumes: []
     envs: {}
 
 upload:
@@ -132,7 +134,7 @@ deploy:
     package-uri: "{{ conf.marathon.registry-url }}"
     instances: 1
     mem: 256
-    cpu: 0.1
+    cpu: 0.5
     cmd: "bin/start"
     user: "root"
     cluster: ""
@@ -149,10 +151,12 @@ deploy:
       - { port: 0, name: "" }
     docker:
       enabled: false
+      args: []
       image: "{{ conf.docker.image }}"
       network: BRIDGE
       ports: []
       volumes: []
+    envs: {}
     environment:
       ENV: "{{ vars.env }}"
       SERVICE_NAME: "{{ conf.marathon.app-name }}"

@@ -97,6 +97,21 @@ func (m Manifest) GetArray(path string) []Manifest {
 	return out
 }
 
+func (m Manifest) GetArrayForce(path string) []interface{} {
+	out := make([]interface{}, 0)
+
+	arr, err := m.tree.Path(path).Children()
+	if err != nil {
+		arr = append(arr, m.tree.Path(path))
+	}
+
+	for _, v := range arr {
+		out = append(out, v.Data())
+	}
+
+	return out
+}
+
 func (m Manifest) GetTree(path string) Manifest {
 	return Manifest{m.tree.Path(path)}
 }

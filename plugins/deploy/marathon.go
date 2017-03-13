@@ -94,8 +94,12 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 	app.AddEnv("SERVICE_DEPLOY_TIME", time.Now().Format(time.RFC3339)) // force redeploy app
 
+	for k, v := range data.GetMap("envs") {
+		app.AddEnv(k, fmt.Sprintf("%v", v.Unwrap()))
+	}
+
 	for k, v := range data.GetMap("environment") {
-		app.AddEnv(k, fmt.Sprintf("%s", v.Unwrap()))
+		app.AddEnv(k, fmt.Sprintf("%v", v.Unwrap()))
 	}
 
 	app.AddUris(data.GetString("package-uri"))
@@ -104,6 +108,10 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		app.Cmd = nil
 		app.EmptyUris()
 		app.EmptyPortDefinitions()
+
+		for _, arg := range data.GetArrayForce("docker.args") {
+			app.AddArgs(fmt.Sprintf("%v", arg))
+		}
 
 		doc := marathon.NewDockerContainer()
 		doc.Docker.Image = data.GetString("docker.image")
