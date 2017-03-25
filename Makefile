@@ -1,5 +1,6 @@
 VERSION?="1.3.0"
 DEST?=./bin
+SUFFIX?=""
 
 default: install
 
@@ -21,14 +22,18 @@ build-configs:
 
 build-serve:
 	echo "==> Build serve binaries..."
-	go build -v -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve serve.go
+	go build -v -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve${SUFFIX} serve.go
 
 build-serve-tools:
 	echo "==> Build serve-tools binaries..."
-	go build -v -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve-tools tools/cmd.go
+	go build -v -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve-tools${SUFFIX} tools/cmd.go
 
 install: build-configs build-serve
 	echo "==> Copy binaries to \$GOPATH/bin/..."
 	cp ${DEST}/* ${GOPATH}/bin/
+
+dist: build-configs
+	GOOS=linux SUFFIX=-linux-amd64 make build-serve
+	GOOS=linux SUFFIX=-linux-amd64 make build-serve-tools
 
 all: deps build-configs vet test build-serve build-serve-tools install

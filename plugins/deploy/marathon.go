@@ -116,7 +116,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		doc := marathon.NewDockerContainer()
 		doc.Docker.Image = data.GetString("docker.image")
 		doc.Docker.Network = data.GetString("docker.network")
-		doc.Docker.SetForcePullImage(false) // todo: use true by default
+		doc.Docker.SetForcePullImage(true)
 		doc.EmptyVolumes()
 
 		for _, port := range data.GetArray("docker.ports") {
