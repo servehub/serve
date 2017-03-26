@@ -101,6 +101,8 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 		return err
 	}
 
+	utils.DelConsulKv(consul, "services/outdated/"+fullName) // force delete outdated key (if exists)
+
 	log.Println(color.GreenString("Service `%s` released with routes: %s", fullName, string(routesJson)))
 
 	// find old services with the same routes
