@@ -21,7 +21,7 @@ info:
   full-name: "{{ info.category }}/{{ info.name }}{{ info.feature-suffix }}"
 
 vars:
-  env: qa
+  env: dev
   build-number: 0
   stage-counter: 0
   purge: false
@@ -30,13 +30,7 @@ conf:
   marathon:
     app-name: "{{ info.full-name }}"
     address: marathon
-    registry-host-qa: task-registry.marathon
-    registry-host-live: task-registry.marathon
-
-    registry-host ? {{ vars.env }}:
-      qa: "{{ conf.marathon.registry-host-qa }}"
-      "*": "{{ conf.marathon.registry-host-live }}"
-
+    registry-host: webdav.marathon
     registry-path: "/{{ info.category }}/{{ info.name }}/{{ info.name }}{{ info.feature-suffix }}-v{{ info.build-version }}.tar.gz"
     registry-url: "http://{{ conf.marathon.registry-host }}{{ conf.marathon.registry-path }}"
 
@@ -117,15 +111,6 @@ build:
     volumes: []
     envs: {}
 
-upload:
-  marathon:
-    unstable-url: "http://{{ conf.marathon.registry-host-qa }}{{ conf.marathon.registry-path }}"
-    stable-url: "http://{{ conf.marathon.registry-host-live }}{{ conf.marathon.registry-path }}"
-
-  tarball:
-    unstable-url: "http://{{ conf.marathon.registry-host-qa }}{{ conf.marathon.registry-path }}"
-    stable-url: "http://{{ conf.marathon.registry-host-live }}{{ conf.marathon.registry-path }}"
-
 deploy:
   marathon:
     consul-address: "{{ conf.consul.address }}"
@@ -150,7 +135,7 @@ deploy:
     ports:
       - { port: 0, name: "" }
     docker:
-      enabled: false
+      enabled: true
       args: []
       image: "{{ conf.docker.image }}"
       network: BRIDGE
@@ -197,7 +182,7 @@ release:
     consul-address: "{{ conf.consul.address }}"
     name-prefix: "{{ info.full-name }}"
     full-name: "{{ info.full-name }}"
-    outdated-timeout-sec ? {{ vars.env }}: { qa: 60, "*": 600 }
+    outdated-timeout-sec ? {{ vars.env }}: { dev: 60, "*": 600 }
     stage: "{{ vars.stage }}"
     route-vars: "{{ vars.route-vars }}"
     routes: []
@@ -230,13 +215,13 @@ test:
     repo: "git@github.com:example/test.git"
     suite: "{{ info.name }}-test"
     current-env: "{{ vars.env }}"
-    env: "qa"
+    env: "dev"
     environment: {}
 
   integration:
     command: "sbt 'testOnly -- -n Integration'"
     current-env: "{{ vars.env }}"
-    env: "qa"
+    env: "dev"
 
 db:
   create:

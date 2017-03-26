@@ -1,4 +1,4 @@
-VERSION?="1.3.0"
+VERSION?="1.4.0"
 DEST?=./bin
 SUFFIX?=""
 
@@ -33,7 +33,9 @@ install: build-configs build-serve
 	cp ${DEST}/* ${GOPATH}/bin/
 
 dist: build-configs
-	GOOS=linux SUFFIX=-linux-amd64 make build-serve
-	GOOS=linux SUFFIX=-linux-amd64 make build-serve-tools
+	GOOS=linux SUFFIX=-v${VERSION}-linux-amd64 make build-serve
+	GOOS=darwin SUFFIX=-v${VERSION}-darwin-amd64 make build-serve
+	GOOS=linux SUFFIX=-v${VERSION}-linux-amd64 make build-serve-tools
+	GOOS=darwin SUFFIX=-v${VERSION}-darwin-amd64 make build-serve-tools
 
 all: deps build-configs vet test build-serve build-serve-tools install
