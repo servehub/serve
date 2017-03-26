@@ -42,6 +42,8 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 	backoffFactor := data.GetFloat("backoff-factor")
 	maxLaunchDelaySeconds := data.GetFloat("max-launch-delay-seconds")
 	taskKillGracePeriodSeconds := data.GetFloat("task-kill-grace-period-seconds")
+	minHealthCapacity := data.GetFloat("min-health-capacity")
+	maxOverCapacity := data.GetFloat("max-over-capacity")
 
 	app := &marathon.Application{
 		User:                       data.GetString("user"),
@@ -50,8 +52,8 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		MaxLaunchDelaySeconds:      &maxLaunchDelaySeconds,
 		TaskKillGracePeriodSeconds: &taskKillGracePeriodSeconds,
 		UpgradeStrategy: &marathon.UpgradeStrategy{
-			MinimumHealthCapacity: data.GetFloat("min-health-capacity"),
-			MaximumOverCapacity:   data.GetFloat("max-over-capacity"),
+			MinimumHealthCapacity: &minHealthCapacity,
+			MaximumOverCapacity:   &maxOverCapacity,
 		},
 	}
 
