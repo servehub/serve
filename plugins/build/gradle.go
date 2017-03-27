@@ -1,8 +1,9 @@
 package build
 
 import (
+	"fmt"
+
 	"github.com/servehub/serve/manifest"
-	"github.com/servehub/utils"
 )
 
 func init() {
@@ -12,9 +13,6 @@ func init() {
 type GradleBuild struct{}
 
 func (p GradleBuild) Run(data manifest.Manifest) error {
-	return utils.RunCmd(
-		`docker run --rm -v "$PWD":/src -v ~/.gradle/caches/:/root/.gradle/caches/ -v ~/.gradle/wrapper/:/root/.gradle/wrapper/ -w /src frekele/gradle gradle %s -Pversion="%s"`,
-		data.GetStringOr("gradle", ""),
-		data.GetString("version"),
-	)
+	data.Set("cmd", fmt.Sprintf(data.GetString("cmd"), data.GetString("gradle")) )
+	return manifest.PluginRegestry.Get("build.docker").Run(data)
 }

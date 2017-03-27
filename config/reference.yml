@@ -21,7 +21,7 @@ info:
   full-name: "{{ info.category }}/{{ info.name }}{{ info.feature-suffix }}"
 
 vars:
-  env: dev
+  env: qa
   build-number: 0
   stage-counter: 0
   purge: false
@@ -92,6 +92,15 @@ build:
     version: "{{ info.build-version }}"
     test: "testOnly -- -l Integration"
 
+  gradle:
+    <<: *build-docker
+    image: frekele/gradle:3.4.1-jdk8
+    volumes:
+      - '$HOME/.gradle:/root/.gradle/caches'
+      - '$HOME/.gradle/wrapper:/root/.gradle/wrapper'
+      - '$HOME/.gradle/init.gradle:/root/.gradle/init.gradle'
+    cmd: gradle %s -Pversion='{{ info.build-version }}'
+
   marathon:
     source: "target/pack"
     registry-url: "{{ conf.marathon.registry-url }}"
@@ -103,7 +112,7 @@ build:
   docker-image:
     image: "{{ conf.docker.image }}"
 
-  docker:
+  docker: &build-docker
     image: "{{ info.full-name }}"
     build: ""
     cmd: "test"
@@ -182,7 +191,7 @@ release:
     consul-address: "{{ conf.consul.address }}"
     name-prefix: "{{ info.full-name }}"
     full-name: "{{ info.full-name }}"
-    outdated-timeout-sec ? {{ vars.env }}: { dev: 60, "*": 600 }
+    outdated-timeout-sec ? {{ vars.env }}: { qa: 60, "*": 600 }
     stage: "{{ vars.stage }}"
     route-vars: "{{ vars.route-vars }}"
     routes: []
@@ -215,13 +224,13 @@ test:
     repo: "git@github.com:example/test.git"
     suite: "{{ info.name }}-test"
     current-env: "{{ vars.env }}"
-    env: "dev"
+    env: "qa"
     environment: {}
 
   integration:
     command: "sbt 'testOnly -- -n Integration'"
     current-env: "{{ vars.env }}"
-    env: "dev"
+    env: "qa"
 
 db:
   create:
