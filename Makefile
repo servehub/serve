@@ -1,39 +1,62 @@
-VERSION?="1.4.3"
+VERSION?="1.4.5"
 DEST?=./bin
 SUFFIX?=""
+TARGET_OS=linux darwin
+TARGET_ARCH=amd64
 
 default: install
 
 vet:
-	echo "==> Running vet..."
 	go vet `go list ./... | grep -v /vendor/`
 
 test:
-	echo "==> Running tests..."
 	go test -cover -v `go list ./... | grep -v /vendor/`
 
 deps:
-	echo "==> Install dependencies..."
+	@echo "==> Install dependencies..."
 	go get -u github.com/jteeuwen/go-bindata/...
 
 build-configs:
-	echo "==> Build configs..."
 	${GOPATH}/bin/go-bindata -pkg config -o manifest/config/config.go config/*.yml
 
 build-serve:
-	echo "==> Build serve binaries..."
-	go build -v -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve${SUFFIX} serve.go
+	go build -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve${SUFFIX} serve.go
 
 build-serve-tools:
-	echo "==> Build serve-tools binaries..."
-	go build -v -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve-tools${SUFFIX} tools/cmd.go
+	go build -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve-tools${SUFFIX} tools/cmd.go
 
 install: build-configs build-serve
-	echo "==> Copy binaries to \$GOPATH/bin/..."
 	cp ${DEST}/* ${GOPATH}/bin/
 
-dist: build-configs
-	GOOS=linux SUFFIX=-v${VERSION}-linux-amd64 make build-serve
-	GOOS=darwin SUFFIX=-v${VERSION}-darwin-amd64 make build-serve
+clean:
+	@echo "==> Cleanup old binaries..."
+	rm -f ${DEST}/*
 
-all: deps build-configs vet test build-serve build-serve-tools install
+dist: clean build-configs
+	@echo "==> Build dist..."
+
+	for GOOS in ${TARGET_OS}; do \
+		for GOARCH in ${TARGET_ARCH}; do \
+			SUFFIX=-v${VERSION}-$$GOOS-$$GOARCH make build-serve; \
+		done \
+	done
+
+release: dist
+	@echo "==> Create github release and upload files..."
+
+	github-release release \
+		--user servehub \
+		--repo serve \
+		--tag v${VERSION}
+
+	for GOOS in ${TARGET_OS}; do \
+		for GOARCH in ${TARGET_ARCH}; do \
+			github-release upload \
+				--user servehub \
+				--repo serve \
+				--tag v${VERSION} \
+				--name serve-v${VERSION}-$$GOOS-$$GOARCH \
+				--file ${DEST}/serve-v${VERSION}-$$GOOS-$$GOARCH \
+				--replace; \
+		done \
+	done
