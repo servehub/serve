@@ -104,7 +104,9 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		app.AddEnv(k, fmt.Sprintf("%v", v.Unwrap()))
 	}
 
-	app.AddUris(data.GetString("package-uri"))
+	for _, uri := range data.GetArrayForce("package-uri") {
+		app.AddUris(fmt.Sprintf("%v", uri))
+	}
 
 	if data.GetBool("docker.enabled") {
 		app.Cmd = nil

@@ -96,10 +96,10 @@ build:
     <<: *build-docker
     image: frekele/gradle:3.4.1-jdk8
     volumes:
-      - '$HOME/.gradle:/root/.gradle/caches'
-      - '$HOME/.gradle/wrapper:/root/.gradle/wrapper'
-      - '$HOME/.gradle/init.gradle:/root/.gradle/init.gradle'
-    cmd: gradle %s -Pversion='{{ info.build-version }}'
+      - '~/.gradle:/root/.gradle/caches'
+      - '~/.gradle/wrapper:/root/.gradle/wrapper'
+      - '~/.gradle/init.gradle:/root/.gradle/init.gradle'
+    cmd: gradle %s -Pversion="{{ info.build-version }}"
 
   marathon:
     source: "target/pack"
@@ -125,7 +125,7 @@ deploy:
     consul-address: "{{ conf.consul.address }}"
     marathon-address: "{{ conf.marathon.address }}"
     app-name: "{{ conf.marathon.app-name }}"
-    package-uri: "{{ conf.marathon.registry-url }}"
+    package-uri: []
     instances: 1
     mem: 128
     cpu: 0.1
@@ -134,7 +134,7 @@ deploy:
     cluster: ""
     constraints:
       - [hostname, UNIQUE]
-    listen-port: "$PORT0"
+    listen-port: ""
     min-health-capacity: 0.0
     max-over-capacity: 0.0
     backoff-seconds: 2
