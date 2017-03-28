@@ -97,11 +97,11 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 	app.AddEnv("SERVICE_DEPLOY_TIME", time.Now().Format(time.RFC3339)) // force redeploy app
 
 	for k, v := range data.GetMap("envs") {
-		app.AddEnv(k, fmt.Sprintf("%v", v.Unwrap()))
+		app.AddEnv(k, strings.TrimSpace(fmt.Sprintf("%v", v.Unwrap())))
 	}
 
 	for k, v := range data.GetMap("environment") {
-		app.AddEnv(k, fmt.Sprintf("%v", v.Unwrap()))
+		app.AddEnv(k, strings.TrimSpace(fmt.Sprintf("%v", v.Unwrap())))
 	}
 
 	for _, uri := range data.GetArrayForce("package-uri") {
@@ -119,20 +119,30 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 		doc := marathon.NewDockerContainer()
 		doc.Docker.Image = data.GetString("docker.image")
-		doc.Docker.Network = data.GetString("docker.network")
+		doc.Docker.Network = strings.ToUpper(data.GetString("docker.network"))
 		doc.Docker.SetForcePullImage(true)
 		doc.EmptyVolumes()
 
 		for _, port := range data.GetArray("docker.ports") {
 			doc.Docker.ExposePort(marathon.PortMapping{
-				ContainerPort: port.GetInt("containerPort"),
+				ContainerPort: port.GetIntOr("containerPort", 0),
 				HostPort:      port.GetIntOr("hostPort", 0),
+				Name:          port.GetStringOr("name", ""),
 				Protocol:      "tcp",
 			})
+
+			// set service name for docker-registrator: one name for all ports
+			if port.GetIntOr("containerPort", 0) != 0 {
+				app.AddEnv(fmt.Sprintf("SERVICE_%d_NAME", port.GetInt("containerPort")), fullName)
+			}
 		}
 
 		for _, vol := range data.GetArray("docker.volumes") {
 			doc.Volume(vol.GetString("hostPath"), vol.GetString("containerPath"), vol.GetString("mode"))
+		}
+
+		for k, v := range data.GetMap("docker.parameters") {
+			doc.Docker.AddParameter(k, fmt.Sprintf("%v", v.Unwrap()))
 		}
 
 		app.Container = doc

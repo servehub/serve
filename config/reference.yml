@@ -134,7 +134,7 @@ deploy:
     cluster: ""
     constraints:
       - [hostname, UNIQUE]
-    listen-port: ""
+    listen-port: "$PORT0"
     min-health-capacity: 0.0
     max-over-capacity: 0.0
     backoff-seconds: 2
@@ -148,6 +148,7 @@ deploy:
       args: []
       image: "{{ conf.docker.image }}"
       network: BRIDGE
+      parameters: {}
       ports: []
       volumes: []
     envs: {}
