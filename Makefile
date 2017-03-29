@@ -1,4 +1,4 @@
-VERSION?="1.4.5"
+VERSION?="1.4.6"
 DEST?=./bin
 SUFFIX?=""
 TARGET_OS=linux darwin
@@ -26,7 +26,7 @@ build-serve-tools:
 	go build -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve-tools${SUFFIX} tools/cmd.go
 
 install: build-configs build-serve
-	cp ${DEST}/* ${GOPATH}/bin/
+	cp ${DEST}/{serve,serve-tools} ${GOPATH}/bin/
 
 clean:
 	@echo "==> Cleanup old binaries..."
@@ -37,14 +37,14 @@ dist: clean build-configs
 
 	for GOOS in ${TARGET_OS}; do \
 		for GOARCH in ${TARGET_ARCH}; do \
-			SUFFIX=-v${VERSION}-$$GOOS-$$GOARCH make build-serve; \
+			GOOS=$$GOOS GOARCH=$$GOARCH SUFFIX=-v${VERSION}-$$GOOS-$$GOARCH make build-serve; \
 		done \
 	done
 
 release: dist
 	@echo "==> Create github release and upload files..."
 
-	github-release release \
+	-github-release release \
 		--user servehub \
 		--repo serve \
 		--tag v${VERSION}

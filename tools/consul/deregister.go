@@ -58,19 +58,32 @@ func DeregisterCommand() cli.Command {
 				Action: func(c *cli.Context) error {
 					consul, _ := api.NewClient(api.DefaultConfig())
 
-					checks, err := consul.Agent().Checks()
+					nodes, _, err := consul.Catalog().Nodes(nil)
 					if err != nil {
 						return err
 					}
 
-					for _, check := range checks {
-						if check.Status == "critical" {
-							log.Println("Deregistering", check.ServiceID, "=", check.Status)
+					for _, node := range nodes {
+						nodeCfg := api.DefaultConfig()
+						nodeCfg.Address = node.Address + ":8500"
+						nodeConsul, _ := api.NewClient(nodeCfg)
 
-							if !c.BoolT("dry-run") {
-								err := consul.Agent().ServiceDeregister(check.ServiceID)
-								if err != nil {
-									return err
+						log.Println("\n\nNode", node.Node)
+
+						checks, err := nodeConsul.Agent().Checks()
+						if err != nil {
+							return err
+						}
+
+						for _, check := range checks {
+							if check.Status == "critical" {
+								log.Println("Deregistering", check.ServiceID, "=", check.Status)
+
+								if !c.BoolT("dry-run") {
+									err := nodeConsul.Agent().ServiceDeregister(check.ServiceID)
+									if err != nil {
+										return err
+									}
 								}
 							}
 						}
