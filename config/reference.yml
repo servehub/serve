@@ -154,6 +154,7 @@ deploy:
     envs: {}
     environment:
       ENV: "{{ vars.env }}"
+      SERVICE_TAG: "{{ info.name }}{{ info.feature-suffix }}"
       SERVICE_NAME: "{{ conf.marathon.app-name }}"
       SERVICE_VERSION: "{{ info.build-version }}"
       SERVICE_BUILD_NUMBER: "{{ vars.build-number }}"
