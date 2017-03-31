@@ -1,4 +1,4 @@
-VERSION?="1.4.6"
+VERSION?="1.4.7"
 DEST?=./bin
 SUFFIX?=""
 TARGET_OS=linux darwin
