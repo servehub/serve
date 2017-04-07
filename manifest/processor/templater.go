@@ -16,7 +16,7 @@ func (t Templater) Process(tree *gabs.Container) error {
 			case "map":
 				newKey, err := templater.Template(key.(string), tree)
 				if err != nil {
-					return err
+					return fmt.Errorf("Error on tempalte key `%v`: %v", key, err)
 				}
 
 				output.Delete(key.(string))
@@ -38,7 +38,7 @@ func (t Templater) Process(tree *gabs.Container) error {
 				default:
 					newValue, err := templater.Template(fmt.Sprintf("%v", value), tree)
 					if err != nil {
-						return err
+						return fmt.Errorf("Error on tempalte value `%v` in key `%v`: %v", value, key, err)
 					}
 
 					output.Set(newValue)

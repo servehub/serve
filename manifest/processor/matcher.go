@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -14,9 +15,9 @@ func (m Matcher) Process(tree *gabs.Container) error {
 	return Repeat(5, func() error {
 		return ProcessAll(tree, func(ktype string, output *gabs.Container, value interface{}, key interface{}) error {
 			if ktype == "map" {
-				skey, err := templater.MatchTemplate(key.(string), tree)
+				skey, err := templater.Template(key.(string), tree)
 				if err != nil {
-					return err
+					return fmt.Errorf("Error on tempalte key `%v`: %v", key, err)
 				}
 
 				parts := strings.SplitN(skey, "?", 2)
@@ -39,7 +40,7 @@ func (m Matcher) Process(tree *gabs.Container) error {
 
 						re, err := regexp.Compile("^" + strings.Trim(k, "^$") + "$")
 						if err != nil {
-							return err
+							return fmt.Errorf("Error on compile matcher regexp `%s`: %v", k, err)
 						}
 
 						matches := re.FindStringSubmatch(matchValue)

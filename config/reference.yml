@@ -7,8 +7,8 @@ info:
   feature ? {{ vars.branch }}:
      "": ""
      "master": ""
-     "feature-(?P<feature>.+)": "{{ match.feature }}"
-     "*": "{{ vars.branch }}"
+     "feature-(?P<feature>.+)": "{{ match.feature | lower | replace('\\W|_', '-') }}"
+     "*": "{{ vars.branch | lower | replace('\\W|_', '-') }}"
 
   feature-suffix ? {{ info.feature }}:
      "": ""
@@ -39,7 +39,7 @@ conf:
 
   kube:
     namespace: default
-    name: "{{ info.full-name | replace('\\W', '-') }}"
+    name: "{{ info.full-name | replace('\\W|_', '-') }}"
 
   docker:
     registry: ""
@@ -68,7 +68,7 @@ gocd:
       depends: []
 
       pipeline:
-        group: "{{ info.category | replace('\\W', '-') }}"
+        group: "{{ info.category | replace('\\W|_', '-') }}"
         pipeline:
           name: "{{ conf.gocd.pipeline-name }}"
           template: "{{ conf.gocd.template }}"
@@ -96,7 +96,7 @@ build:
     <<: *build-docker
     image: frekele/gradle:3.4.1-jdk8
     volumes:
-      - '~/.gradle:/root/.gradle/caches'
+      - '~/.gradle/caches:/root/.gradle/caches'
       - '~/.gradle/wrapper:/root/.gradle/wrapper'
       - '~/.gradle/init.gradle:/root/.gradle/init.gradle'
     cmd: gradle %s -Pversion="{{ info.build-version }}"
@@ -206,7 +206,7 @@ release:
   ingress:
     namespace: "{{ conf.kube.namespace }}"
     name: "{{ conf.kube.name }}"
-    service: "{{ info.full-name | replace('\\W', '-') }}"
+    service: "{{ info.full-name | replace('\\W|_', '-') }}"
     version: "{{ info.build-version }}"
     ports: [port: 80]
     stage: "{{ vars.stage }}"
