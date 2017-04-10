@@ -37,6 +37,7 @@ func main() {
 		}
 	}
 
+	color.NoColor = false
 	if _, ok := vars["no-color"]; ok {
 		color.NoColor = true
 	}

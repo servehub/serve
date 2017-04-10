@@ -1,3 +1,4 @@
+SHELL:=/bin/bash
 VERSION?="1.4.8"
 DEST?=./bin
 SUFFIX?=""
@@ -26,7 +27,7 @@ build-serve-tools:
 	go build -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve-tools${SUFFIX} tools/cmd.go
 
 install: build-configs build-serve
-	cp ${DEST}/{serve,serve-tools} ${GOPATH}/bin/
+	cp ${DEST}/serve ${GOPATH}/bin/
 
 clean:
 	@echo "==> Cleanup old binaries..."
