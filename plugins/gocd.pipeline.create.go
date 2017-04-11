@@ -154,9 +154,17 @@ func goCdUnpause(resource string) error {
 	return nil
 }
 
-func goCdUpdate(name string, env string, resource string, body string, headers map[string]string, depends []string) error {
-	fmt.Println(env)
+func goCdPause(resource, cause string) error {
+	if resp, err := goCdRequest("POST", resource+"/pause", "pauseCause="+cause,
+		map[string]string{"Confirm": "true"}); err != nil {
+		return err
+	} else if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("Operation error: %s", resp.Status)
+	}
+	return nil
+}
 
+func goCdUpdate(name string, env string, resource string, body string, headers map[string]string, depends []string) error {
 	if resp, err := goCdRequest("PUT", resource+"/go/api/admin/pipelines/"+name, body, headers); err != nil {
 		return err
 	} else if resp.StatusCode != http.StatusOK {
@@ -211,6 +219,10 @@ func goCdDelete(name string, env string, resource string, headers map[string]str
 		return err
 	} else if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("Operation error: %s", resp.Status)
+	}
+
+	if err := goCdPause(resource+"/go/api/pipelines/"+name, "Deleting"); err != nil {
+		return fmt.Errorf("Error on pause pipeline before deleting: %v", err)
 	}
 
 	if resp, err := goCdRequest("DELETE", resource+"/go/api/admin/pipelines/"+name, "", headers); err != nil {
