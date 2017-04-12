@@ -16,7 +16,7 @@ import (
 var version = "0.0"
 
 var flagRegex = regexp.MustCompile("--([a-z0-9-]+)(=(.+))?")
-var pluginNameRegex = regexp.MustCompile("^[a-z0-9-.]+$")
+var pluginNameRegex = regexp.MustCompile("^[a-z][a-z0-9-.]+$")
 
 func main() {
 	plugin := ""
@@ -45,6 +45,11 @@ func main() {
 	manifestFile := "manifest.yml"
 	if f, ok := vars["manifest"]; ok {
 		manifestFile = f
+	}
+
+	if _, ok := vars["version"]; ok && plugin == "" {
+		fmt.Println("version:", version)
+		return
 	}
 
 	pluginData, pluginDataExists := vars["plugin-data"]
