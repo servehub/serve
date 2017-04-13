@@ -48,7 +48,7 @@ func main() {
 	}
 
 	if _, ok := vars["version"]; ok && plugin == "" {
-		fmt.Println("version:", version)
+		fmt.Printf("v%s\n", version)
 		return
 	}
 

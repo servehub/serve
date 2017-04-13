@@ -30,6 +30,23 @@ func TestAllProcessors(t *testing.T) {
 			`,
 			expect: `{"info":{"feature":"some-test-branch-new","feature-suffix":"-some-test-branch-new"},"vars":{"branch":"some-Test-branch/new"}}`,
 		},
+
+		"modify composite variables": {
+			in: `
+				{
+			    "info": {
+						"name": "testov-test{{ vars.branch }}",
+						"category": "web",
+						"full-name": "{{ info.category }}/{{ info.name }}"
+          },
+          "vars": { "branch": "superman" },
+          "kube": {
+			      "name": "{{ info.full-name | replace('\\W|_', '-') }}"
+			    }
+				}
+			`,
+			expect: `{"info":{"category":"web","full-name":"web/testov-testsuperman","name":"testov-testsuperman"},"kube":{"name":"web-testov-testsuperman"},"vars":{"branch":"superman"}}`,
+		},
 	})
 }
 
@@ -46,8 +63,6 @@ func (a allProcessors) Process(tree *gabs.Container) error {
 		if err := proc.Process(tree); err != nil {
 			return fmt.Errorf("%T: %v", proc, err)
 		}
-
-		fmt.Println(tree.StringIndent("", "  "))
 	}
 	return nil
 }

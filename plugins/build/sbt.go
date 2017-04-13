@@ -1,8 +1,9 @@
 package build
 
 import (
+	"fmt"
+
 	"github.com/servehub/serve/manifest"
-	"github.com/servehub/utils"
 )
 
 func init() {
@@ -12,10 +13,6 @@ func init() {
 type SbtBuild struct{}
 
 func (p SbtBuild) Run(data manifest.Manifest) error {
-	return utils.RunCmd(
-		`sbt ';set every version := "%s"' clean "%s" %s`,
-		data.GetString("version"),
-		data.GetString("test"),
-		data.GetStringOr("sbt", ""),
-	)
+	data.Set("cmd", fmt.Sprintf(data.GetString("cmd"), data.GetString("sbt")) )
+	return manifest.PluginRegestry.Get("build.docker").Run(data)
 }

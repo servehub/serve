@@ -89,8 +89,12 @@ gocd:
 
 build:
   sbt:
-    version: "{{ info.build-version }}"
-    test: "testOnly -- -l Integration"
+    <<: *build-docker
+    image: 1science/sbt:0.13-oracle-jdk-8
+    volumes:
+      - '~/.ivy2:/root/.ivy2'
+      - '~/.sbt/0.13/global.sbt:/root/.sbt/0.13/global.sbt'
+    cmd: sbt ';set every version := "{{ info.build-version }}"' %s
 
   gradle:
     <<: *build-docker
@@ -100,6 +104,13 @@ build:
       - '~/.gradle/wrapper:/root/.gradle/wrapper'
       - '~/.gradle/init.gradle:/root/.gradle/init.gradle'
     cmd: gradle %s -Pversion="{{ info.build-version }}"
+
+  node:
+    <<: *build-docker
+    image: node:7
+    volumes:
+      - '~/.cache/yarn:/root/.cache/yarn'
+    cmd: "%s"
 
   marathon:
     source: "target/pack"
