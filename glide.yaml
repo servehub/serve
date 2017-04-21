@@ -9,5 +9,3 @@ import:
   - package: github.com/cenk/backoff
   - package: github.com/valyala/fasttemplate
   - package: github.com/jteeuwen/go-bindata
-#  - package: k8s.io/client-go
-#    version: 49948ae0ca8eb31d632fbf346e25ee0eb6762d5b

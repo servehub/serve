@@ -173,19 +173,54 @@ deploy:
       SERVICE_CHECK_TCP: true
 
   kube:
-    namespace: "{{ conf.kube.namespace }}"
-    name: "{{ conf.kube.name }}"
-    image: "{{ conf.docker.image }}"
     replicas: 1
-    mem: ""
-    cpu: ""
+    mem: "64"
+    cpu: "0.1"
     ports: []
+    volumes: []
+    envs: {}
     environment:
       ENV: "{{ vars.env }}"
-      SERVICE_NAME: "{{ info.name }}{{ info.feature-suffix }}"
+      SERVICE_TAG: "{{ info.name }}{{ info.feature-suffix }}"
+      SERVICE_NAME: "{{ conf.marathon.app-name }}"
       SERVICE_VERSION: "{{ info.build-version }}"
       SERVICE_BUILD_NUMBER: "{{ vars.build-number }}"
-      MEMORY: "{{ deploy.kube.mem }}"
+      SERVICE_MEMORY: "{{ deploy.kube.mem }}"
+      SERVICE_CHECK_TCP: true
+
+    deployment:
+      kind: Deployment
+      apiVersion: extensions/v1beta1
+      metadata:
+        name: "{{ conf.kube.name }}"
+      spec:
+        replicas: "{{ deploy.kube.replicas }}"
+        revisionHistoryLimit: 0
+        strategy:
+          type: RollingUpdate
+          rollingUpdate:
+            maxUnavailable: 0
+            maxSurge: 1
+        template:
+          metadata:
+            labels:
+              app: "{{ conf.kube.name }}"
+          spec:
+            containers:
+              - name: "{{ conf.kube.name }}"
+                image: "{{ conf.docker.image }}"
+                imagePullPolicy: Always
+                ports: []
+                resources:
+                  requests:
+                    memory: "{{ deploy.kube.mem }}Mi"
+                    cpu: "{{ deploy.kube.cpu }}"
+                  limits:
+                    memory: "{{ deploy.kube.mem }}Mi"
+                    cpu: "{{ deploy.kube.cpu }}"
+                livenessProbe:
+                  initialDelaySeconds: 15
+                  timeoutSeconds: 3
 
   tarball:
     cluster: "localhost"
