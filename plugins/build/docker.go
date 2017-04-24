@@ -28,7 +28,7 @@ func (p BuildDockerRun) Run(data manifest.Manifest) error {
 		cmds = append(cmds, fmt.Sprintf("%s", s))
 	}
 
-	volumes := []string{`-v "$PWD":/src`}
+	volumes := []string{`-v "${SERVE_WORKDIR:-$PWD}":/src`}
 	for _, v := range data.GetArrayForce("volumes") {
 		volumes = append(volumes, fmt.Sprintf("-v %s", v))
 	}
