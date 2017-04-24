@@ -52,15 +52,21 @@ func (p DeployKube) Run(data manifest.Manifest) error {
 
 		for _, p := range data.GetArray("ports") {
 			cnt.Set("livenessProbe.tcpSocket.port", p.GetInt("containerPort"))
+			cnt.Set("livenessProbe.initialDelaySeconds", 60)
+			cnt.Set("livenessProbe.timeoutSeconds", 3)
 		}
 	}
 
-	deployment, err := yaml.Marshal(data.GetTree("deployment").Unwrap())
+	return KubeApply("deployment", data.GetTree("deployment").Unwrap())
+}
+
+func KubeApply(name string, data interface{}) error {
+	bytes, err := yaml.Marshal(data)
 	if err != nil {
-		return fmt.Errorf("Error on serialize deployment yaml: %v", err)
+		return fmt.Errorf("Error on serialize %s yaml: %v", name, err)
 	}
 
-	tmpfile, err := ioutil.TempFile("", "deployment")
+	tmpfile, err := ioutil.TempFile("", "serve-kube-"+name)
 	if err != nil {
 		return fmt.Errorf("Error create tmpfile: %v", err)
 	}
@@ -70,7 +76,7 @@ func (p DeployKube) Run(data manifest.Manifest) error {
 		os.Remove(tmpfile.Name())
 	}()
 
-	if _, err := tmpfile.Write(deployment); err != nil {
+	if _, err := tmpfile.Write(bytes); err != nil {
 		return fmt.Errorf("Error write to tmpfile: %v", err)
 	}
 

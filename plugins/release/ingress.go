@@ -1,128 +1,54 @@
 package release
 
-//import (
-//	"encoding/json"
-//	"fmt"
-//	"log"
-//	"os"
-//	"time"
-//
-//	"k8s.io/apimachinery/pkg/api/errors"
-//	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-//	"k8s.io/apimachinery/pkg/util/intstr"
-//	"k8s.io/client-go/kubernetes"
-//	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
-//	"k8s.io/client-go/tools/clientcmd"
-//
-//	"github.com/servehub/serve/manifest"
-//)
-//
-//func init() {
-//	manifest.PluginRegestry.Add("release.ingress", ReleaseIngress{})
-//}
-//
-//type ReleaseIngress struct{}
-//
-//func (p ReleaseIngress) Run(data manifest.Manifest) error {
-//	config, err := clientcmd.BuildConfigFromFlags("", os.Getenv("HOME")+"/.kube/config")
-//	if err != nil {
-//		return err
-//	}
-//
-//	kube, err := kubernetes.NewForConfig(config)
-//	if err != nil {
-//		return err
-//	}
-//
-//	if err := runService(kube, data); err != nil {
-//		return err
-//	}
-//
-//	return runIngress(kube, data)
-//}
-//
-//func runIngress(kube *kubernetes.Clientset, data manifest.Manifest) error {
-//	appName := data.GetString("name")
-//
-//	rules := make([]v1beta1.IngressRule, 0)
-//	for _, route := range data.GetArray("routes") {
-//		rules = append(rules, v1beta1.IngressRule{
-//			Host: route.GetString("host"),
-//			IngressRuleValue: v1beta1.IngressRuleValue{
-//				HTTP: &v1beta1.HTTPIngressRuleValue{
-//					Paths: []v1beta1.HTTPIngressPath{
-//						{
-//							Path: route.GetStringOr("location", "/"),
-//							Backend: v1beta1.IngressBackend{
-//								ServiceName: appName,
-//								ServicePort: intstr.FromInt(route.GetIntOr("port", 80)),
-//							},
-//						},
-//					},
-//				},
-//			},
-//		})
-//	}
-//
-//	ingressSpec := &v1beta1.Ingress{
-//		TypeMeta: metav1.TypeMeta{
-//			Kind:       "Ingress",
-//			APIVersion: "extensions/v1beta1",
-//		},
-//		ObjectMeta: metav1.ObjectMeta{
-//			Name: appName,
-//			Labels: map[string]string{
-//				"service": data.GetString("service"),
-//				"stage":   data.GetString("stage"),
-//				"version": data.GetString("version"),
-//			},
-//		},
-//		Spec: v1beta1.IngressSpec{
-//			Rules: rules,
-//		},
-//	}
-//
-//	ingresses := kube.Extensions().Ingresses(data.GetString("namespace"))
-//
-//	if exists, err := ingresses.List(metav1.ListOptions{
-//		LabelSelector: "service=" + data.GetString("service") + ",stage=" + data.GetString("stage") + ",version!=" + data.GetString("version"),
-//	}); err != nil {
-//		return err
-//	} else if len(exists.Items) > 0 {
-//		items, _ := json.MarshalIndent(exists.Items, "", "  ")
-//		log.Println("Exists ingress: ", string(items))
-//		log.Println("Mark as outdated!")
-//
-//		for _, ing := range exists.Items {
-//			ing.Labels["stage"] = "outdated"
-//
-//			if ing.Annotations == nil {
-//				ing.Annotations = make(map[string]string, 0)
-//			}
-//			ing.Annotations["endOfLife"] = time.Now().Add(15 * time.Minute).String()
-//
-//			if _, err := ingresses.Update(&ing); err != nil {
-//				return err
-//			}
-//		}
-//	}
-//
-//	_, err := ingresses.Update(ingressSpec)
-//
-//	switch {
-//	case err == nil:
-//		log.Println("Ingress updated")
-//
-//	case !errors.IsNotFound(err):
-//		return fmt.Errorf("Could not update ingress: %s", err)
-//
-//	default:
-//		_, err = ingresses.Create(ingressSpec)
-//		if err != nil {
-//			return fmt.Errorf("Could not create ingress: %s", err)
-//		}
-//		log.Println("Ingress created")
-//	}
-//
-//	return nil
-//}
+import (
+	"fmt"
+
+	"github.com/servehub/serve/manifest"
+	"github.com/servehub/serve/plugins/deploy"
+)
+
+func init() {
+	manifest.PluginRegestry.Add("release.ingress", ReleaseIngress{})
+}
+
+type ReleaseIngress struct{}
+
+func (p ReleaseIngress) Run(data manifest.Manifest) error {
+	servicePorts := make([]interface{}, 0)
+	rules := make([]interface{}, 0)
+
+	data.Set("service.metadata.name", data.GetString("name"))
+	data.Set("service.spec.selector.app", data.GetString("app"))
+
+	for _, route := range data.GetArray("routes") {
+		servicePorts = append(servicePorts, map[string]interface{}{
+			"port": route.GetIntOr("port", 80),
+		})
+
+		rules = append(rules, map[string]interface{}{
+			"host": route.GetString("host"),
+			"http": map[string]interface{}{
+				"paths": []interface{}{
+					map[string]interface{}{
+						"path": route.GetStringOr("path", "/"),
+						"backend": map[string]interface{}{
+							"serviceName": data.GetString("name"),
+							"servicePort": route.GetIntOr("port", 80),
+						},
+					},
+				},
+			},
+		})
+	}
+
+	data.Set("service.spec.ports", servicePorts)
+
+	data.Set("ingress.metadata.name", data.GetString("name"))
+	data.Set("ingress.spec.rules", rules)
+
+	if err := deploy.KubeApply("service", data.GetTree("service").Unwrap()); err != nil {
+		return fmt.Errorf("Error apply service: %v", err)
+	}
+
+	return deploy.KubeApply("ingress", data.GetTree("ingress").Unwrap())
+}

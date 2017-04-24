@@ -1,5 +1,5 @@
 SHELL:=/bin/bash
-VERSION?="1.6.1"
+VERSION?="1.6.2"
 DEST?=./bin
 SUFFIX?=""
 TARGET_OS=linux darwin

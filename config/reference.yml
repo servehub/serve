@@ -93,8 +93,7 @@ build:
     image: 1science/sbt:0.13-oracle-jdk-8
     volumes:
       - '~/.ivy2:/root/.ivy2'
-      - '~/.sbt/0.13/global.sbt:/root/.sbt/0.13/global.sbt'
-    cmd: sbt ';set every version := "{{ info.build-version }}"' %s
+    cmd: sbt ";set every version := \"{{ info.build-version }}\"" %s
 
   gradle:
     <<: *build-docker
@@ -102,7 +101,6 @@ build:
     volumes:
       - '~/.gradle/caches:/root/.gradle/caches'
       - '~/.gradle/wrapper:/root/.gradle/wrapper'
-      - '~/.gradle/init.gradle:/root/.gradle/init.gradle'
     cmd: gradle %s -Pversion="{{ info.build-version }}"
 
   node:
@@ -128,6 +126,7 @@ build:
     build: ""
     cmd: "test"
     shell: "/bin/sh -c '%s'"
+    workdir: "{{ conf.docker.workdir }}"
     volumes: []
     envs: {}
 
@@ -215,12 +214,6 @@ deploy:
                   requests:
                     memory: "{{ deploy.kube.mem }}Mi"
                     cpu: "{{ deploy.kube.cpu }}"
-                  limits:
-                    memory: "{{ deploy.kube.mem }}Mi"
-                    cpu: "{{ deploy.kube.cpu }}"
-                livenessProbe:
-                  initialDelaySeconds: 15
-                  timeoutSeconds: 3
 
   tarball:
     cluster: "localhost"
@@ -250,16 +243,20 @@ release:
     ports: [port: 80]
 
   ingress:
-    namespace: "{{ conf.kube.namespace }}"
-    name: "{{ conf.kube.name }}"
-    service: "{{ info.full-name | replace('\\W|_', '-') }}"
-    version: "{{ info.build-version }}"
-    ports: [port: 80]
-    stage: "{{ vars.stage }}"
-    routes:
-      - host: "localhost"
-        port: 80
-        location: "/"
+    name: "{{ info.full-name | replace('\\W|_', '-') }}"
+    app: "{{ conf.kube.name }}"
+    routes: []
+
+    service:
+      kind: Service
+      apiVersion: v1
+      spec:
+        type: LoadBalancer
+        ports: []
+
+    ingress:
+      kind: Ingress
+      apiVersion: extensions/v1beta1
 
 outdated:
   consul-address: "{{ conf.consul.address }}"
