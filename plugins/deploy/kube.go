@@ -31,6 +31,7 @@ func (p DeployKube) Run(data manifest.Manifest) error {
 	}
 
 	envsMap["SERVICE_DEPLOY_TIME"] = time.Now().Format(time.RFC3339) // force redeploy app
+	envsMap["SERVICE_MEMORY"] = strings.ToLower(data.GetString("requests.memory"))
 
 	for k, v := range envsMap {
 		if m, ok := v.(map[string]interface{}); ok {
@@ -50,10 +51,13 @@ func (p DeployKube) Run(data manifest.Manifest) error {
 		cnt.Set("env", envs)
 		cnt.Set("ports", data.GetTree("ports").Unwrap())
 
+		cnt.Set("resources.requests", data.GetTree("requests").Unwrap())
+		cnt.Set("resources.limits", data.GetTree("limits").Unwrap())
+
 		for _, p := range data.GetArray("ports") {
-			cnt.Set("livenessProbe.tcpSocket.port", p.GetInt("containerPort"))
-			cnt.Set("livenessProbe.initialDelaySeconds", 60)
-			cnt.Set("livenessProbe.timeoutSeconds", 3)
+			cnt.Set("readinessProbe.tcpSocket.port", p.GetInt("containerPort"))
+			cnt.Set("readinessProbe.initialDelaySeconds", 10)
+			cnt.Set("readinessProbe.timeoutSeconds", 3)
 		}
 	}
 

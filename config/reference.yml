@@ -177,8 +177,12 @@ deploy:
 
   kube:
     replicas: 1
-    mem: "64"
-    cpu: "0.1"
+    requests:
+      memory: "64M"
+      cpu: "0.1"
+    limits:
+      memory: "512M"
+      cpu: "2"
     ports: []
     volumes: []
     envs: {}
@@ -188,7 +192,6 @@ deploy:
       SERVICE_NAME: "{{ conf.marathon.app-name }}"
       SERVICE_VERSION: "{{ info.build-version }}"
       SERVICE_BUILD_NUMBER: "{{ vars.build-number }}"
-      SERVICE_MEMORY: "{{ deploy.kube.mem }}"
       SERVICE_CHECK_TCP: true
 
     deployment:
@@ -213,11 +216,6 @@ deploy:
               - name: "{{ conf.kube.name }}"
                 image: "{{ conf.docker.image }}"
                 imagePullPolicy: Always
-                ports: []
-                resources:
-                  requests:
-                    memory: "{{ deploy.kube.mem }}Mi"
-                    cpu: "{{ deploy.kube.cpu }}"
 
   tarball:
     cluster: "localhost"
