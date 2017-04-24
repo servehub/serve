@@ -120,6 +120,10 @@ build:
 
   docker-image:
     image: "{{ conf.docker.image }}"
+    login:
+      user: ""
+      password: ""
+      registry: "{{ conf.docker.registry }}"
 
   docker: &build-docker
     image: "{{ info.full-name }}"
