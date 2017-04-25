@@ -194,6 +194,11 @@ deploy:
       SERVICE_BUILD_NUMBER: "{{ vars.build-number }}"
       SERVICE_CHECK_TCP: true
 
+    readinessProbe:
+      periodSeconds: 5
+      successThreshold: 3
+      timeoutSeconds: 3
+
     deployment:
       kind: Deployment
       apiVersion: extensions/v1beta1

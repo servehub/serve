@@ -55,9 +55,9 @@ func (p DeployKube) Run(data manifest.Manifest) error {
 		cnt.Set("resources.limits", data.GetTree("limits").Unwrap())
 
 		for _, p := range data.GetArray("ports") {
+			cnt.Set("readinessProbe", data.GetTree("readinessProbe").Unwrap())
 			cnt.Set("readinessProbe.tcpSocket.port", p.GetInt("containerPort"))
-			cnt.Set("readinessProbe.initialDelaySeconds", 10)
-			cnt.Set("readinessProbe.timeoutSeconds", 3)
+			break // check only first port
 		}
 	}
 

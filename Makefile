@@ -1,5 +1,5 @@
 SHELL:=/bin/bash
-VERSION?="1.6.6"
+VERSION?=$$(git describe --tags --abbrev=0)
 DEST?=./bin
 SUFFIX?=""
 TARGET_OS=linux darwin
