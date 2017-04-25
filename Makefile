@@ -16,6 +16,7 @@ test:
 deps:
 	@echo "==> Install dependencies..."
 	go get -u github.com/jteeuwen/go-bindata/...
+	glide i -v
 
 build-configs:
 	${GOPATH}/bin/go-bindata -pkg config -o manifest/config/config.go config/*.yml

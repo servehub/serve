@@ -1,0 +1,10 @@
+language: go
+
+go:
+  - 1.8.x
+
+install:
+  - make deps
+
+install:
+  - VERSION="1.6.${TRAVIS_BUILD_NUMBER:-0}" make dist
