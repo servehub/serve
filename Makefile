@@ -15,8 +15,9 @@ test:
 
 deps:
 	@echo "==> Install dependencies..."
-	go get -u github.com/jteeuwen/go-bindata/...
-	go get -u github.com/aktau/github-release
+	go get github.com/Masterminds/glide
+	go get github.com/jteeuwen/go-bindata/...
+	go get github.com/aktau/github-release
 	glide i -v
 
 build-configs:
