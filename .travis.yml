@@ -3,6 +3,11 @@ language: go
 go:
   - 1.8.x
 
+cache:
+  directories:
+    - $GOPATH/src
+    - $GOPATH/pkg
+
 install:
   - make deps
 
