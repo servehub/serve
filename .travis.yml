@@ -6,5 +6,5 @@ go:
 install:
   - make deps
 
-install:
+script:
   - VERSION="1.6.${TRAVIS_BUILD_NUMBER:-0}" make dist
