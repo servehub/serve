@@ -7,7 +7,7 @@ install:
   - make deps
 
 script:
-  - VERSION="${TRAVIS_TAG:-1.6.${TRAVIS_BUILD_NUMBER}}" make dist
+  - VERSION="${${TRAVIS_TAG//v/}:-1.6.${TRAVIS_BUILD_NUMBER}}" make dist
 
 deploy:
   provider: releases

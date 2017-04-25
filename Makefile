@@ -17,7 +17,6 @@ deps:
 	@echo "==> Install dependencies..."
 	go get github.com/Masterminds/glide
 	go get github.com/jteeuwen/go-bindata/...
-	go get github.com/aktau/github-release
 	glide i -v
 
 build-configs:
