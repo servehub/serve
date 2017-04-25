@@ -14,6 +14,7 @@ install:
 script:
   - export VERSION="${TRAVIS_TAG//v/}"
   - export VERSION="${VERSION:-1.6.${TRAVIS_BUILD_NUMBER}}"
+  - ls -la
   - make dist
 
 deploy:
