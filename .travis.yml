@@ -3,18 +3,12 @@ language: go
 go:
   - 1.8.x
 
-cache:
-  directories:
-    - $GOPATH/src
-    - $GOPATH/pkg
-
 install:
   - make deps
 
 script:
   - export VERSION="${TRAVIS_TAG//v/}"
   - export VERSION="${VERSION:-1.6.${TRAVIS_BUILD_NUMBER}}"
-  - ls -la
   - make dist
 
 deploy:
