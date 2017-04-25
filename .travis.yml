@@ -7,4 +7,16 @@ install:
   - make deps
 
 script:
-  - VERSION="1.6.${TRAVIS_BUILD_NUMBER:-0}" make dist
+  - VERSION="${TRAVIS_TAG:-1.6.${TRAVIS_BUILD_NUMBER}}" make dist
+
+deploy:
+  provider: releases
+  api_key:
+    secure: xBnXv+Twc3kuHA1HRBNq3VGfk6XGZB0efkbyM4Bma+y6/am6H5Jb6bcr8aVpmPzSiB0gNT8bDjbGePkBVvICOzzFlBqMS2UBh6ezo/Dg+OjvHd5tMekzjc3y4f7culZVvNplBnHog9Aj2KHJbinTgmoRp89kDZuDsr9f4kDAoSgwk4KW0M2wsopbN8rH9lT2uT22riZYiTILdE0d6G5Ppxr8FlI1/0Mq1T3g03OHTfSa0reBuGzAEcYENdNUzbppyyNUuP1BshGoaKswN/lQUQQ+3aXwJ6OucytUX4Y0+NQDd4HVr432M6UXamSiTU+HTkRWvdqVR9VgSKNGeFEIUz1nyajEqvrcTEMJJn4a572G7vJn+ITHHCzSztgaUJKyaCMVQHUucgPfU1AdLRXvveniGJ2DJqBR7vWJPujLP+SYESlJU2ompjgpSeqa9OQ/eYgdtVAiO08yaa8ZWJHsmVs2+mgwgXY2R28fRbeuUMlk9IANGjgx/ORvxuvt3ZTkLdBp8wc1+vw6IkM/x1e1xvlMAp/GWBnDcxz4A1+Kk5oF55RvAKYMl0+Yyo08Nk87/EVD2677tt4M+07Te2ZSg2/ErlwtxK9njRWbCRYO/z2u2B8+pEyzgdMI4z3+b10Sy1hGiMnUt2bXvgSfYWNINeQu+o4SILgycTFu/9Y2P1g=
+  file_glob: true
+  file: bin/*
+  overwrite: true
+  skip_cleanup: true
+  on:
+    repo: servehub/serve
+    tags: true
