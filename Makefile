@@ -1,10 +1,12 @@
 SHELL:=/bin/bash
-VERSION?="1.6.3"
+VERSION?="1.6.6"
 DEST?=./bin
 SUFFIX?=""
 TARGET_OS=linux darwin
 TARGET_ARCH=amd64
-CGO_ENABLED=0
+PACKAGE=github.com/servehub/serve
+
+export CGO_ENABLED=0
 
 default: install
 
@@ -44,6 +46,9 @@ dist: clean build-configs
 			GOOS=$$GOOS GOARCH=$$GOARCH SUFFIX=-v${VERSION}-$$GOOS-$$GOARCH make build-serve; \
 		done \
 	done
+
+docker-dist:
+	docker run --rm -v "${PWD}":/go/src/${PACKAGE} -w /go/src/${PACKAGE} golang:1.8 /bin/sh -c 'make deps && make dist'
 
 release: dist
 	@echo "==> Create github release and upload files..."
