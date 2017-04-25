@@ -4,6 +4,7 @@ DEST?=./bin
 SUFFIX?=""
 TARGET_OS=linux darwin
 TARGET_ARCH=amd64
+CGO_ENABLED=0
 
 default: install
 

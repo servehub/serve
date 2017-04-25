@@ -7,8 +7,7 @@ install:
   - make deps
 
 script:
-  - export VERSION="${TRAVIS_TAG//v/}"
-  - export VERSION="${VERSION:-1.6.${TRAVIS_BUILD_NUMBER}}"
+  - if [ -n "$TRAVIS_TAG" ]; then export VERSION="${TRAVIS_TAG//v/}"; fi
   - make dist
 
 deploy:
