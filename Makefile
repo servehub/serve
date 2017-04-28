@@ -1,5 +1,5 @@
 SHELL:=/bin/bash
-VERSION?=$$(git describe --tags --abbrev=0 | sed 's/v//')
+VERSION?=$(shell git describe --tags --abbrev=0 | sed 's/v//')
 DEST?=./bin
 SUFFIX?=""
 TARGET_OS=linux darwin

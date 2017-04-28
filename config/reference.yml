@@ -38,12 +38,12 @@ conf:
     address: consul
 
   kube:
-    namespace: default
-    name: "{{ info.full-name | replace('\\W|_', '-') }}"
+    full-name: "{{ info.name | replace('\\W|_', '-') }}{{ info.feature-suffix | replace('\\W|_', '-') }}"
 
   docker:
     registry: ""
     image: "{{ conf.docker.registry }}{{ info.category }}/{{ info.name }}{{ info.feature-suffix }}:v{{ info.build-version }}"
+    workdir: "${PWD}"
 
   gocd:
     api-url: https://localhost:8154
@@ -203,7 +203,7 @@ deploy:
       kind: Deployment
       apiVersion: extensions/v1beta1
       metadata:
-        name: "{{ conf.kube.name }}"
+        name: "{{ conf.kube.full-name }}"
       spec:
         replicas: "{{ deploy.kube.replicas }}"
         revisionHistoryLimit: 0
@@ -215,10 +215,10 @@ deploy:
         template:
           metadata:
             labels:
-              app: "{{ conf.kube.name }}"
+              app: "{{ conf.kube.full-name }}"
           spec:
             containers:
-              - name: "{{ conf.kube.name }}"
+              - name: "{{ conf.kube.full-name }}"
                 image: "{{ conf.docker.image }}"
                 imagePullPolicy: Always
 
@@ -245,13 +245,12 @@ release:
     routes: []
 
   kube-service:
-    namespace: "{{ conf.kube.namespace }}"
-    name: "{{ conf.kube.name }}"
+    name: "{{ conf.kube.full-name }}"
     ports: [port: 80]
 
   ingress:
-    name: "{{ info.full-name | replace('\\W|_', '-') }}"
-    app: "{{ conf.kube.name }}"
+    name: "{{ info.name | replace('\\W|_', '-') }}{{ info.feature-suffix | replace('\\W|_', '-') }}"
+    app: "{{ conf.kube.full-name }}"
     routes: []
 
     service:
