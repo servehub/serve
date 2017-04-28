@@ -162,7 +162,8 @@ deploy:
       args: []
       image: "{{ conf.docker.image }}"
       network: BRIDGE
-      parameters: {}
+      parameters:
+        oom-kill-disable: true
       ports: []
       volumes: []
     envs: {}
