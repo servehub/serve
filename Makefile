@@ -22,6 +22,7 @@ deps:
 	glide i -v
 	go get github.com/jteeuwen/go-bindata/...
 	go get github.com/alecthomas/gometalinter
+	gometalinter --install
 
 build-configs:
 	${GOPATH}/bin/go-bindata -pkg config -o manifest/config/config.go config/*.yml
