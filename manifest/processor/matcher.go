@@ -17,7 +17,7 @@ func (m Matcher) Process(tree *gabs.Container) error {
 			if ktype == "map" {
 				skey, err := templater.Template(key.(string), tree)
 				if err != nil {
-					return fmt.Errorf("Error on tempalte key `%v`: %v", key, err)
+					return fmt.Errorf("Error on template key `%v`: %v", key, err)
 				}
 
 				parts := strings.SplitN(skey, "?", 2)

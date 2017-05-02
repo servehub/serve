@@ -154,11 +154,12 @@ func saveManifest(data map[string]interface{}) (string, error) {
 
 func loadData(name string) (map[string]interface{}, error) {
 	resultFile, err := os.Open(name)
-	defer resultFile.Close()
 	if err != nil {
 		log.Printf("Cannot open %s", name)
 		return nil, fmt.Errorf("Cannot open %s", name)
 	}
+	defer resultFile.Close()
+
 	resBytes, err := ioutil.ReadAll(resultFile)
 	if err != nil {
 		log.Printf("Cannot open %s", name)

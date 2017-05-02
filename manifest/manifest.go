@@ -171,7 +171,7 @@ func (m Manifest) ToEnvMap(prefix string) map[string]string {
 	result := make(map[string]string)
 	if children, err := m.tree.ChildrenMap(); err == nil {
 		for k, child := range children {
-			result = utils.MergeMaps(result, Manifest{child}.ToEnvMap(prefix+strings.ToUpper(string(envNameRegex.ReplaceAllString(k, "_")))+"_"))
+			result = utils.MergeMaps(result, Manifest{child}.ToEnvMap(prefix+strings.ToUpper(envNameRegex.ReplaceAllString(k, "_"))+"_"))
 		}
 	} else if children, err := m.tree.Children(); err == nil {
 		for i, child := range children {

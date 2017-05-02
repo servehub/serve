@@ -10,8 +10,8 @@ export CGO_ENABLED=0
 
 default: install
 
-vet:
-	go vet `go list ./... | grep -v /vendor/`
+lint:
+	gometalinter --config=gometalinter.json ./...
 
 test:
 	go test -cover -v `go list ./... | grep -v /vendor/`
@@ -19,8 +19,9 @@ test:
 deps:
 	@echo "==> Install dependencies..."
 	go get github.com/Masterminds/glide
-	go get github.com/jteeuwen/go-bindata/...
 	glide i -v
+	go get github.com/jteeuwen/go-bindata/...
+	go get github.com/alecthomas/gometalinter
 
 build-configs:
 	${GOPATH}/bin/go-bindata -pkg config -o manifest/config/config.go config/*.yml

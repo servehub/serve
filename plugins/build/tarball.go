@@ -12,14 +12,20 @@ func init() {
 type TarballBuild struct{}
 
 func (p TarballBuild) Run(data manifest.Manifest) error {
-	utils.RunCmd("rm -rf ./tarball.tmp && mkdir ./tarball.tmp")
+	if err := utils.RunCmd("rm -rf ./tarball.tmp && mkdir ./tarball.tmp"); err != nil {
+		return err
+	}
 
 	for _, f := range data.GetArray("files") {
 		if file, ok := f.Unwrap().(string); ok {
-			utils.RunCmd("cp -a %s ./tarball.tmp/", file)
+			if err := utils.RunCmd("cp -a %s ./tarball.tmp/", file); err != nil {
+				return err
+			}
 		} else if files, ok := f.Unwrap().(map[string]interface{}); ok {
 			for from, to := range files {
-				utils.RunCmd("cp -a %s ./tarball.tmp/%s", from, to)
+				if err := utils.RunCmd("cp -a %s ./tarball.tmp/%s", from, to); err != nil {
+					return err
+				}
 			}
 		}
 	}
