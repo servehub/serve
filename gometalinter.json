@@ -19,5 +19,5 @@
   "MinConstLength": 10,
   "DuplThreshold": 100,
   "Cyclo": 30,
-  "Deadline": "300s"
+  "Deadline": "600s"
 }
