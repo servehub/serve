@@ -22,7 +22,7 @@ build-configs:
 	${GOPATH}/bin/go-bindata -pkg config -o manifest/config/config.go config/*.yml
 
 lint: build-configs
-	gometalinter --config=gometalinter.json ./...
+	gometalinter --config=gometalinter.json --debug --fast ./...
 
 test: build-configs
 	go test -cover -v `go list ./... | grep -v /vendor/`

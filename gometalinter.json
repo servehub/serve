@@ -3,9 +3,14 @@
   "DisableAll": true,
   "Enable": [
     "deadcode",
+    "unconvert",
+    "goconst",
+    "dupl",
     "structcheck",
+    "unparam",
     "gocyclo",
     "staticcheck",
+    "unused",
     "varcheck",
     "interfacer",
     "ineffassign",
@@ -14,5 +19,5 @@
   "MinConstLength": 10,
   "DuplThreshold": 100,
   "Cyclo": 30,
-  "Deadline": "600s"
+  "Deadline": "120s"
 }
