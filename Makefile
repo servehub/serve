@@ -10,12 +10,6 @@ export CGO_ENABLED=0
 
 default: install
 
-lint:
-	gometalinter --config=gometalinter.json ./...
-
-test:
-	go test -cover -v `go list ./... | grep -v /vendor/`
-
 deps:
 	@echo "==> Install dependencies..."
 	go get github.com/Masterminds/glide
@@ -26,6 +20,12 @@ deps:
 
 build-configs:
 	${GOPATH}/bin/go-bindata -pkg config -o manifest/config/config.go config/*.yml
+
+lint: build-configs
+	gometalinter --config=gometalinter.json ./...
+
+test: build-configs
+	go test -cover -v `go list ./... | grep -v /vendor/`
 
 build-serve:
 	go build -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve${SUFFIX} serve.go
