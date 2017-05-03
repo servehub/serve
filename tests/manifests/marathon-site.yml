@@ -1,3 +1,35 @@
+manifest:
+  info:
+    name: rest-api
+    description: REST Api
+    version: "2.1"
+    category: superman/web
+    owner:
+      name: Dmitry Kulikov
+      email: kulikov.dm@gmail.com
+
+  include:
+    - file: include.d/site.yml
+
+  build:
+    - gradle: install
+    - docker-image: {}
+
+  deploy:
+    - marathon:
+        mem: 1024
+        docker:
+          ports:
+            - containerPort: 8080
+            - name: jmx
+
+  release:
+    - http:
+        routes:
+          - host ? {{ vars.env }}:
+              dev: "{{ info.feature-prefix }}api.superman.qa"
+              prod: "api.superman.space"
+
 tests:
   - run: "build.gradle --build-number=34"
     expect:
@@ -160,34 +192,29 @@ tests:
       task-kill-grace-period-seconds: 60
       user: root
 
-manifest:
-  info:
-    name: rest-api
-    description: REST Api
-    version: "2.1"
-    category: superman/web
-    owner:
-      name: Dmitry Kulikov
-      email: kulikov.dm@gmail.com
+  - run: "release.http --env=dev --build-number=126 --stage=staging"
+    expect:
+      consul-address: consul.superman.space
+      full-name: superman/web/rest-api-v2.1.126
+      name-prefix: superman/web/rest-api-v
+      outdated-timeout-sec: 600
+      route-vars: ''
+      routes:
+        - host: api.superman.qa
+      stage: staging
 
-  include:
-    - file: include.d/site.yml
+  - run: "release.http --env=dev --build-number=126 --branch=new-design"
+    expect:
+      consul-address: consul.superman.space
+      full-name: superman/web/rest-api-new-design
+      name-prefix: superman/web/rest-api-new-design
+      outdated-timeout-sec: 600
+      route-vars: ''
+      routes:
+        - host: new-design-api.superman.qa
+      stage: ''
 
-  build:
-    - gradle: install
-    - docker-image: {}
-
-  deploy:
-    - marathon:
-        mem: 1024
-        docker:
-          ports:
-            - containerPort: 8080
-            - name: jmx
-
-  release:
-    - http:
-        routes:
-          - host ? {{ vars.env }}:
-              dev: "{{ info.feature-prefix }}api.superman.qa"
-              prod: "api.superman.space"
+  - run: "outdated --env=dev --build-number=126 --branch=new-design"
+    expect:
+      consul-address: "consul.superman.space"
+      full-name: "superman/web/rest-api-new-design"
