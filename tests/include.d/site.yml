@@ -1,0 +1,56 @@
+conf:
+  kube:
+    full-name ? {{ info.feature }}:
+      "": "{{ info.name | replace('\\W|_', '-') }}-v{{ info.build-version | replace('\\W', '-') }}"
+      "*": "{{ info.name | replace('\\W|_', '-') }}{{ info.feature-suffix | replace('\\W|_', '-') }}"
+
+  marathon:
+    app-name ? {{ info.feature }}:
+      "": "{{ info.full-name }}-v{{ info.build-version }}"
+      "*": "{{ info.full-name }}"
+
+  gocd:
+    template ? {{ info.feature }}:
+      "": "serve-live-staging-tpl"
+      "*": "serve-featured-tpl"
+
+deploy:
+  marathon:
+    envs:
+      JAVA_OPTS: >
+        -Xmx{{ deploy.marathon.mem | percent("60") }}m
+        -Xms{{ deploy.marathon.mem | percent("60") }}m
+        -XX:MaxMetaspaceSize={{ deploy.marathon.mem | percent("30") }}m
+
+deploy:
+  kube:
+    requests:
+      memory: "512M"
+      cpu: "0.2"
+    limits:
+      memory: "1024M"
+      cpu: "1"
+    ports:
+      - containerPort: 8080
+
+    envs:
+      JAVA_OPTS: >
+        -Dspring.profiles.active={{ vars.env }}
+        -Xmx{{ deploy.kube.requests.memory | lower }}
+
+release:
+  http:
+    full-name: "{{ conf.marathon.app-name }}"
+    name-prefix ? {{ info.feature }}:
+      "": "{{ info.full-name }}-v"
+      "*": "{{ info.full-name }}"
+
+  ingress:
+    routes:
+      - host ? {{ vars.env }}:
+          dev: "{{ info.feature-prefix }}{{ release.ingress.prefix }}.superman.qa"
+          prod: "{{ release.ingress.prefix }}.superman.space"
+        port: "{{ deploy.kube.ports.containerPort }}"
+
+outdated:
+  full-name: "{{ conf.marathon.app-name }}"

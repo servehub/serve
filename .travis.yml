@@ -7,7 +7,7 @@ install:
   - make deps
 
 script:
-  - make lint test dist
+  - make lint test test-manifests dist
 
 deploy:
   provider: releases

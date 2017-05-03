@@ -3,6 +3,7 @@ package testrunner
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -11,7 +12,6 @@ import (
 	"reflect"
 	"strings"
 
-	"errors"
 	"github.com/codegangsta/cli"
 	"github.com/fatih/color"
 	"github.com/ghodss/yaml"
@@ -90,7 +90,7 @@ func runTest(serve, configPath string, data map[string]interface{}) error {
 	}
 
 	params := strings.Split(run.(string), " ")
-	params = append(params, "--var", fmt.Sprintf("config-path=%v", configPath), "--manifest", data["manifest"].(string), "--dry-run", "--no-color")
+	params = append(params, fmt.Sprintf("--config-path=%v", configPath), fmt.Sprintf("--manifest=%s", data["manifest"]), "--dry-run", "--no-color")
 	result, err := serveCommand(serve, params...)
 	if err != nil {
 		return err
@@ -101,9 +101,11 @@ func runTest(serve, configPath string, data map[string]interface{}) error {
 	}
 
 	if d := diff(result, data["expect"].(map[string]interface{})); !reflect.DeepEqual(d, make(map[string]interface{})) {
-		log.Println(color.RedString("diff %v\n", d))
+		js, _ := yaml.Marshal(d)
+		log.Println(color.RedString("diff:\n%s", js))
 		return fmt.Errorf("Error: diff %v\n", d)
 	}
+
 	return nil
 }
 
@@ -122,6 +124,8 @@ func serveCommand(serve string, params ...string) (map[string]interface{}, error
 	}
 	result := make(map[string]interface{})
 
+	println(buf.String())
+
 	if b := strings.Index(buf.String(), "{"); b != -1 {
 		if e := strings.Index(buf.String(), "}\n\n"); e != -1 {
 			if err := json.Unmarshal(buf.Bytes()[b:e+1], &result); err != nil {
@@ -130,6 +134,7 @@ func serveCommand(serve string, params ...string) (map[string]interface{}, error
 			}
 		}
 	}
+
 	return result, nil
 }
 

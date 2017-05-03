@@ -22,10 +22,15 @@ build-configs:
 	${GOPATH}/bin/go-bindata -pkg config -o manifest/config/config.go config/*.yml
 
 lint: build-configs
-	gometalinter --config=gometalinter.json --debug --fast ./...
+	gometalinter --config=gometalinter.json --fast ./...
 
 test: build-configs
 	go test -cover -v `go list ./... | grep -v /vendor/`
+
+test-manifests: build-configs build-serve build-serve-tools
+	for file in `ls ${PWD}/tests/manifests/*.yml`; do \
+		${DEST}/serve-tools test-runner --file $$file --serve ${DEST}/serve --config-path=${PWD}/tests/; \
+	done
 
 build-serve:
 	go build -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve${SUFFIX} serve.go
@@ -34,7 +39,9 @@ build-serve-tools:
 	go build -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve-tools${SUFFIX} tools/cmd.go
 
 install: build-configs build-serve
-	cp ${DEST}/serve ${GOPATH}/bin/
+	for f in serve serve-tools; do \
+		if [ -f ${DEST}/$$f ]; then cp ${DEST}/$$f ${GOPATH}/bin/; fi \
+	done
 
 clean:
 	@echo "==> Cleanup old binaries..."

@@ -1,0 +1,193 @@
+tests:
+  - run: "build.gradle --build-number=34"
+    expect:
+      build: ""
+      cmd: gradle %s -Pversion="2.1.34"
+      envs: {}
+      gradle: install
+      image: frekele/gradle:3.4.1-jdk8
+      shell: "/bin/sh -c '%s'"
+      volumes:
+        - "~/.gradle/caches:/root/.gradle/caches"
+        - "~/.gradle/wrapper:/root/.gradle/wrapper"
+      workdir: "${PWD}"
+
+  - run: "build.docker-image --build-number=34"
+    expect:
+      image: registry-superman.superman.space/superman/web/rest-api:v2.1.34
+      login:
+        registry: registry-superman.superman.space/
+        user: "${REGISTRY_USER}"
+        password: "${REGISTRY_BUILD_TOKEN}"
+
+  - run: "build.docker-image --build-number=34 --branch=feature/new-design"
+    expect:
+      image: registry-superman.superman.space/superman/web/rest-api-feature-new-design:v2.1.34
+      login:
+        registry: registry-superman.superman.space/
+        user: "${REGISTRY_USER}"
+        password: "${REGISTRY_BUILD_TOKEN}"
+
+  - run: "deploy.marathon --env=dev --build-number=34 --branch=master"
+    expect:
+      app-name: superman/web/rest-api-v2.1.34
+      backoff-factor: 2
+      backoff-seconds: 2
+      cluster: ''
+      cmd: bin/start
+      constraints: [["hostname", "UNIQUE"]]
+      consul-address: consul.superman.space
+      cpu: 0.1
+      docker:
+        args: []
+        enabled: true
+        image: registry-superman.superman.space/superman/web/rest-api:v2.1.34
+        network: BRIDGE
+        parameters:
+          oom-kill-disable: true
+        ports:
+          - containerPort: 8080
+          - name: jmx
+        volumes: []
+      environment:
+        ENV: dev
+        SERVICE_BUILD_NUMBER: '34'
+        SERVICE_CHECK_TCP: true
+        SERVICE_MEMORY: '1024'
+        SERVICE_NAME: superman/web/rest-api-v2.1.34
+        SERVICE_TAG: rest-api
+        SERVICE_VERSION: 2.1.34
+      envs: {}
+      instances: 1
+      listen-port: "$PORT0"
+      marathon-address: marathon.superman.space
+      max-launch-delay-seconds: 120
+      max-over-capacity: 0
+      mem: 1024
+      min-health-capacity: 0
+      package-uri: []
+      ports:
+        - name: ''
+          port: 0
+      task-kill-grace-period-seconds: 60
+      user: root
+
+  - run: "deploy.marathon --env=dev --build-number=42 --branch=new-design"
+    expect:
+      app-name: superman/web/rest-api-new-design
+      backoff-factor: 2
+      backoff-seconds: 2
+      cluster: ''
+      cmd: bin/start
+      constraints: [["hostname", "UNIQUE"]]
+      consul-address: consul.superman.space
+      cpu: 0.1
+      docker:
+        args: []
+        enabled: true
+        image: registry-superman.superman.space/superman/web/rest-api-new-design:v2.1.42
+        network: BRIDGE
+        parameters:
+          oom-kill-disable: true
+        ports:
+          - containerPort: 8080
+          - name: jmx
+        volumes: []
+      environment:
+        ENV: dev
+        SERVICE_BUILD_NUMBER: '42'
+        SERVICE_CHECK_TCP: true
+        SERVICE_MEMORY: '1024'
+        SERVICE_NAME: superman/web/rest-api-new-design
+        SERVICE_TAG: rest-api-new-design
+        SERVICE_VERSION: 2.1.42
+      envs: {}
+      instances: 1
+      listen-port: "$PORT0"
+      marathon-address: marathon.superman.space
+      max-launch-delay-seconds: 120
+      max-over-capacity: 0
+      mem: 1024
+      min-health-capacity: 0
+      package-uri: []
+      ports:
+        - name: ''
+          port: 0
+      task-kill-grace-period-seconds: 60
+      user: root
+
+  - run: "deploy.marathon --env=prod --build-number=126"
+    expect:
+      app-name: superman/web/rest-api-v2.1.126
+      backoff-factor: 2
+      backoff-seconds: 2
+      cluster: ''
+      cmd: bin/start
+      constraints: [["hostname", "UNIQUE"]]
+      consul-address: consul.superman.space
+      cpu: 0.1
+      docker:
+        args: []
+        enabled: true
+        image: registry-superman.superman.space/superman/web/rest-api:v2.1.126
+        network: BRIDGE
+        parameters:
+          oom-kill-disable: true
+        ports:
+          - containerPort: 8080
+          - name: jmx
+        volumes: []
+      environment:
+        ENV: prod
+        SERVICE_BUILD_NUMBER: '126'
+        SERVICE_CHECK_TCP: true
+        SERVICE_MEMORY: '1024'
+        SERVICE_NAME: superman/web/rest-api-v2.1.126
+        SERVICE_TAG: rest-api
+        SERVICE_VERSION: 2.1.126
+      envs: {}
+      instances: 1
+      listen-port: "$PORT0"
+      marathon-address: marathon.superman.space
+      max-launch-delay-seconds: 120
+      max-over-capacity: 0
+      mem: 1024
+      min-health-capacity: 0
+      package-uri: []
+      ports:
+        - name: ''
+          port: 0
+      task-kill-grace-period-seconds: 60
+      user: root
+
+manifest:
+  info:
+    name: rest-api
+    description: REST Api
+    version: "2.1"
+    category: superman/web
+    owner:
+      name: Dmitry Kulikov
+      email: kulikov.dm@gmail.com
+
+  include:
+    - file: include.d/site.yml
+
+  build:
+    - gradle: install
+    - docker-image: {}
+
+  deploy:
+    - marathon:
+        mem: 1024
+        docker:
+          ports:
+            - containerPort: 8080
+            - name: jmx
+
+  release:
+    - http:
+        routes:
+          - host ? {{ vars.env }}:
+              dev: "{{ info.feature-prefix }}api.superman.qa"
+              prod: "api.superman.space"
