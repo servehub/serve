@@ -73,7 +73,13 @@ func (m Manifest) GetBool(path string) bool {
 
 func (m Manifest) GetMap(path string) map[string]Manifest {
 	out := make(map[string]Manifest)
-	mmap, err := m.tree.Path(path).ChildrenMap()
+
+	tree := m.tree
+	if len(path) > 0 && path != "." && path != "/" {
+		tree = m.tree.Path(path)
+	}
+
+	mmap, err := tree.ChildrenMap()
 	if err != nil {
 		log.Fatalf("Error get map '%v' from: %v. Error: %s", path, m.tree.Path(path).Data(), err)
 	}

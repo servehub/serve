@@ -235,6 +235,12 @@ deploy:
     hooks: []
       # - postinstall: ./install.sh
 
+  secrets:
+    env: "{{ vars.env }}"
+    consul:
+      address: "{{ conf.consul.address }}"
+      path: "services/secrets"
+
 release:
   http:
     consul-address: "{{ conf.consul.address }}"
