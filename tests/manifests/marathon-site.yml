@@ -63,8 +63,8 @@ tests:
   - run: "deploy.marathon --env=dev --build-number=34 --branch=master"
     expect:
       app-name: superman/web/rest-api-v2.1.34
-      backoff-factor: 2
-      backoff-seconds: 2
+      backoff-factor: 3.0
+      backoff-seconds: 3
       cluster: ''
       cmd: bin/start
       constraints: [["hostname", "UNIQUE"]]
@@ -93,7 +93,7 @@ tests:
       instances: 1
       listen-port: "$PORT0"
       marathon-address: marathon.superman.space
-      max-launch-delay-seconds: 120
+      max-launch-delay-seconds: 300
       max-over-capacity: 0
       mem: 1024
       min-health-capacity: 0
@@ -107,8 +107,8 @@ tests:
   - run: "deploy.marathon --env=dev --build-number=42 --branch=new-design"
     expect:
       app-name: superman/web/rest-api-new-design
-      backoff-factor: 2
-      backoff-seconds: 2
+      backoff-factor: 3.0
+      backoff-seconds: 3
       cluster: ''
       cmd: bin/start
       constraints: [["hostname", "UNIQUE"]]
@@ -137,7 +137,7 @@ tests:
       instances: 1
       listen-port: "$PORT0"
       marathon-address: marathon.superman.space
-      max-launch-delay-seconds: 120
+      max-launch-delay-seconds: 300
       max-over-capacity: 0
       mem: 1024
       min-health-capacity: 0
@@ -151,8 +151,8 @@ tests:
   - run: "deploy.marathon --env=prod --build-number=126"
     expect:
       app-name: superman/web/rest-api-v2.1.126
-      backoff-factor: 2
-      backoff-seconds: 2
+      backoff-factor: 3.0
+      backoff-seconds: 3
       cluster: ''
       cmd: bin/start
       constraints: [["hostname", "UNIQUE"]]
@@ -181,7 +181,7 @@ tests:
       instances: 1
       listen-port: "$PORT0"
       marathon-address: marathon.superman.space
-      max-launch-delay-seconds: 120
+      max-launch-delay-seconds: 300
       max-over-capacity: 0
       mem: 1024
       min-health-capacity: 0
