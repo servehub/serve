@@ -151,9 +151,9 @@ deploy:
     listen-port: "$PORT0"
     min-health-capacity: 0.0
     max-over-capacity: 0.0
-    backoff-seconds: 2
-    backoff-factor: 2.0
-    max-launch-delay-seconds: 120
+    backoff-seconds: 3
+    backoff-factor: 3.0
+    max-launch-delay-seconds: 300
     task-kill-grace-period-seconds: 60
     ports:
       - { port: 0, name: "" }
