@@ -299,13 +299,13 @@ db:
 
 dashboard:
   kibana3:
+    purge: "{{ vars.purge }}"
     user: guest
     group: guest
     title: "{{ info.name }}{{ info.feature-suffix }}"
     elastic:
       address: "http://localhost:9200"
       url: "{{ dashboard.kibana3.elastic.address }}/kibana-int/dashboard/{{ dashboard.kibana3.title }}"
-    purge: "{{ vars.purge }}"
     dashboard:
       title: "{{ dashboard.kibana3.title | replace('\\W|_', '-') }}"
       editable: true

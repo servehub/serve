@@ -24,6 +24,16 @@ func (p DashboardKibana3) Run(data manifest.Manifest) error {
 
 		return err
 	} else {
+		exists, err := http.DefaultClient.Get(data.GetString("elastic.url"))
+		if err != nil {
+			return err
+		}
+
+		if exists.StatusCode != 404 {
+			log.Println("Kibana dashboard already exists!")
+			return nil
+		}
+
 		value := map[string]string{
 			"user":      data.GetString("user"),
 			"group":     data.GetString("group"),
