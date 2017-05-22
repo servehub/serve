@@ -59,6 +59,11 @@ dist: clean build-configs
 docker-dist:
 	docker run --rm -v "${PWD}":/go/src/${PACKAGE} -w /go/src/${PACKAGE} golang:1.8 /bin/sh -c 'make deps && make dist'
 
+bump-tag:
+	TAG=$$(echo "v${VERSION}" | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g'); \
+	git tag $$TAG; \
+	git push --tags
+
 release: dist
 	@echo "==> Create github release and upload files..."
 

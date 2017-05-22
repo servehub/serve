@@ -170,7 +170,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		return err
 	}
 
-	return backoff.Retry(func() error {
+	if err := backoff.Retry(func() error {
 		services, _, err := consulApi.Health().Service(fullName, "", true, nil)
 
 		if err != nil {
@@ -185,7 +185,12 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 		log.Println(color.GreenString("Service `%s` successfully started!", fullName))
 		return nil
-	}, backoff.NewExponentialBackOff())
+	}, backoff.NewExponentialBackOff()); err != nil {
+		log.Println(color.RedString("Error on deploy `%s`. Cleanup...", fullName))
+		return utils.MarkAsOutdated(consulApi, fullName, 0)
+	}
+
+	return nil
 }
 
 func (p DeployMarathon) Uninstall(data manifest.Manifest) error {
