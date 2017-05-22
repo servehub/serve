@@ -94,6 +94,7 @@ tests:
       listen-port: "$PORT0"
       marathon-address: marathon.superman.space
       max-launch-delay-seconds: 300
+      backoff-max-elapsed-time: 5m
       max-over-capacity: 0
       mem: 1024
       min-health-capacity: 0
@@ -138,6 +139,7 @@ tests:
       listen-port: "$PORT0"
       marathon-address: marathon.superman.space
       max-launch-delay-seconds: 300
+      backoff-max-elapsed-time: 5m
       max-over-capacity: 0
       mem: 1024
       min-health-capacity: 0
@@ -182,6 +184,7 @@ tests:
       listen-port: "$PORT0"
       marathon-address: marathon.superman.space
       max-launch-delay-seconds: 300
+      backoff-max-elapsed-time: 5m
       max-over-capacity: 0
       mem: 1024
       min-health-capacity: 0

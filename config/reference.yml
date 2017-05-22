@@ -155,6 +155,7 @@ deploy:
     backoff-factor: 3.0
     max-launch-delay-seconds: 300
     task-kill-grace-period-seconds: 60
+    backoff-max-elapsed-time: 5m
     ports:
       - { port: 0, name: "" }
     docker:

@@ -170,6 +170,13 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		return err
 	}
 
+	bc := backoff.NewExponentialBackOff()
+	if maxBc, err := time.ParseDuration(data.GetString("backoff-max-elapsed-time")); err == nil {
+		bc.MaxElapsedTime = maxBc
+	} else {
+		log.Println(color.YellowString("Error on parse `backoff-max-elapsed-time` duration `%s`: %v", data.GetString("backoff-max-elapsed-time"), err))
+	}
+
 	if err := backoff.Retry(func() error {
 		services, _, err := consulApi.Health().Service(fullName, "", true, nil)
 
@@ -185,7 +192,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 		log.Println(color.GreenString("Service `%s` successfully started!", fullName))
 		return nil
-	}, backoff.NewExponentialBackOff()); err != nil {
+	}, bc); err != nil {
 		log.Println(color.RedString("Error on deploy `%s`: %v. Cleanup...", fullName, err))
 
 		if err := utils.MarkAsOutdated(consulApi, fullName, 0); err != nil {
