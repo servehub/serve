@@ -186,8 +186,13 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		log.Println(color.GreenString("Service `%s` successfully started!", fullName))
 		return nil
 	}, backoff.NewExponentialBackOff()); err != nil {
-		log.Println(color.RedString("Error on deploy `%s`. Cleanup...", fullName))
-		return utils.MarkAsOutdated(consulApi, fullName, 0)
+		log.Println(color.RedString("Error on deploy `%s`: %v. Cleanup...", fullName, err))
+
+		if err := utils.MarkAsOutdated(consulApi, fullName, 0); err != nil {
+			return err
+		}
+
+		return err
 	}
 
 	return nil
