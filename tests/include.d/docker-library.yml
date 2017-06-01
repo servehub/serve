@@ -1,0 +1,7 @@
+info:
+  category: common
+  version: "1.0"
+
+conf:
+  docker:
+    registry: "registry.superman.space/"

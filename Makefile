@@ -29,7 +29,7 @@ test: build-configs
 
 test-manifests: build-configs build-serve build-serve-tools
 	for file in `ls ${PWD}/tests/manifests/*.yml`; do \
-		${DEST}/serve-tools test-runner --file $$file --serve ${DEST}/serve --config-path=${PWD}/tests/; \
+		${DEST}/serve-tools test-runner --file $$file --serve ${DEST}/serve --config-path=${PWD}/tests/ || exit 1; \
 	done
 
 build-serve:

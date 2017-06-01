@@ -1,0 +1,22 @@
+manifest:
+  info:
+    name: nodejs
+
+  include:
+    - file: include.d/docker-library.yml
+
+  build:
+    - docker-image:
+        workdir: 7
+        tags: [7, 7.10, latest]
+
+tests:
+  - run: "build --build-number=34"
+    expect:
+      image: registry.superman.space/common/nodejs:v1.0.34
+      tags: [7, 7.10, latest]
+      workdir: 7
+      login:
+        registry: registry.superman.space/
+        user: "${DOCKER_REGISTRY_USER}"
+        password: "${DOCKER_REGISTRY_PASSWORD}"

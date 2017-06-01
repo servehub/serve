@@ -47,18 +47,22 @@ tests:
   - run: "build.docker-image --build-number=34"
     expect:
       image: registry-superman.superman.space/superman/web/rest-api:v2.1.34
+      tags: []
+      workdir: "."
       login:
         registry: registry-superman.superman.space/
-        user: "${REGISTRY_USER}"
-        password: "${REGISTRY_BUILD_TOKEN}"
+        user: "${DOCKER_REGISTRY_USER}"
+        password: "${DOCKER_REGISTRY_PASSWORD}"
 
   - run: "build.docker-image --build-number=34 --branch=feature/new-design"
     expect:
       image: registry-superman.superman.space/superman/web/rest-api-feature-new-design:v2.1.34
+      tags: []
+      workdir: "."
       login:
         registry: registry-superman.superman.space/
-        user: "${REGISTRY_USER}"
-        password: "${REGISTRY_BUILD_TOKEN}"
+        user: "${DOCKER_REGISTRY_USER}"
+        password: "${DOCKER_REGISTRY_PASSWORD}"
 
   - run: "deploy.marathon --env=dev --build-number=34 --branch=master"
     expect:

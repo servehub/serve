@@ -120,6 +120,8 @@ build:
 
   docker-image:
     image: "{{ conf.docker.image }}"
+    tags: []
+    workdir: "."
     login:
       user: ""
       password: ""

@@ -1,6 +1,9 @@
 package build
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/servehub/serve/manifest"
 	"github.com/servehub/utils"
 )
@@ -23,9 +26,36 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 		}
 	}
 
-	if err := utils.RunCmd("docker build --pull -t %s .", data.GetString("image")); err != nil {
+	image := data.GetString("image")
+	prefix := image[:strings.Index(image, ":")]
+	tags := make([]string, 0)
+
+	for _, tag := range data.GetArray("tags") {
+		tags = append(tags, fmt.Sprintf("%s:%v", prefix, tag.Unwrap()))
+	}
+
+	// pull exists tagged images for cache
+	for _, tag := range tags {
+		utils.RunCmd("docker pull %s", tag)
+	}
+
+	if len(tags) == 0 {
+		tags = []string{image}
+	}
+
+	if err := utils.RunCmd(
+		"docker build --pull -t %s %s",
+		strings.Join(tags, " -t "),
+		data.GetString("workdir"),
+	); err != nil {
 		return err
 	}
 
-	return utils.RunCmd("docker push %s", data.GetString("image"))
+	for _, tag := range tags {
+		if err := utils.RunCmd("docker push %s", tag); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
