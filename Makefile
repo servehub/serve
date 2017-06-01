@@ -62,7 +62,7 @@ docker-dist:
 bump-tag:
 	TAG=$$(echo "v${VERSION}" | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g'); \
 	git tag $$TAG; \
-	git push --tags
+	git push && git push --tags
 
 release: dist
 	@echo "==> Create github release and upload files..."
