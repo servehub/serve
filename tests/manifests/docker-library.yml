@@ -16,6 +16,7 @@ tests:
       image: registry.superman.space/common/nodejs:v1.0.34
       tags: [7, 7.10, latest]
       workdir: 7
+      name: ""
       login:
         registry: registry.superman.space/
         user: "${DOCKER_REGISTRY_USER}"

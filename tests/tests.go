@@ -3,7 +3,7 @@ package tests
 import (
 	"fmt"
 	"testing"
-	"strings"
+	"sync/atomic"
 
 	"github.com/ghodss/yaml"
 
@@ -31,13 +31,15 @@ func RunAllMultiCmdTests(t *testing.T, cases map[string]TestCase, plugin manifes
 
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
+			var number int32 = 0
+
 			utils.RunCmdWithEnv = func(cmdline string, env map[string]string) error {
-				for _, v := range test.Expects {
-					if v == cmdline {
-						return nil
-					}
+				if int(number) < len(test.Expects) && cmdline == test.Expects[number] {
+					atomic.AddInt32(&number, 1)
+					return nil
 				}
-				return fmt.Errorf("\ncmd: \ngiven: %v \nexpected one of: \n%v", cmdline, strings.Join(test.Expects, "\n"))
+
+				return fmt.Errorf("\ncmd: \ngiven: %v \nexpected: %v", cmdline, test.Expects[number])
 			}
 
 			if err := loadTestData(utils.StripLeftMargin(test.In), plugin); err != nil {

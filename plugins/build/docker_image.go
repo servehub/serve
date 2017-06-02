@@ -28,6 +28,11 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 
 	image := data.GetString("image")
 	prefix := image[:strings.Index(image, ":")]
+
+	if data.Has("name") {
+		prefix = prefix[:strings.LastIndex(prefix, "/")] + "/" + data.GetString("name")
+	}
+
 	tags := make([]string, 0)
 
 	for _, tag := range data.GetArray("tags") {

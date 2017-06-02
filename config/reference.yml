@@ -1,4 +1,5 @@
 info:
+  name: ""
   version: "0.0"
   description: "{{ info.name }}"
 
@@ -120,6 +121,7 @@ build:
 
   docker-image:
     image: "{{ conf.docker.image }}"
+    name: ""
     tags: []
     workdir: "."
     login:
