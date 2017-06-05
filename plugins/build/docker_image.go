@@ -15,28 +15,31 @@ func init() {
 type BuildDockerImage struct{}
 
 func (p BuildDockerImage) Run(data manifest.Manifest) error {
-	if data.Has("login.user") {
-		if err := utils.RunCmd(
-			`docker login -u "%s" -p "%s" %s`,
-			data.GetString("login.user"),
-			data.GetString("login.password"),
-			data.GetString("login.registry"),
-		); err != nil {
-			return err
-		}
-	}
-
 	image := data.GetString("image")
 	prefix := image[:strings.Index(image, ":")]
+
+	if data.Has("category") {
+		prefix = prefix[:strings.Index(prefix, "/")] + "/" + data.GetString("category") + prefix[strings.LastIndex(prefix, "/"):]
+	}
 
 	if data.Has("name") {
 		prefix = prefix[:strings.LastIndex(prefix, "/")] + "/" + data.GetString("name")
 	}
 
-	tags := make([]string, 0)
+	if data.Has("login.user") {
+		if err := utils.RunCmd(
+			`docker login -u "%s" -p "%s" %s`,
+			data.GetString("login.user"),
+			data.GetString("login.password"),
+			image,
+		); err != nil {
+			return err
+		}
+	}
 
-	for _, tag := range data.GetArray("tags") {
-		tags = append(tags, fmt.Sprintf("%s:%v", prefix, tag.Unwrap()))
+	tags := make([]string, 0)
+	for _, tag := range data.GetArrayForce("tags") {
+		tags = append(tags, fmt.Sprintf("%s:%v", prefix, tag))
 	}
 
 	// pull exists tagged images for cache

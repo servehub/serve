@@ -17,7 +17,7 @@ tests:
       tags: [7, 7.10, latest]
       workdir: 7
       name: ""
+      category: ""
       login:
-        registry: registry.superman.space/
         user: "${DOCKER_REGISTRY_USER}"
         password: "${DOCKER_REGISTRY_PASSWORD}"

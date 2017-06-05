@@ -15,7 +15,6 @@ func TestDockerImageBuild(t *testing.T) {
 		      tags: []
 		      workdir: "."
 		      login:
-		        registry: registry.superman.space/
 		        user: ""
 		        password: ""
 				`,
@@ -31,7 +30,6 @@ func TestDockerImageBuild(t *testing.T) {
 		      tags: [7, "7.10", latest]
 		      workdir: 7
 		      login:
-		        registry: registry.superman.space/
 		        user: ""
 		        password: ""
 				`,
@@ -53,7 +51,6 @@ func TestDockerImageBuild(t *testing.T) {
 		      name: php
 		      workdir: 7
 		      login:
-		        registry: registry.superman.space/
 		        user: ""
 		        password: ""
 				`,
@@ -72,21 +69,57 @@ func TestDockerImageBuild(t *testing.T) {
 				In: `---
 		      image: registry.superman.space/web/common/:v0.0.0
 		      name: "postgres-for-tests"
-				  suffix: ""
 				  tags: [9.6, "latest"]
 				  workdir: "postgres-for-tests/9.6"
 				  login:
 				    password: "${DOCKER_REGISTRY_PASSWORD}"
-				    registry: "registry.superman.space/"
 				    user: "${DOCKER_REGISTRY_USER}"
 				`,
 				Expects: []string{
-					`docker login -u "${DOCKER_REGISTRY_USER}" -p "${DOCKER_REGISTRY_PASSWORD}" registry.superman.space/`,
+					`docker login -u "${DOCKER_REGISTRY_USER}" -p "${DOCKER_REGISTRY_PASSWORD}" registry.superman.space/web/common/:v0.0.0`,
 					"docker pull registry.superman.space/web/common/postgres-for-tests:9.6",
 					"docker pull registry.superman.space/web/common/postgres-for-tests:latest",
 					"docker build --pull -t registry.superman.space/web/common/postgres-for-tests:9.6 -t registry.superman.space/web/common/postgres-for-tests:latest postgres-for-tests/9.6",
 					"docker push registry.superman.space/web/common/postgres-for-tests:9.6",
 					"docker push registry.superman.space/web/common/postgres-for-tests:latest",
+				},
+			},
+
+			"custom category": {
+				In: `---
+		      image: registry.superman.space/web/common/:v0.0.0
+		      name: "new-container"
+		      category: "utility"
+				  tags: [9.6, "latest"]
+				  workdir: "new-container/9.6"
+				  login:
+				    user: ""
+				    password: ""
+				`,
+				Expects: []string{
+					"docker pull registry.superman.space/utility/new-container:9.6",
+					"docker pull registry.superman.space/utility/new-container:latest",
+					"docker build --pull -t registry.superman.space/utility/new-container:9.6 -t registry.superman.space/utility/new-container:latest new-container/9.6",
+					"docker push registry.superman.space/utility/new-container:9.6",
+					"docker push registry.superman.space/utility/new-container:latest",
+				},
+			},
+
+			"custom category 2": {
+				In: `---
+		      image: registry.superman.space/web/common/front/some-app:v0.0.0
+		      name: "newyear"
+		      category: "library/utils"
+				  tags: latest
+				  workdir: "."
+				  login:
+				    user: ""
+				    password: ""
+				`,
+				Expects: []string{
+					"docker pull registry.superman.space/library/utils/newyear:latest",
+					"docker build --pull -t registry.superman.space/library/utils/newyear:latest .",
+					"docker push registry.superman.space/library/utils/newyear:latest",
 				},
 			},
 
@@ -96,12 +129,11 @@ func TestDockerImageBuild(t *testing.T) {
 		      tags: []
 		      workdir: "."
 		      login:
-		        registry: registry.superman.space/
 		        user: "${DOCKER_REGISTRY_USER}"
 						password: "${DOCKER_REGISTRY_PASSWORD}"
 				`,
 				Expects: []string{
-					`docker login -u "${DOCKER_REGISTRY_USER}" -p "${DOCKER_REGISTRY_PASSWORD}" registry.superman.space/`,
+					`docker login -u "${DOCKER_REGISTRY_USER}" -p "${DOCKER_REGISTRY_PASSWORD}" registry.superman.space/common/node:v1.0.34`,
 					"docker build --pull -t registry.superman.space/common/node:v1.0.34 .",
 					"docker push registry.superman.space/common/node:v1.0.34",
 				},

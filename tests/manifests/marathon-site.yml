@@ -50,8 +50,8 @@ tests:
       tags: []
       workdir: "."
       name: ""
+      category: ""
       login:
-        registry: registry-superman.superman.space/
         user: "${DOCKER_REGISTRY_USER}"
         password: "${DOCKER_REGISTRY_PASSWORD}"
 
@@ -61,8 +61,8 @@ tests:
       tags: []
       workdir: "."
       name: ""
+      category: ""
       login:
-        registry: registry-superman.superman.space/
         user: "${DOCKER_REGISTRY_USER}"
         password: "${DOCKER_REGISTRY_PASSWORD}"
 

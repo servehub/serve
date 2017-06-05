@@ -122,12 +122,12 @@ build:
   docker-image:
     image: "{{ conf.docker.image }}"
     name: ""
+    category: ""
     tags: []
     workdir: "."
     login:
       user: ""
       password: ""
-      registry: "{{ conf.docker.registry }}"
 
   docker: &build-docker
     image: "{{ info.full-name }}"
