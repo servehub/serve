@@ -47,14 +47,17 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 		utils.RunCmd("docker pull %s", tag)
 	}
 
+	cacheFrom := ""
 	if len(tags) == 0 {
 		tags = []string{image}
+	} else {
+		cacheFrom = "--cache-from=" + tags[0]
 	}
 
 	if err := utils.RunCmd(
-		"docker build --pull -t %s --cache-from=%s %s",
+		"docker build --pull -t %s %s %s",
 		strings.Join(tags, " -t "),
-		tags[0],
+		cacheFrom,
 		data.GetString("workdir"),
 	); err != nil {
 		return err
