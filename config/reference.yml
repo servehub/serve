@@ -26,6 +26,7 @@ vars:
   build-number: 0
   stage-counter: 0
   purge: false
+  no-push: false
 
 conf:
   marathon:
@@ -125,6 +126,7 @@ build:
     category: ""
     tags: []
     workdir: "."
+    no-push: "{{ vars.no-push }}"
     login:
       user: ""
       password: ""

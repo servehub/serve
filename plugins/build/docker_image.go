@@ -52,16 +52,19 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 	}
 
 	if err := utils.RunCmd(
-		"docker build --pull -t %s %s",
+		"docker build --pull -t %s --cache-from=%s %s",
 		strings.Join(tags, " -t "),
+		tags[0],
 		data.GetString("workdir"),
 	); err != nil {
 		return err
 	}
 
-	for _, tag := range tags {
-		if err := utils.RunCmd("docker push %s", tag); err != nil {
-			return err
+	if !data.GetBool("no-push") {
+		for _, tag := range tags {
+			if err := utils.RunCmd("docker push %s", tag); err != nil {
+				return err
+			}
 		}
 	}
 

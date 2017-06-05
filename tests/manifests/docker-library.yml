@@ -18,6 +18,7 @@ tests:
       workdir: 7
       name: ""
       category: ""
+      no-push: "false"
       login:
         user: "${DOCKER_REGISTRY_USER}"
         password: "${DOCKER_REGISTRY_PASSWORD}"

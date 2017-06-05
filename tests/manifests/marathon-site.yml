@@ -51,6 +51,7 @@ tests:
       workdir: "."
       name: ""
       category: ""
+      no-push: "false"
       login:
         user: "${DOCKER_REGISTRY_USER}"
         password: "${DOCKER_REGISTRY_PASSWORD}"
@@ -62,6 +63,7 @@ tests:
       workdir: "."
       name: ""
       category: ""
+      no-push: "false"
       login:
         user: "${DOCKER_REGISTRY_USER}"
         password: "${DOCKER_REGISTRY_PASSWORD}"
