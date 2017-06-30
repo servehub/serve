@@ -76,7 +76,7 @@ func TestDockerImageBuild(t *testing.T) {
 				    user: "${DOCKER_REGISTRY_USER}"
 				`,
 				Expects: []string{
-					`docker login -u "${DOCKER_REGISTRY_USER}" -p "${DOCKER_REGISTRY_PASSWORD}" registry.superman.space/web/common/:v0.0.0`,
+					`docker login -u "${DOCKER_REGISTRY_USER}" -p "${DOCKER_REGISTRY_PASSWORD}" registry.superman.space`,
 					"docker pull registry.superman.space/web/common/postgres-for-tests:9.6",
 					"docker pull registry.superman.space/web/common/postgres-for-tests:latest",
 					"docker build --pull -t registry.superman.space/web/common/postgres-for-tests:9.6 -t registry.superman.space/web/common/postgres-for-tests:latest --cache-from=registry.superman.space/web/common/postgres-for-tests:9.6 postgres-for-tests/9.6",
@@ -133,7 +133,7 @@ func TestDockerImageBuild(t *testing.T) {
 						password: "${DOCKER_REGISTRY_PASSWORD}"
 				`,
 				Expects: []string{
-					`docker login -u "${DOCKER_REGISTRY_USER}" -p "${DOCKER_REGISTRY_PASSWORD}" registry.superman.space/common/node:v1.0.34`,
+					`docker login -u "${DOCKER_REGISTRY_USER}" -p "${DOCKER_REGISTRY_PASSWORD}" registry.superman.space`,
 					"docker build --pull -t registry.superman.space/common/node:v1.0.34  .",
 					"docker push registry.superman.space/common/node:v1.0.34",
 				},

@@ -40,6 +40,10 @@ func (p BuildDockerRun) Run(data manifest.Manifest) error {
 		if err := utils.RunCmd("docker build --pull -t %s -f %s .", image, data.GetString("build")); err != nil {
 			return err
 		}
+	} else {
+		if err := utils.RunCmd("docker pull %s", image); err != nil {
+			return err
+		}
 	}
 
 	return utils.RunCmd(

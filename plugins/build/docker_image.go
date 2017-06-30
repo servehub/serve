@@ -31,7 +31,7 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 			`docker login -u "%s" -p "%s" %s`,
 			data.GetString("login.user"),
 			data.GetString("login.password"),
-			image,
+			image[:strings.Index(image, "/")],
 		); err != nil {
 			return err
 		}

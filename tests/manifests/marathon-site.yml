@@ -34,7 +34,7 @@ tests:
   - run: "build.gradle --build-number=34"
     expect:
       build: ""
-      cmd: gradle %s -Pversion="2.1.34"
+      cmd: gradle %s -Pversion="2.1.34" --refresh-dependencies
       envs: {}
       gradle: install
       image: frekele/gradle:3.4.1-jdk8
