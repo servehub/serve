@@ -307,6 +307,8 @@ db:
 dashboard:
   kibana3:
     purge: "{{ vars.purge }}"
+    enabled: true
+    force-recreate: "{{ vars.force }}"
     user: guest
     group: guest
     title: "{{ info.name }}{{ info.feature-suffix }}"
@@ -333,9 +335,12 @@ dashboard:
       loader: { "save_gist": false, "save_elasticsearch": true, "save_local": true, "save_default": true, "save_temp": true, "save_temp_ttl_enable": true, "save_temp_ttl": "30d", "load_gist": true, "load_elasticsearch": true, "load_elasticsearch_size": 20, "load_local": true, "hide": false }
       services:
         query:
-          ids: [0]
+          ids: [0, 1, 2, 3]
           list:
-            0: { "id": 0, "color": "#7EB26D", "alias": "", "pin": false, "type": "lucene", "enable": true, "query": "*" }
+            0: { "id": 0, "color": "#E24D42", "alias": "ERROR", "pin": false, "type": "lucene", "enable": true, "query": "level:(ERROR FATAL)" }
+            1: { "id": 1, "color": "#EAB839", "alias": "WARN", "pin": false, "type": "lucene", "enable": true, "query": "level:(WARN WARNING)" }
+            2: { "id": 2, "color": "#7EB26D", "alias": "INFO", "pin": false, "type": "lucene", "enable": true, "query": "level:INFO OR (NOT level:(DEBUG TRACE NOTICE ERROR INFO FATAL WARN WARNING))" }
+            3: { "id": 3, "color": "#E0F9D7", "alias": "DEBUG", "pin": false, "type": "lucene", "enable": true, "query": "level:(DEBUG TRACE NOTICE)" }
         filter:
           ids: [0, 1]
           list:
@@ -343,7 +348,7 @@ dashboard:
             1: { "type": "field", "field": "service_tag", "query": "\"{{ dashboard.kibana3.title }}\"", "mandate": "must", "active": true, "alias": "", "id": 1 }
       rows:
         - title: Graph
-          height: 250px
+          height: 200px
           editable: true
           collapse: false
           collapsable: true
@@ -357,7 +362,7 @@ dashboard:
           collapsable: true
           notice: false
           panels:
-            - { "title": "All events", "error": false, "span": 12, "editable": true, "group": [ "default" ], "type": "table", "size": 100, "pages": 5, "offset": 0, "sort": [ "@timestamp", "desc" ], "style": { "font-size": "9pt" }, "overflow": "min-height", "fields": [ "@timestamp", "message" ], "localTime": true, "timeField": "@timestamp", "highlight": [], "sortable": true, "header": true, "paging": true, "spyable": true, "queries": { "mode": "all", "ids": [ 0 ] }, "field_list": false, "status": "Stable", "trimFactor": 500, "normTimes": true, "all_fields": true }
+            - { "title": "All events", "error": false, "span": 12, "editable": true, "group": [ "default" ], "type": "table", "size": 100, "pages": 5, "offset": 0, "sort": [ "@timestamp", "desc" ], "style": { "font-size": "9pt" }, "overflow": "min-height", "fields": [ "@timestamp", "level", "message" ], "localTime": true, "timeField": "@timestamp", "highlight": [], "sortable": true, "header": true, "paging": true, "spyable": true, "queries": { "mode": "all", "ids": [ 0 ] }, "field_list": false, "status": "Stable", "trimFactor": 500, "normTimes": true, "all_fields": true }
 
 monitoring:
   env: "{{ vars.env }}"

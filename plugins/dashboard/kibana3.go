@@ -16,6 +16,11 @@ func init() {
 type DashboardKibana3 struct{}
 
 func (p DashboardKibana3) Run(data manifest.Manifest) error {
+	if !data.GetBool("enabled") {
+		log.Println("Kibana dashboard for this service not enabled!")
+		return nil
+	}
+
 	if data.GetBool("purge") {
 		req, _ := http.NewRequest("DELETE", data.GetString("elastic.url"), nil)
 
@@ -29,7 +34,7 @@ func (p DashboardKibana3) Run(data manifest.Manifest) error {
 			return err
 		}
 
-		if exists.StatusCode != 404 {
+		if exists.StatusCode != 404 && !data.GetBool("force-recreate") {
 			log.Println("Kibana dashboard already exists!")
 			return nil
 		}
