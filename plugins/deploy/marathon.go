@@ -57,14 +57,14 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		},
 	}
 
-	listenPort := ""
+	healthPort := ""
 	if len(data.GetArray("ports")) > 0 {
-	  listenPort = data.GetString("listen-port")
+	  healthPort = data.GetString("listen-port")
 	}
 
 	portArgs := ""
-	if listenPort != "" {
-		portArgs = "--port " + listenPort
+	if healthPort != "" {
+		portArgs = "--port " + healthPort
 	}
 
 	app.Name(fullName)
@@ -130,7 +130,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
     ports := data.GetArray("docker.ports")
     if len(ports) == 0 {
-      listenPort = ""
+      healthPort = ""
     }
 
 		for _, port := range ports {
@@ -145,6 +145,10 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 			if port.GetIntOr("containerPort", 0) != 0 {
 				app.AddEnv(fmt.Sprintf("SERVICE_%d_NAME", port.GetInt("containerPort")), fullName)
 			}
+
+			if len(ports) == 1 && port.GetIntOr("containerPort", 0) == 0 {
+			  healthPort = ""
+			}
 		}
 
 		for _, vol := range data.GetArray("docker.volumes") {
@@ -158,10 +162,12 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		app.Container = doc
 	}
 
-	if listenPort == "$PORT0" {
+	if healthPort != "" {
 		health := marathon.NewDefaultHealthCheck()
 		health.Protocol = "TCP"
 		app.AddHealthCheck(*health)
+	} else {
+	  app.AddEnv("SERVICE_CHECK_TCP", "false")
 	}
 
 	if _, err := marathonApi.UpdateApplication(app, false); err != nil {

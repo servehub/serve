@@ -172,7 +172,8 @@ deploy:
       network: BRIDGE
       parameters:
         oom-kill-disable: true
-      ports: []
+      ports:
+        - { containerPort: 0, hostPort: 0, name: "" }
       volumes: []
     envs: {}
     environment:
