@@ -57,9 +57,14 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		},
 	}
 
+	listenPort := ""
+	if len(data.GetArray("ports")) > 0 {
+	  listenPort = data.GetString("listen-port")
+	}
+
 	portArgs := ""
-	if port := data.GetString("listen-port"); port != "" {
-		portArgs = "--port " + port
+	if listenPort != "" {
+		portArgs = "--port " + listenPort
 	}
 
 	app.Name(fullName)
@@ -148,7 +153,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		app.Container = doc
 	}
 
-	if data.GetString("listen-port") == "$PORT0" {
+	if listenPort == "$PORT0" {
 		health := marathon.NewDefaultHealthCheck()
 		health.Protocol = "TCP"
 		app.AddHealthCheck(*health)
