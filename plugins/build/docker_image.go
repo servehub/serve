@@ -55,7 +55,8 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 	}
 
 	if err := utils.RunCmd(
-		"docker build --pull -t %s %s %s",
+		"docker build %s -t %s %s %s",
+		data.GetString("build-args"),
 		strings.Join(tags, " -t "),
 		cacheFrom,
 		data.GetString("workdir"),

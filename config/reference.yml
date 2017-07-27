@@ -126,6 +126,7 @@ build:
     category: ""
     tags: []
     workdir: "."
+    build-args: "--pull"
     no-push: "{{ vars.no-push }}"
     login:
       user: ""

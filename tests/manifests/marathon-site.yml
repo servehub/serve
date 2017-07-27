@@ -52,6 +52,7 @@ tests:
       name: ""
       category: ""
       no-push: "false"
+      build-args: "--pull"
       login:
         user: "${DOCKER_REGISTRY_USER}"
         password: "${DOCKER_REGISTRY_PASSWORD}"
@@ -64,6 +65,7 @@ tests:
       name: ""
       category: ""
       no-push: "false"
+      build-args: "--pull"
       login:
         user: "${DOCKER_REGISTRY_USER}"
         password: "${DOCKER_REGISTRY_PASSWORD}"

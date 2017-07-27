@@ -14,6 +14,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      image: registry.superman.space/common/node:v1.0.34
 		      tags: []
 		      workdir: "."
+		      build-args: "--pull"
 		      login:
 		        user: ""
 		        password: ""
@@ -29,6 +30,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      image: registry.superman.space/common/node:v1.0.34
 		      tags: [7, "7.10", latest]
 		      workdir: 7
+		      build-args: "--pull"
 		      login:
 		        user: ""
 		        password: ""
@@ -50,6 +52,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      tags: [7, "7.0", latest]
 		      name: php
 		      workdir: 7
+		      build-args: "--pull"
 		      login:
 		        user: ""
 		        password: ""
@@ -71,6 +74,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      name: "postgres-for-tests"
 				  tags: [9.6, "latest"]
 				  workdir: "postgres-for-tests/9.6"
+				  build-args: "--pull"
 				  login:
 				    password: "${DOCKER_REGISTRY_PASSWORD}"
 				    user: "${DOCKER_REGISTRY_USER}"
@@ -92,6 +96,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      category: "utility"
 				  tags: [9.6, "latest"]
 				  workdir: "new-container/9.6"
+				  build-args: "--pull"
 				  login:
 				    user: ""
 				    password: ""
@@ -112,6 +117,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      category: "library/utils"
 				  tags: latest
 				  workdir: "."
+				  build-args: "--pull"
 				  login:
 				    user: ""
 				    password: ""
@@ -128,6 +134,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      image: registry.superman.space/common/node:v1.0.34
 		      tags: []
 		      workdir: "."
+		      build-args: "--pull"
 		      login:
 		        user: "${DOCKER_REGISTRY_USER}"
 						password: "${DOCKER_REGISTRY_PASSWORD}"
