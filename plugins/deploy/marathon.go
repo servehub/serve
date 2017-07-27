@@ -128,7 +128,12 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		doc.Docker.SetForcePullImage(true)
 		doc.EmptyVolumes()
 
-		for _, port := range data.GetArray("docker.ports") {
+    ports := data.GetArray("docker.ports")
+    if len(ports) == 0 {
+      listenPort = ""
+    }
+
+		for _, port := range ports {
 			doc.Docker.ExposePort(marathon.PortMapping{
 				ContainerPort: port.GetIntOr("containerPort", 0),
 				HostPort:      port.GetIntOr("hostPort", 0),
