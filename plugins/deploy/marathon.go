@@ -167,7 +167,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		health.Protocol = "TCP"
 		app.AddHealthCheck(*health)
 	} else {
-	  app.AddEnv("SERVICE_CHECK_TCP", "false")
+	  delete(*app.Env, "SERVICE_CHECK_TCP")
 	}
 
 	if _, err := marathonApi.UpdateApplication(app, false); err != nil {
