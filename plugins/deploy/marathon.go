@@ -146,7 +146,8 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 				app.AddEnv(fmt.Sprintf("SERVICE_%d_NAME", port.GetInt("containerPort")), fullName)
 			}
 
-			if len(ports) == 1 && port.GetIntOr("containerPort", 0) == 0 {
+			// if exists only default port definition — disable healthcheck
+			if len(ports) == 1 && port.GetIntOr("containerPort", 0) == 0 && port.GetIntOr("hostPort", 0) == 0 && port.GetStringOr("name", "") == "" {
 			  healthPort = ""
 			}
 		}
