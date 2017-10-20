@@ -34,14 +34,16 @@ tests:
   - run: "build.gradle --build-number=34"
     expect:
       build: ""
-      cmd: gradle %s -Pversion="2.1.34" --refresh-dependencies
+      cmd: gradle clean %s -Pversion="2.1.34" --refresh-dependencies
       envs: {}
       gradle: install
-      image: frekele/gradle:3.4.1-jdk8
+      image: frekele/gradle:4.2-jdk8
       shell: "/bin/sh -c '%s'"
       volumes:
         - "~/.gradle/caches:/root/.gradle/caches"
         - "~/.gradle/wrapper:/root/.gradle/wrapper"
+        - "~/.gradle/init.gradle:/root/.gradle/init.gradle"
+      docker-args: "--entrypoint=''"
       workdir: "${PWD}"
 
   - run: "build.docker-image --build-number=34"

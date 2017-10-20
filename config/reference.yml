@@ -99,11 +99,13 @@ build:
 
   gradle:
     <<: *build-docker
-    image: frekele/gradle:3.4.1-jdk8
+    image: frekele/gradle:4.2-jdk8
     volumes:
       - '~/.gradle/caches:/root/.gradle/caches'
       - '~/.gradle/wrapper:/root/.gradle/wrapper'
-    cmd: gradle %s -Pversion="{{ info.build-version }}" --refresh-dependencies
+      - '~/.gradle/init.gradle:/root/.gradle/init.gradle'
+    docker-args: "--entrypoint=''"
+    cmd: gradle clean %s -Pversion="{{ info.build-version }}" --refresh-dependencies
 
   node:
     <<: *build-docker
@@ -134,6 +136,7 @@ build:
 
   docker: &build-docker
     image: "{{ info.full-name }}"
+    docker-args: ""
     build: ""
     cmd: "test"
     shell: "/bin/sh -c '%s'"

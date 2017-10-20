@@ -47,9 +47,10 @@ func (p BuildDockerRun) Run(data manifest.Manifest) error {
 	}
 
 	return utils.RunCmd(
-		`docker run --rm %s %s -w /src %s %s`,
+		`docker run --rm %s %s -w /src %s %s %s`,
 		strings.Join(envs, " "),
 		strings.Join(volumes, " "),
+		data.GetString("docker-args"),
 		image,
 		fmt.Sprintf(data.GetString("shell"), strings.Join(cmds, " && ")),
 	)
