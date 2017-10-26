@@ -112,6 +112,7 @@ build:
     image: node:7
     volumes:
       - '~/.cache/yarn:/root/.cache/yarn'
+      - '~/.npm:/root/.npm'
     cmd: "%s"
 
   marathon:
