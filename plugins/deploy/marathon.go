@@ -166,6 +166,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 	if healthPort != "" {
 		health := marathon.NewDefaultHealthCheck()
 		health.Protocol = "TCP"
+		health.GracePeriodSeconds = 300
 		app.AddHealthCheck(*health)
 	} else {
 	  delete(*app.Env, "SERVICE_CHECK_TCP")
