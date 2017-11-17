@@ -21,7 +21,7 @@ func (p TestAutotest) Run(data manifest.Manifest) error {
 	}
 
 	if err := utils.RunCmd("rm -rf autotest && git clone --depth 1 --single-branch --recursive %s autotest", data.GetString("repo")); err != nil {
-		return fmt.Errorf("Error on clone test git repo: %v", err)
+		return fmt.Errorf("error on clone test git repo: %v", err)
 	}
 
 	envs := make(map[string]string, 0)

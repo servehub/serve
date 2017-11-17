@@ -302,6 +302,12 @@ test:
     current-env: "{{ vars.env }}"
     env: "qa"
 
+  component:
+    current-env: "{{ vars.env }}"
+    env: "qa"
+    name: "{{ info.name }}{{ info.feature-suffix }}"
+    compose: {}
+
 db:
   create:
     postgresql:
