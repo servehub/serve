@@ -5,7 +5,9 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"time"
 
+	"github.com/fatih/color"
 	"github.com/ghodss/yaml"
 	"github.com/servehub/serve/manifest"
 	"github.com/servehub/utils"
@@ -48,6 +50,14 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 
 	defer func() {
 		utils.RunCmd("docker-compose -p %s -f %s rm --force --stop -v", data.GetString("name"), tmpfile.Name())
+	}()
+
+	go func() {
+		select {
+		case <-time.After(5 * time.Minute):
+			color.Red("Timeout exceeded for tests, exit...")
+			utils.RunCmd("docker-compose -p %s -f %s stop --timeout 1", data.GetString("name"), tmpfile.Name())
+		}
 	}()
 
 	return utils.RunCmd("docker-compose -p %s -f %s up --remove-orphans --force-recreate --abort-on-container-exit", data.GetString("name"), tmpfile.Name())
