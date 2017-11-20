@@ -96,7 +96,9 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 	}
 
 	for _, port := range data.GetArray("ports") {
-		app.AddPortDefinition(marathon.PortDefinition{Name: port.GetStringOr("name", "")}.SetPort(port.GetIntOr("port", 0)))
+		portDef := marathon.PortDefinition{Name: port.GetStringOr("name", "")}
+		portDef.SetPort(port.GetIntOr("port", 0))
+		app.AddPortDefinition(portDef)
 	}
 
 	app.AddEnv("SERVICE_DEPLOY_TIME", time.Now().Format(time.RFC3339)) // force redeploy app

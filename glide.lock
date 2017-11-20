@@ -1,16 +1,16 @@
 hash: 5f0d4547f3394fd61176b524437120bc32a4872f53aca61418f462f44538878e
-updated: 2017-06-21T19:34:09.136652185+03:00
+updated: 2017-11-10T17:04:24.239293+03:00
 imports:
 - name: github.com/cenk/backoff
-  version: 5d150e7eec023ce7a124856b37c68e54b4050ac7
+  version: 309aa717adbf351e92864cbedf9cca0b769a4b5a
 - name: github.com/codegangsta/cli
-  version: cf33a9befefdd6c6ea1a236ab6d546e797a62cbf
+  version: 44cb242eeb4d76cc813fdc69ba5c4b224677e799
 - name: github.com/donovanhide/eventsource
-  version: 441a03aa37b3329bbb79f43de81914ea18724718
+  version: 3ed64d21fb0b6bd8b49bcfec08f3004daee8723d
 - name: github.com/fatih/color
   version: 62e9147c64a1ed519147b62a56a14e83e2be02c1
 - name: github.com/gambol99/go-marathon
-  version: 70411c820ff2d535db8146471b29687f9f87c68d
+  version: ec4a50170df729be7380d2797177dea832f41013
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/google/go-querystring
@@ -18,7 +18,7 @@ imports:
   subpackages:
   - query
 - name: github.com/hashicorp/consul
-  version: 50e11db5d861e7da667c8c85465aa0fabd9ef58e
+  version: a373c7357a577f10c68ee9af3afd414df06651fb
   subpackages:
   - api
 - name: github.com/hashicorp/go-cleanhttp
@@ -26,7 +26,7 @@ imports:
 - name: github.com/hashicorp/go-rootcerts
   version: 6bb64b370b90e7ef1fa532be9e591a81c3493e00
 - name: github.com/hashicorp/serf
-  version: 91fd53b1d3e624389ed9a295a3fa380e5c7b9dfc
+  version: c20a0b1b1ea9eb8168bcdec0116688fa9254e449
   subpackages:
   - coordinate
 - name: github.com/jteeuwen/go-bindata
@@ -61,7 +61,7 @@ imports:
   subpackages:
   - unix
 - name: gopkg.in/alecthomas/kingpin.v2
-  version: 7f0871f2e17818990e4eed73f9b5c2f429501228
+  version: 1087e65c9441605df944fb12c33f0fe7072d18ca
 - name: gopkg.in/yaml.v2
   version: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
 testImports: []

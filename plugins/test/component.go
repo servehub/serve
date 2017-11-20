@@ -42,5 +42,13 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 		return fmt.Errorf("error write to tmpfile: %v", err)
 	}
 
-	return utils.RunCmd("docker-compose -p %s -f %s up --force-recreate --abort-on-container-exit", data.GetString("name"), tmpfile.Name())
+	if err := utils.RunCmd("docker-compose -p %s -f %s pull --parallel", data.GetString("name"), tmpfile.Name()); err != nil {
+		return fmt.Errorf("error on pull new images for docker-compose: %v", err)
+	}
+
+	defer func() {
+		utils.RunCmd("docker-compose -p %s -f %s rm --force --stop -v", data.GetString("name"), tmpfile.Name())
+	}()
+
+	return utils.RunCmd("docker-compose -p %s -f %s up --remove-orphans --force-recreate --abort-on-container-exit", data.GetString("name"), tmpfile.Name())
 }
