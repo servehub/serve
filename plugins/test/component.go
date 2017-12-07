@@ -49,14 +49,14 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 	}
 
 	defer func() {
-		utils.RunCmd("docker-compose -p %s -f %s rm --force --stop -v", data.GetString("name"), tmpfile.Name())
+		utils.RunCmd("docker-compose -p %s -f %s down -v --remove-orphans", data.GetString("name"), tmpfile.Name())
 	}()
 
 	go func() {
 		select {
 		case <-time.After(5 * time.Minute):
 			color.Red("Timeout exceeded for tests, exit...")
-			utils.RunCmd("docker-compose -p %s -f %s stop --timeout 1", data.GetString("name"), tmpfile.Name())
+			utils.RunCmd("docker-compose -p %s -f %s down -v --remove-orphans", data.GetString("name"), tmpfile.Name())
 		}
 	}()
 
