@@ -109,7 +109,7 @@ build:
 
   node:
     <<: *build-docker
-    image: node:7
+    image: node:8
     volumes:
       - '~/.cache/yarn:/root/.cache/yarn'
       - '~/.npm:/root/.npm'

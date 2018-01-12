@@ -60,5 +60,5 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 		}
 	}()
 
-	return utils.RunCmd("docker-compose -p %s -f %s up --remove-orphans --force-recreate --abort-on-container-exit", data.GetString("name"), tmpfile.Name())
+	return utils.RunCmd("DOCKER_CLIENT_TIMEOUT=300 COMPOSE_HTTP_TIMEOUT=300 docker-compose -p %s -f %s up --abort-on-container-exit", data.GetString("name"), tmpfile.Name())
 }
