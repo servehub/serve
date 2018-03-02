@@ -52,9 +52,14 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 		utils.RunCmd("docker-compose -p %s -f %s down -v --remove-orphans", data.GetString("name"), tmpfile.Name())
 	}()
 
+	timeout, err := time.ParseDuration(data.GetString("timeout"))
+	if err != nil {
+		return fmt.Errorf("error parse timeout: %v", err)
+	}
+
 	go func() {
 		select {
-		case <-time.After(5 * time.Minute):
+		case <- time.After(timeout):
 			color.Red("Timeout exceeded for tests, exit...")
 			utils.RunCmd("docker-compose -p %s -f %s down -v --remove-orphans", data.GetString("name"), tmpfile.Name())
 		}

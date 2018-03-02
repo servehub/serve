@@ -307,6 +307,7 @@ test:
     env: "qa"
     name: "{{ info.name }}{{ info.feature-suffix }}"
     compose: {}
+    timeout: 10m
 
 db:
   create:
