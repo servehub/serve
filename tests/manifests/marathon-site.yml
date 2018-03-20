@@ -61,7 +61,7 @@ tests:
 
   - run: "build.docker-image --build-number=34 --branch=feature/new-design"
     expect:
-      image: registry-superman.superman.space/superman/web/rest-api-feature-new-design:v2.1.34
+      image: registry-superman.superman.space/superman/web/rest-api-new-design:v2.1.34
       tags: []
       workdir: "."
       name: ""
