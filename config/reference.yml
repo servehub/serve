@@ -8,7 +8,7 @@ info:
   feature ? {{ vars.branch }}:
      "": ""
      "master": ""
-     "feature-(?P<feature>.+)": "{{ match.feature | lower | replace('\\W|_', '-') }}"
+     "feature[-/](?P<feature>.+)": "{{ match.feature | lower | replace('\\W|_', '-') }}"
      "*": "{{ vars.branch | lower | replace('\\W|_', '-') }}"
 
   feature-suffix ? {{ info.feature }}:
