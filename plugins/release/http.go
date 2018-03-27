@@ -74,15 +74,21 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 
 		fields := make(map[string]string)
 		for k, v := range route.Unwrap().(map[string]interface{}) {
-			if k != "host" && k != "location" {
+			if k != "host" && k != "location" && k != "cache" {
 				fields[k] = fmt.Sprintf("%v", v)
 			}
+		}
+
+		var cache map[string]interface{} = nil
+		if route.Has("cache") {
+			cache = route.GetTree("cache").Unwrap().(map[string]interface{})
 		}
 
 		routes.Routes = append(routes.Routes, consulRoute{
 			Host:     route.GetString("host"),
 			Location: route.GetStringOr("location", ""),
 			Vars:     utils.MergeMaps(fields, routeVars),
+			Cache:    cache,
 		})
 	}
 
@@ -148,7 +154,8 @@ type consulRoutes struct {
 }
 
 type consulRoute struct {
-	Host     string            `json:"host"`
-	Location string            `json:"location,omitempty"`
-	Vars     map[string]string `json:"vars,omitempty"`
+	Host     string                 `json:"host"`
+	Location string                 `json:"location,omitempty"`
+	Vars     map[string]string      `json:"vars,omitempty"`
+	Cache    map[string]interface{} `json:"cache,omitempty"`
 }

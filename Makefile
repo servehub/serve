@@ -52,7 +52,7 @@ dist: clean build-configs
 
 	for GOOS in ${TARGET_OS}; do \
 		for GOARCH in ${TARGET_ARCH}; do \
-			GOOS=$$GOOS GOARCH=$$GOARCH SUFFIX=-v${VERSION}-$$GOOS-$$GOARCH make build-serve; \
+			GOOS=$$GOOS GOARCH=$$GOARCH SUFFIX=-v${VERSION}-$$GOOS-$$GOARCH make build-serve build-serve-tools; \
 		done \
 	done
 

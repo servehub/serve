@@ -27,7 +27,7 @@ func NginxTemplateContextCommand() cli.Command {
 			consul, _ := api.NewClient(api.DefaultConfig())
 
 			upstreams := make(map[string]map[string]map[string]interface{})
-			services := make(map[string]map[string][]map[string]string)
+			services := make(map[string]map[string][]map[string]interface{})
 			duplicates := make(map[string]string)
 
 			allServicesRoutes, _, err := consul.KV().List("services/routes/", nil)
@@ -69,11 +69,11 @@ func NginxTemplateContextCommand() cli.Command {
 						}
 
 						if _, ok := services[host]; !ok {
-							services[host] = make(map[string][]map[string]string, 0)
+							services[host] = make(map[string][]map[string]interface{}, 0)
 						}
 
 						if _, ok := services[host][location]; !ok {
-							services[host][location] = make([]map[string]string, 0)
+							services[host][location] = make([]map[string]interface{}, 0)
 						}
 
 						routeKeys := "-"
@@ -90,11 +90,12 @@ func NginxTemplateContextCommand() cli.Command {
 							continue
 						}
 
-						services[host][location] = append(services[host][location], map[string]string{
+						services[host][location] = append(services[host][location], map[string]interface{}{
 							"upstream":    upstream,
 							"routeKeys":   routeKeys,
 							"routeValues": routeValues,
 							"sortIndex":   strconv.Itoa(len(route.Vars)),
+							"cache":       route.Cache,
 						})
 					}
 				}
@@ -144,4 +145,5 @@ type consulRoute struct {
 	Host     string            `json:"host"`
 	Location string            `json:"location,omitempty"`
 	Vars     map[string]string `json:"vars,omitempty"`
+	Cache    map[string]string `json:"cache,omitempty"`
 }
