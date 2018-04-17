@@ -1,5 +1,5 @@
 hash: 5f0d4547f3394fd61176b524437120bc32a4872f53aca61418f462f44538878e
-updated: 2017-11-10T17:04:24.239293+03:00
+updated: 2018-04-17T18:46:49.28597+03:00
 imports:
 - name: github.com/cenk/backoff
   version: 309aa717adbf351e92864cbedf9cca0b769a4b5a

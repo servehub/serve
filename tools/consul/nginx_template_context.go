@@ -23,8 +23,24 @@ func NginxTemplateContextCommand() cli.Command {
 	return cli.Command{
 		Name:  "nginx-template-context",
 		Usage: "Collect and return data for consul-template",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "filter"},
+		},
 		Action: func(c *cli.Context) error {
 			consul, _ := api.NewClient(api.DefaultConfig())
+
+			filters := make(map[string]interface{})
+			for _, filter := range strings.Split(c.String("filter"), ",") {
+				if filter != "" {
+					fvs := strings.SplitN(filter, "=", 2)
+
+					if len(fvs) > 1 {
+						filters[fvs[0]] = strings.TrimSpace(fvs[1])
+					} else {
+						filters[fvs[0]] = true
+					}
+				}
+			}
 
 			upstreams := make(map[string]map[string]map[string]interface{})
 			services := make(map[string]map[string][]map[string]interface{})
@@ -59,6 +75,29 @@ func NginxTemplateContextCommand() cli.Command {
 
 				for _, route := range routes.Routes {
 					for _, host := range spacesRegex.Split(route.Host, -1) {
+
+						skipedByFilters := false
+
+						for fk, fv := range filters {
+							if fv == true {
+								if _, ok := route.Vars[fk]; !ok {
+									skipedByFilters = true
+									break
+								}
+							} else if vval, ok := route.Vars[fk]; !ok || vval != fv {
+								skipedByFilters = true
+								break
+							}
+
+							delete(route.Vars, fk)
+						}
+
+						if skipedByFilters {
+							break
+						}
+
+						delete(route.Vars, "public") // todo: remove hardcoded filter
+
 						location := route.Location
 						if location == "" {
 							location = "/"
@@ -96,6 +135,7 @@ func NginxTemplateContextCommand() cli.Command {
 							"routeValues": routeValues,
 							"sortIndex":   strconv.Itoa(len(route.Vars)),
 							"cache":       route.Cache,
+							"extra":       route.Extra,
 						})
 					}
 				}
@@ -146,4 +186,5 @@ type consulRoute struct {
 	Location string            `json:"location,omitempty"`
 	Vars     map[string]string `json:"vars,omitempty"`
 	Cache    map[string]string `json:"cache,omitempty"`
+	Extra    string            `json:"extra,omitempty"`
 }
