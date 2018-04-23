@@ -10,7 +10,7 @@ import (
 
 	"github.com/cenk/backoff"
 	"github.com/fatih/color"
-	marathon "github.com/gambol99/go-marathon"
+	"github.com/gambol99/go-marathon"
 
 	"github.com/servehub/serve/manifest"
 	"github.com/servehub/utils"
@@ -59,7 +59,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 	healthPort := ""
 	if len(data.GetArray("ports")) > 0 {
-	  healthPort = data.GetString("listen-port")
+		healthPort = data.GetString("listen-port")
 	}
 
 	portArgs := ""
@@ -130,10 +130,10 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		doc.Docker.SetForcePullImage(true)
 		doc.EmptyVolumes()
 
-    ports := data.GetArray("docker.ports")
-    if len(ports) == 0 {
-      healthPort = ""
-    }
+		ports := data.GetArray("docker.ports")
+		if len(ports) == 0 {
+			healthPort = ""
+		}
 
 		for _, port := range ports {
 			doc.Docker.ExposePort(marathon.PortMapping{
@@ -150,7 +150,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 			// if exists only default port definition — disable healthcheck
 			if len(ports) == 1 && port.GetIntOr("containerPort", 0) == 0 && port.GetIntOr("hostPort", 0) == 0 && port.GetStringOr("name", "") == "" {
-			  healthPort = ""
+				healthPort = ""
 			}
 		}
 
@@ -171,10 +171,13 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		health.GracePeriodSeconds = 300
 		app.AddHealthCheck(*health)
 	} else {
-	  delete(*app.Env, "SERVICE_CHECK_TCP")
+		delete(*app.Env, "SERVICE_CHECK_TCP")
 	}
 
-	if _, err := marathonApi.UpdateApplication(app, false); err != nil {
+	if err := backoff.Retry(func() error {
+		_, err := marathonApi.UpdateApplication(app, false)
+		return err
+	}, backoff.WithMaxTries(backoff.NewConstantBackOff(time.Second*3), 3)); err != nil {
 		color.Yellow("marathon <- %s", app)
 		return err
 	}
@@ -233,12 +236,22 @@ func (p DeployMarathon) Uninstall(data manifest.Manifest) error {
 
 	name := data.GetString("app-name")
 
-	if _, err := marathonApi.Application(name); err == nil {
-		if _, err := marathonApi.DeleteApplication(name, false); err != nil {
-			return err
+	if err := backoff.Retry(func() error {
+		if _, err := marathonApi.Application(name); err == nil {
+			if _, err := marathonApi.DeleteApplication(name, false); err != nil {
+				return err
+			}
+		} else {
+			if apierr, ok := err.(*marathon.APIError); ok && apierr.ErrCode == 404 {
+				log.Println(color.YellowString("Seems app `%s` doesnt exists in marathon! Error: `%v`", name, err))
+			} else {
+				return fmt.Errorf("Marathon could't return `%s` info! Error: `%v`", name, err)
+			}
 		}
-	} else {
-		log.Println(color.YellowString("App `%s` doesnt exists in marathon!", name))
+
+		return nil
+	}, backoff.WithMaxTries(backoff.NewConstantBackOff(time.Second*3), 3)); err != nil {
+		return err
 	}
 
 	return utils.DeletePluginData("deploy.marathon", name, data.GetString("consul-address"))
