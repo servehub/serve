@@ -25,6 +25,9 @@ manifest:
 
   release:
     - http:
+        defaults:
+          public: true
+
         routes:
           - host ? {{ vars.env }}:
               dev: "{{ info.feature-prefix }}api.superman.qa"
@@ -211,6 +214,8 @@ tests:
       name-prefix: superman/web/rest-api-v
       outdated-timeout-sec: 600
       route-vars: ''
+      defaults:
+        public: true
       routes:
         - host: api.superman.qa
       stage: staging
@@ -222,6 +227,8 @@ tests:
       name-prefix: superman/web/rest-api-new-design
       outdated-timeout-sec: 600
       route-vars: ''
+      defaults:
+        public: true
       routes:
         - host: new-design-api.superman.qa
       stage: ''

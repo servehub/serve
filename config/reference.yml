@@ -261,6 +261,7 @@ release:
     outdated-timeout-sec ? {{ vars.env }}: { qa: 60, "*": 600 }
     stage: "{{ vars.stage }}"
     route-vars: "{{ vars.route-vars }}"
+    defaults: {}
     routes: []
 
   kube-service:

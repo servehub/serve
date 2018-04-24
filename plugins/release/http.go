@@ -66,9 +66,19 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 		routeVars["stage"] = data.GetString("stage")
 	}
 
+	defaults := data.GetTree("defaults").Unwrap().(map[string]interface{})
+
 	// collect routes
 	routes := consulRoutes{}
 	for _, route := range data.GetArray("routes") {
+
+		// set default values
+		for k, v := range defaults {
+			if !route.Has(k) {
+				route.Set(k, v)
+			}
+		}
+
 		if !route.Has("host") {
 			log.Printf("Not found 'host': %s, skip...", route.String())
 			continue
