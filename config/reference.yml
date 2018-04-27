@@ -42,6 +42,9 @@ conf:
   kube:
     full-name: "{{ info.name | replace('\\W|_', '-') }}{{ info.feature-suffix | replace('\\W|_', '-') }}"
 
+  metronome:
+    address: metronome
+
   docker:
     registry: ""
     image: "{{ conf.docker.registry }}{{ info.category }}/{{ info.name }}{{ info.feature-suffix }}:v{{ info.build-version }}"
@@ -253,6 +256,22 @@ deploy:
       address: "{{ conf.consul.address }}"
       path: "services/secrets"
 
+  metronome:
+    id: "{{ info.name }}{{ info.feature-suffix }}"
+    metronome-address: "{{ conf.metronome.address }}"
+    cpu: 0.1
+    mem: 64
+    disk: 128
+    envs: {}
+    cmd: ""
+    docker:
+      image: "{{ conf.docker.image }}"
+    schedules:
+      - cron: "1 * * * *"
+        concurrency-policy: ALLOW
+        starting-deadline-seconds: 60
+        timezone: "Europe/Moscow"
+
 release:
   http:
     consul-address: "{{ conf.consul.address }}"
@@ -261,7 +280,9 @@ release:
     outdated-timeout-sec ? {{ vars.env }}: { qa: 60, "*": 600 }
     stage: "{{ vars.stage }}"
     route-vars: "{{ vars.route-vars }}"
-    defaults: {}
+    defaults:
+      public ? {{ vars.env }}:
+        "live": true
     routes: []
 
   kube-service:

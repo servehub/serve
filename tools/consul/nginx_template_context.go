@@ -135,6 +135,7 @@ func NginxTemplateContextCommand() cli.Command {
 							"routeValues": routeValues,
 							"sortIndex":   strconv.Itoa(len(route.Vars)),
 							"cache":       route.Cache,
+							"ssl":         route.Ssl,
 							"extra":       route.Extra,
 						})
 					}
@@ -186,5 +187,6 @@ type consulRoute struct {
 	Location string            `json:"location,omitempty"`
 	Vars     map[string]string `json:"vars,omitempty"`
 	Cache    map[string]string `json:"cache,omitempty"`
+	Ssl      map[string]string `json:"ssl,omitempty"`
 	Extra    string            `json:"extra,omitempty"`
 }

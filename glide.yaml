@@ -9,3 +9,4 @@ import:
   - package: github.com/cenk/backoff
   - package: github.com/valyala/fasttemplate
   - package: github.com/jteeuwen/go-bindata
+  - package: github.com/adobe-platform/go-metronome/metronome

@@ -1,8 +1,16 @@
-hash: 5f0d4547f3394fd61176b524437120bc32a4872f53aca61418f462f44538878e
-updated: 2018-04-17T18:46:49.28597+03:00
+hash: 789c2c9642c7a92ee393c0830f019e56b85b454cb4b292d7decfff77b5979534
+updated: 2018-04-27T12:53:28.815863+03:00
 imports:
+- name: github.com/adobe-platform/go-metronome
+  version: 58e096fb2116b1c69509b4e107f1c223776a3dc4
+  subpackages:
+  - metronome
+- name: github.com/behance/go-logrus
+  version: eb84da520d0bfecda7a9288107ec991b4ebcedb4
 - name: github.com/cenk/backoff
   version: 309aa717adbf351e92864cbedf9cca0b769a4b5a
+- name: github.com/ChannelMeter/iso8601duration
+  version: 8da3af7a2a61a4eb5ae9bddec06bf637fa9593da
 - name: github.com/codegangsta/cli
   version: 44cb242eeb4d76cc813fdc69ba5c4b224677e799
 - name: github.com/donovanhide/eventsource
