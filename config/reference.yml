@@ -272,6 +272,27 @@ deploy:
         starting-deadline-seconds: 60
         timezone: "Europe/Moscow"
 
+  copy-db:
+    enabled ? {{ vars.env }}-{{ info.feature }}: { "qa-.+": true }
+    from: postgres
+    to-suffix: "{{ info.feature-suffix | replace('\\W', '-') }}"
+    owner: postgres
+    purge: "{{ vars.purge }}"
+    create-command: |
+      docker exec compose_stolon-proxy_1 \
+        bash -c 'psql -U postgres -h 127.0.0.1 -p 25432 -lqt | grep -qw "{.to}" || \
+          (createdb -U postgres -h 127.0.0.1 -p 25432 -O {.owner} "{.to}" \
+          && pg_dump -U postgres -h 127.0.0.1 -p 25432 "{.from}" \
+          | psql -U postgres -h 127.0.0.1 -p 25432 "{.to}")'
+    purge-command: |
+      docker exec compose_stolon-proxy_1 \
+        psql -U postgres -h 127.0.0.1 -p 25432 -c \"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='{.to}'\" \
+          && docker exec compose_stolon-proxy_1 dropdb -U postgres -h 127.0.0.1 -p 25432 --if-exists '{.to}'
+    ssh:
+      host: "localhost"
+      user: root
+
+
 release:
   http:
     consul-address: "{{ conf.consul.address }}"
@@ -330,13 +351,6 @@ test:
     name: "{{ info.name }}{{ info.feature-suffix }}"
     compose: {}
     timeout: 10m
-
-db:
-  create:
-    postgresql:
-      purge: "{{ vars.purge }}"
-      ssh-user: ""
-      target: "feature_{{ info.name | replace('\\W', '_') }}{{ info.feature-suffix | replace('\\W', '_') }}"
 
 dashboard:
   kibana3:
