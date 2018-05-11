@@ -23,8 +23,6 @@ func (p DeployCopyDb) Run(data manifest.Manifest) error {
 		return nil
 	}
 
-	data.Set("to", data.GetString("from")+data.GetString("to-suffix"))
-
 	if data.GetBool("purge") {
 		return p.Purge(data)
 	} else {

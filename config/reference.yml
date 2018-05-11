@@ -275,7 +275,7 @@ deploy:
   copy-db:
     enabled ? {{ vars.env }}-{{ info.feature }}: { "qa-.+": true }
     from: postgres
-    to-suffix: "{{ info.feature-suffix | replace('\\W', '-') }}"
+    to: "{{ deploy.copy-db.from }}{{ info.feature-suffix | replace('\\W', '-') }}"
     owner: postgres
     purge: "{{ vars.purge }}"
     create-command: |
@@ -291,7 +291,6 @@ deploy:
     ssh:
       host: "localhost"
       user: root
-
 
 release:
   http:
