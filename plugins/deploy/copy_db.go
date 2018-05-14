@@ -36,9 +36,11 @@ func (p DeployCopyDb) Create(data manifest.Manifest) error {
 		return err
 	}
 
-	return utils.RunSingleSshCmd(
-		data.GetString("ssh.host"),
+	return utils.RunCmd(
+		`ssh -i %s -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null %s@%s "%s"`,
+		data.GetString("ssh.key"),
 		data.GetString("ssh.user"),
+		data.GetString("ssh.host"),
 		cmd,
 	)
 }
@@ -49,9 +51,11 @@ func (p DeployCopyDb) Purge(data manifest.Manifest) error {
 		return err
 	}
 
-	return utils.RunSingleSshCmd(
-		data.GetString("ssh.host"),
+	return utils.RunCmd(
+		`ssh -i %s -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null %s@%s "%s"`,
+		data.GetString("ssh.key"),
 		data.GetString("ssh.user"),
+		data.GetString("ssh.host"),
 		cmd,
 	)
 }
