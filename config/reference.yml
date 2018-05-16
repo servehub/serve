@@ -300,6 +300,7 @@ release:
     full-name: "{{ info.full-name }}"
     outdated-timeout-sec ? {{ vars.env }}: { qa: 60, "*": 600 }
     stage: "{{ vars.stage }}"
+    maintenance: "{{ vars.maintenance }}"
     route-vars: "{{ vars.route-vars }}"
     defaults:
       public ? {{ vars.env }}:

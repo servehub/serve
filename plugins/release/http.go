@@ -101,13 +101,18 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 			ssl = route.GetTree("ssl").Unwrap().(map[string]interface{})
 		}
 
+		extra := route.GetStringOr("extra", "")
+		if data.GetBool("maintenance") {
+			extra += "\n return 503; \n"
+		}
+
 		routes.Routes = append(routes.Routes, consulRoute{
 			Host:     route.GetString("host"),
 			Location: route.GetStringOr("location", ""),
 			Vars:     utils.MergeMaps(fields, routeVars),
 			Cache:    cache,
 			Ssl:      ssl,
-			Extra:    route.GetStringOr("extra", ""),
+			Extra:    extra,
 		})
 	}
 
