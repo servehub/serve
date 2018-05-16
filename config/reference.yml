@@ -303,8 +303,7 @@ release:
     maintenance: "{{ vars.maintenance }}"
     route-vars: "{{ vars.route-vars }}"
     defaults:
-      public ? {{ vars.env }}:
-        "live": true
+      public: true
     routes: []
 
   kube-service:
