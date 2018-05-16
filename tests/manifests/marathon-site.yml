@@ -214,6 +214,7 @@ tests:
       name-prefix: superman/web/rest-api-v
       outdated-timeout-sec: 600
       route-vars: ''
+      maintenance: ''
       defaults:
         public: true
       routes:
@@ -227,6 +228,7 @@ tests:
       name-prefix: superman/web/rest-api-new-design
       outdated-timeout-sec: 600
       route-vars: ''
+      maintenance: ''
       defaults:
         public: true
       routes:
