@@ -151,6 +151,9 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 		OuterLoop:
 			for _, route := range routes.Routes {
 				for _, oldRoute := range oldRoutes.Routes {
+					delete(route.Vars, "public") // ignore public filter
+					delete(oldRoute.Vars, "public")
+
 					if route.Host == oldRoute.Host && route.Location == oldRoute.Location && utils.MapsEqual(route.Vars, oldRoute.Vars) {
 						outdated := strings.TrimPrefix(existsRoute.Key, "services/routes/")
 						log.Println(color.GreenString("Found %s with the same routes %v. Remove it!", outdated, string(existsRoute.Value)))
