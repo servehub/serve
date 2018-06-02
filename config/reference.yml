@@ -43,7 +43,7 @@ conf:
     full-name: "{{ info.name | replace('\\W|_', '-') }}{{ info.feature-suffix | replace('\\W|_', '-') }}"
 
   metronome:
-    address: metronome
+    address: http://localhost:8082
 
   docker:
     registry: ""
