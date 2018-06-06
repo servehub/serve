@@ -17,6 +17,10 @@ func init() {
 type DeployMetronome struct{}
 
 func (p DeployMetronome) Run(data manifest.Manifest) error {
+	if !data.GetBool("enabled") {
+		return nil
+	}
+
 	config := metronome.NewDefaultConfig()
 	config.URL = data.GetString("metronome-address")
 
@@ -68,7 +72,7 @@ func (p DeployMetronome) Run(data manifest.Manifest) error {
 
 		schedule, err := client.CreateSchedule(jobReq.ID, schReq)
 
-		if err != nil && strings.Contains(err.Error(), "A schedule with id cms-0 already exists") {
+		if err != nil && strings.Contains(err.Error(), "A schedule with id "+schReq.ID+" already exists") {
 			updatedSchedule, err := client.UpdateSchedule(jobReq.ID, schReq.ID, schReq)
 
 			if err != nil {

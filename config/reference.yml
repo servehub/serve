@@ -257,6 +257,7 @@ deploy:
       path: "services/secrets"
 
   metronome:
+    enabled: true
     id: "{{ info.name }}{{ info.feature-suffix }}"
     metronome-address: "{{ conf.metronome.address }}"
     cpu: 0.1
