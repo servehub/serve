@@ -278,7 +278,8 @@ deploy:
     from: postgres
     to: "{{ deploy.copy-db.from }}{{ info.feature-suffix | replace('\\W', '-') }}"
     owner: postgres
-    purge: "{{ vars.purge }}"
+    app-name: "{{ conf.marathon.app-name }}"
+    consul-address: "{{ conf.consul.address }}"
     create-command: |
       docker exec compose_stolon-proxy_1 \
         bash -c 'psql -U postgres -h 127.0.0.1 -p 25432 -lqt | grep -qw "{.to}" || \

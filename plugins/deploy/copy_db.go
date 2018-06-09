@@ -36,13 +36,17 @@ func (p DeployCopyDb) Create(data manifest.Manifest) error {
 		return err
 	}
 
-	return utils.RunCmd(
+	if err = utils.RunCmd(
 		`ssh -i %s -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null %s@%s "%s"`,
 		data.GetString("ssh.key"),
 		data.GetString("ssh.user"),
 		data.GetString("ssh.host"),
 		cmd,
-	)
+	); err != nil {
+		return fmt.Errorf("Error on copy db: %v", err)
+	}
+
+	return utils.RegisterPluginData("deploy.copy-db", data.GetString("app-name"), data.String(), data.GetString("consul-address"))
 }
 
 func (p DeployCopyDb) Purge(data manifest.Manifest) error {
@@ -51,13 +55,17 @@ func (p DeployCopyDb) Purge(data manifest.Manifest) error {
 		return err
 	}
 
-	return utils.RunCmd(
+	if err = utils.RunCmd(
 		`ssh -i %s -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null %s@%s "%s"`,
 		data.GetString("ssh.key"),
 		data.GetString("ssh.user"),
 		data.GetString("ssh.host"),
 		cmd,
-	)
+	); err != nil {
+		return fmt.Errorf("Error on purge db copy: %v", err)
+	}
+
+	return utils.DeletePluginData("deploy.copy-db", data.GetString("app-name"), data.GetString("consul-address"))
 }
 
 func applyTemplate(cmd string, data interface{}) (string, error) {
