@@ -243,7 +243,7 @@ func (p DeployMarathon) Uninstall(data manifest.Manifest) error {
 				return err
 			}
 		} else {
-			if apierr, ok := err.(*marathon.APIError); ok && apierr.ErrCode == 404 {
+			if apierr, ok := err.(*marathon.APIError); ok && apierr.ErrCode == marathon.ErrCodeNotFound {
 				log.Println(color.YellowString("Seems app `%s` doesnt exists in marathon! Error: `%v`", name, err))
 			} else {
 				return fmt.Errorf("Marathon could't return `%s` info! Error: `%v`", name, err)
