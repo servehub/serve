@@ -107,7 +107,7 @@ func (m Manifest) GetArrayForce(path string) []interface{} {
 	out := make([]interface{}, 0)
 
 	arr, err := m.tree.Path(path).Children()
-	if err != nil {
+	if err != nil && m.tree.ExistsP(path) {
 		arr = append(arr, m.tree.Path(path))
 	}
 
