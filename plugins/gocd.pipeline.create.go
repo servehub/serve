@@ -177,7 +177,7 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 		return err
 	}
 
-	return goCdUnpause(resource + "/go/api/pipelines/" + name)
+	return nil
 }
 
 func goCdDelete(name string, env string, resource string, headers map[string]string) error {
