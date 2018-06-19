@@ -52,11 +52,11 @@ func main() {
 		return
 	}
 
-	pluginData, pluginDataExists := vars["plugin-data"]
+	pluginDataFile, pluginDataExists := vars["plugin-data"]
 
 	var manifestData *manifest.Manifest
 	if pluginDataExists {
-		manifestData = manifest.LoadJSON(pluginData)
+		manifestData = manifest.LoadJSON(pluginDataFile)
 	} else {
 		manifestData = manifest.Load(manifestFile, vars)
 	}

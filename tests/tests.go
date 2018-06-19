@@ -2,8 +2,8 @@ package tests
 
 import (
 	"fmt"
-	"testing"
 	"sync/atomic"
+	"testing"
 
 	"github.com/ghodss/yaml"
 
@@ -54,6 +54,6 @@ func loadTestData(data string, plugin manifest.Plugin) error {
 	if json, err := yaml.YAMLToJSON([]byte(data)); err != nil {
 		return fmt.Errorf("Parser error: %v", err)
 	} else {
-		return plugin.Run(*manifest.LoadJSON(string(json)))
+		return plugin.Run(*manifest.ParseJSON(string(json)))
 	}
 }

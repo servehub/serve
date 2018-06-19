@@ -178,7 +178,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		fmt.Printf("Creating marathon application %s...", app.ID)
 		_, err := marathonApi.UpdateApplication(app, false)
 		return err
-	}, backoff.WithMaxTries(backoff.NewConstantBackOff(time.Second*5), 3)); err != nil {
+	}, backoff.WithMaxRetries(backoff.NewConstantBackOff(time.Second*5), 3)); err != nil {
 		color.Yellow("marathon <- %s", app)
 		return err
 	}
@@ -251,7 +251,7 @@ func (p DeployMarathon) Uninstall(data manifest.Manifest) error {
 		}
 
 		return nil
-	}, backoff.WithMaxTries(backoff.NewConstantBackOff(time.Second*3), 3)); err != nil {
+	}, backoff.WithMaxRetries(backoff.NewConstantBackOff(time.Second*3), 3)); err != nil {
 		return err
 	}
 

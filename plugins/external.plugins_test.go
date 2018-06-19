@@ -2,6 +2,7 @@ package plugins
 
 import (
 	"testing"
+
 	"github.com/servehub/serve/tests"
 )
 

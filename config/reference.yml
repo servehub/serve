@@ -93,6 +93,16 @@ gocd:
                 shallow_clone: true
 
 build:
+  docker: &build-docker
+    image: "{{ info.full-name }}"
+    docker-args: ""
+    build: ""
+    cmd: "test"
+    shell: "/bin/sh -c '%s'"
+    workdir: "{{ conf.docker.workdir }}"
+    volumes: []
+    envs: {}
+
   sbt:
     <<: *build-docker
     image: 1science/sbt:0.13-oracle-jdk-8
@@ -137,16 +147,6 @@ build:
     login:
       user: ""
       password: ""
-
-  docker: &build-docker
-    image: "{{ info.full-name }}"
-    docker-args: ""
-    build: ""
-    cmd: "test"
-    shell: "/bin/sh -c '%s'"
-    workdir: "{{ conf.docker.workdir }}"
-    volumes: []
-    envs: {}
 
 deploy:
   marathon:

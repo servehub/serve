@@ -208,7 +208,16 @@ func Load(path string, vars map[string]string) *Manifest {
 	return &Manifest{tree}
 }
 
-func LoadJSON(json string) *Manifest {
+func LoadJSON(path string) *Manifest {
+	tree, err := gabs.ParseJSONFile(path)
+	if err != nil {
+		log.Fatalf("Error on load json file '%s': %v\n", path, err)
+	}
+
+	return &Manifest{tree}
+}
+
+func ParseJSON(json string) *Manifest {
 	tree, err := gabs.ParseJSON([]byte(json))
 	if err != nil {
 		log.Fatalf("Error on parse json '%s': %v\n", json, err)
