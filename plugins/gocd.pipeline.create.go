@@ -142,6 +142,9 @@ func goCdUnpause(resource string) error {
 		map[string]string{"Confirm": "true"}); err != nil {
 		return err
 	} else if resp.StatusCode != http.StatusOK {
+		if body, err := ioutil.ReadAll(resp.Body); err == nil {
+			log.Printf("Operation error body: %s", body)
+		}
 		return fmt.Errorf("Operation error: %s", resp.Status)
 	}
 	return nil
