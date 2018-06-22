@@ -112,6 +112,8 @@ tests:
       max-over-capacity: 0
       mem: 1024
       min-health-capacity: 0
+      expunge-after-seconds: 86400
+      inactive-after-seconds: 1200
       package-uri: []
       ports:
         - name: ''
@@ -156,6 +158,8 @@ tests:
       max-over-capacity: 0
       mem: 1024
       min-health-capacity: 0
+      expunge-after-seconds: 86400
+      inactive-after-seconds: 1200
       package-uri: []
       ports:
         - name: ''
@@ -200,6 +204,8 @@ tests:
       max-over-capacity: 0
       mem: 1024
       min-health-capacity: 0
+      expunge-after-seconds: 86400
+      inactive-after-seconds: 1200
       package-uri: []
       ports:
         - name: ''

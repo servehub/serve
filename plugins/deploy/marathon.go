@@ -45,6 +45,9 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 	minHealthCapacity := data.GetFloat("min-health-capacity")
 	maxOverCapacity := data.GetFloat("max-over-capacity")
 
+	inactiveAfterSeconds := data.GetFloat("inactive-after-seconds")
+	expungeAfterSeconds := data.GetFloat("expunge-after-seconds")
+
 	app := &marathon.Application{
 		User:                       data.GetString("user"),
 		BackoffSeconds:             &backoffSeconds,
@@ -54,6 +57,13 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		UpgradeStrategy: &marathon.UpgradeStrategy{
 			MinimumHealthCapacity: &minHealthCapacity,
 			MaximumOverCapacity:   &maxOverCapacity,
+		},
+		UnreachableStrategy: &marathon.UnreachableStrategy{
+			EnabledUnreachableStrategy: marathon.EnabledUnreachableStrategy{
+				InactiveAfterSeconds: &inactiveAfterSeconds,
+				ExpungeAfterSeconds:  &expungeAfterSeconds,
+			},
+			AbsenceReason: "",
 		},
 	}
 
