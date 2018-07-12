@@ -29,7 +29,7 @@ func NginxTemplateContextCommand() cli.Command {
 		Action: func(c *cli.Context) error {
 			consul, _ := api.NewClient(api.DefaultConfig())
 
-			filters := make(map[string]interface{})
+			filters := make(map[string]string)
 			for _, filter := range strings.Split(c.String("filter"), ",") {
 				if filter != "" {
 					fvs := strings.SplitN(filter, "=", 2)
@@ -37,7 +37,7 @@ func NginxTemplateContextCommand() cli.Command {
 					if len(fvs) > 1 {
 						filters[fvs[0]] = strings.TrimSpace(fvs[1])
 					} else {
-						filters[fvs[0]] = true
+						filters[fvs[0]] = "true"
 					}
 				}
 			}
@@ -79,12 +79,7 @@ func NginxTemplateContextCommand() cli.Command {
 						skipedByFilters := false
 
 						for fk, fv := range filters {
-							if fv == true {
-								if _, ok := route.Vars[fk]; !ok {
-									skipedByFilters = true
-									break
-								}
-							} else if vval, ok := route.Vars[fk]; !ok || vval != fv {
+							if vval, ok := route.Vars[fk]; !ok || vval != fv {
 								skipedByFilters = true
 								break
 							}
