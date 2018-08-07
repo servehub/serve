@@ -124,6 +124,10 @@ func NginxTemplateContextCommand() cli.Command {
 							continue
 						}
 
+						if route.Params == nil {
+							route.Params = make(map[string]interface{})
+						}
+
 						services[host][location] = append(services[host][location], map[string]interface{}{
 							"upstream":    upstream,
 							"routeKeys":   routeKeys,
@@ -132,6 +136,7 @@ func NginxTemplateContextCommand() cli.Command {
 							"cache":       route.Cache,
 							"ssl":         route.Ssl,
 							"extra":       route.Extra,
+							"params":      route.Params,
 						})
 					}
 				}
@@ -178,10 +183,11 @@ type consulRoutes struct {
 }
 
 type consulRoute struct {
-	Host     string            `json:"host"`
-	Location string            `json:"location,omitempty"`
-	Vars     map[string]string `json:"vars,omitempty"`
-	Cache    map[string]string `json:"cache,omitempty"`
-	Ssl      map[string]string `json:"ssl,omitempty"`
-	Extra    string            `json:"extra,omitempty"`
+	Host     string                 `json:"host"`
+	Location string                 `json:"location,omitempty"`
+	Vars     map[string]string      `json:"vars,omitempty"`
+	Cache    map[string]string      `json:"cache,omitempty"`
+	Ssl      map[string]string      `json:"ssl,omitempty"`
+	Extra    string                 `json:"extra,omitempty"`
+	Params   map[string]interface{} `json:"params,omitempty"`
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/servehub/utils"
 )
 
-var routeVarsExclude = []string{"host", "location", "cache", "extra", "ssl"}
+var routeVarsExclude = []string{"host", "location", "cache", "extra", "ssl", "stripPrefix", "redirectHttps"}
 
 func init() {
 	manifest.PluginRegestry.Add("release.http", ReleaseHttp{})
@@ -96,6 +96,16 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 			cache = route.GetTree("cache").Unwrap().(map[string]interface{})
 		}
 
+		var params = make(map[string]interface{})
+
+		if route.GetBool("stripPrefix") {
+			params["stripPrefix"] = true
+		}
+
+		if route.GetBool("redirectHttps") {
+			params["redirectHttps"] = true
+		}
+
 		var ssl map[string]interface{} = nil
 		if route.Has("ssl") {
 			ssl = route.GetTree("ssl").Unwrap().(map[string]interface{})
@@ -113,6 +123,7 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 			Cache:    cache,
 			Ssl:      ssl,
 			Extra:    extra,
+			Params:   params,
 		})
 	}
 
@@ -186,5 +197,6 @@ type consulRoute struct {
 	Vars     map[string]string      `json:"vars,omitempty"`
 	Cache    map[string]interface{} `json:"cache,omitempty"`
 	Ssl      map[string]interface{} `json:"ssl,omitempty"`
+	Params   map[string]interface{} `json:"params,omitempty"`
 	Extra    string                 `json:"extra,omitempty"`
 }
