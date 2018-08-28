@@ -120,6 +120,7 @@ tests:
           port: 0
       task-kill-grace-period-seconds: 60
       user: root
+      version: v2.1.34
 
   - run: "deploy.marathon --env=dev --build-number=42 --branch=new-design"
     expect:
@@ -166,6 +167,7 @@ tests:
           port: 0
       task-kill-grace-period-seconds: 60
       user: root
+      version: v2.1.42
 
   - run: "deploy.marathon --env=prod --build-number=126"
     expect:
@@ -212,6 +214,7 @@ tests:
           port: 0
       task-kill-grace-period-seconds: 60
       user: root
+      version: v2.1.126
 
   - run: "release.http --env=dev --build-number=126 --stage=staging"
     expect:

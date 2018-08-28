@@ -112,6 +112,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 	}
 
 	app.AddEnv("SERVICE_DEPLOY_TIME", time.Now().Format(time.RFC3339)) // force redeploy app
+	app.AddEnv("SERVICE_TAGS", data.GetString("version"))
 
 	for k, v := range data.GetMap("envs") {
 		app.AddEnv(k, strings.TrimSpace(fmt.Sprintf("%v", v.Unwrap())))
@@ -213,7 +214,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 	}
 
 	if err := backoff.Retry(func() error {
-		services, _, err := consulApi.Health().Service(fullName, "", true, nil)
+		services, _, err := consulApi.Health().Service(fullName, data.GetString("version"), true, nil)
 
 		if err != nil {
 			log.Println(color.RedString("Error in check health in consul: %v", err))

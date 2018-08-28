@@ -153,6 +153,7 @@ deploy:
     consul-address: "{{ conf.consul.address }}"
     marathon-address: "{{ conf.marathon.address }}"
     app-name: "{{ conf.marathon.app-name }}"
+    version: "v{{ info.build-version }}"
     package-uri: []
     instances: 1
     mem: 128
