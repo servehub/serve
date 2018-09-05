@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"regexp"
 	"sort"
+	"strings"
 
 	"github.com/servehub/serve/manifest"
 	"github.com/servehub/utils/gabs"
@@ -144,7 +145,12 @@ func goCdUnpause(resource string) error {
 	} else if resp.StatusCode != http.StatusOK {
 		if body, err := ioutil.ReadAll(resp.Body); err == nil {
 			log.Printf("Operation error body: %s", body)
+
+			if strings.Contains(string(body), "is already unpaused") {
+				return nil
+			}
 		}
+
 		return fmt.Errorf("Operation error: %s", resp.Status)
 	}
 	return nil
