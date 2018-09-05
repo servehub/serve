@@ -226,6 +226,7 @@ tests:
       maintenance: ''
       defaults:
         public: true
+        enabled: true
       routes:
         - host: api.superman.qa
       stage: staging
@@ -240,6 +241,7 @@ tests:
       maintenance: ''
       defaults:
         public: true
+        enabled: true
       routes:
         - host: new-design-api.superman.qa
       stage: ''
