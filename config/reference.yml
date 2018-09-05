@@ -308,6 +308,7 @@ release:
     maintenance: "{{ vars.maintenance }}"
     route-vars: "{{ vars.route-vars }}"
     defaults:
+      enabled: true
       public: true
     routes: []
 

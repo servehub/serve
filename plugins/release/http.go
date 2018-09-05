@@ -14,7 +14,7 @@ import (
 	"github.com/servehub/utils"
 )
 
-var routeVarsExclude = []string{"host", "location", "cache", "extra", "ssl", "stripPrefix", "redirectHttps"}
+var routeVarsExclude = []string{"host", "location", "cache", "extra", "ssl", "stripPrefix", "redirectHttps", "enabled"}
 
 func init() {
 	manifest.PluginRegestry.Add("release.http", ReleaseHttp{})
@@ -79,8 +79,8 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 			}
 		}
 
-		if !route.Has("host") {
-			log.Printf("Not found 'host': %s, skip...", route.String())
+		if !route.Has("host") || !route.GetBool("enabled") {
+			log.Printf("Not found 'host' or host disabled: %s, skip...", route.String())
 			continue
 		}
 
