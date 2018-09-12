@@ -400,6 +400,7 @@ dashboard:
           list:
             0: { "type": "time", "field": "@timestamp", "from": "now-3h", "to": "now", "mandate": "must", "active": true, "alias": "", "id": 0 }
             1: { "type": "field", "field": "service_tag", "query": "\"{{ dashboard.kibana3.title }}\"", "mandate": "must", "active": true, "alias": "", "id": 1 }
+            2: { "type": "field", "field": "level", "query": "ERROR WARN", "mandate": "must", "active": false, "alias": "", "id": 2 }
       rows:
         - title: Graph
           height: 200px
