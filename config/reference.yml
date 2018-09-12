@@ -396,7 +396,7 @@ dashboard:
             2: { "id": 2, "color": "#7EB26D", "alias": "INFO", "pin": false, "type": "lucene", "enable": true, "query": "level:INFO OR (NOT level:(DEBUG TRACE NOTICE ERROR INFO FATAL WARN WARNING))" }
             3: { "id": 3, "color": "#E0F9D7", "alias": "DEBUG", "pin": false, "type": "lucene", "enable": true, "query": "level:(DEBUG TRACE NOTICE)" }
         filter:
-          ids: [0, 1]
+          ids: [0, 1, 2]
           list:
             0: { "type": "time", "field": "@timestamp", "from": "now-3h", "to": "now", "mandate": "must", "active": true, "alias": "", "id": 0 }
             1: { "type": "field", "field": "service_tag", "query": "\"{{ dashboard.kibana3.title }}\"", "mandate": "must", "active": true, "alias": "", "id": 1 }
