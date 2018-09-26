@@ -257,7 +257,7 @@ deploy:
     env: "{{ vars.env }}"
     consul:
       address: "{{ conf.consul.address }}"
-      path: "services/secrets"
+      path: "services/secrets/{{ info.category }}/{{ info.name }}"
 
   metronome:
     enabled: true
