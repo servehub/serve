@@ -124,6 +124,13 @@ func NginxTemplateContextCommand() cli.Command {
 							continue
 						}
 
+						ssl := route.Ssl
+						if _, ok := duplicates[host+":ssl"]; !ok {
+							duplicates[host+":ssl"] = "exist"
+						} else {
+							ssl = nil
+						}
+
 						if route.Params == nil {
 							route.Params = make(map[string]interface{})
 						}
@@ -134,7 +141,7 @@ func NginxTemplateContextCommand() cli.Command {
 							"routeValues": routeValues,
 							"sortIndex":   strconv.Itoa(len(route.Vars)),
 							"cache":       route.Cache,
-							"ssl":         route.Ssl,
+							"ssl":         ssl,
 							"extra":       route.Extra,
 							"params":      route.Params,
 						})
