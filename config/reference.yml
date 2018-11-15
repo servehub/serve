@@ -285,7 +285,7 @@ deploy:
     consul-address: "{{ conf.consul.address }}"
     create-command: |
       docker exec compose_stolon-proxy_1 \
-        bash -c 'psql -U postgres -h 127.0.0.1 -p 25432 -lqt | grep -qw "{.to}" || \
+        bash -c 'psql -U postgres -h 127.0.0.1 -p 25432 -lqt | grep -qw " {.to} " || \
           (createdb -U postgres -h 127.0.0.1 -p 25432 -O {.owner} "{.to}" \
           && pg_dump -U postgres -h 127.0.0.1 -p 25432 "{.from}" \
           | psql -U postgres -h 127.0.0.1 -p 25432 "{.to}")'
@@ -417,7 +417,7 @@ dashboard:
           collapsable: true
           notice: false
           panels:
-            - { "title": "All events", "error": false, "span": 12, "editable": true, "group": [ "default" ], "type": "table", "size": 100, "pages": 5, "offset": 0, "sort": [ "@timestamp", "desc" ], "style": { "font-size": "9pt" }, "overflow": "min-height", "fields": [ "@timestamp", "level", "message" ], "localTime": true, "timeField": "@timestamp", "highlight": [], "sortable": true, "header": true, "paging": true, "spyable": true, "queries": { "mode": "all", "ids": [ 0 ] }, "field_list": false, "status": "Stable", "trimFactor": 500, "normTimes": true, "all_fields": true }
+            - { "title": "All events", "error": false, "span": 12, "editable": true, "group": [ "default" ], "type": "table", "size": 100, "pages": 5, "offset": 0, "sort": [ "@timestamp", "desc" ], "style": { "font-size": "9pt" }, "overflow": "min-height", "fields": [ "@timestamp", "level", "message" ], "localTime": true, "timeField": "@timestamp", "highlight": [], "sortable": true, "header": true, "paging": true, "spyable": true, "queries": { "mode": "all", "ids": [ 0 ] }, "field_list": false, "status": "Stable", "trimFactor": 600, "normTimes": true, "all_fields": true }
 
 monitoring:
   env: "{{ vars.env }}"
