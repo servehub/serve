@@ -73,7 +73,6 @@ func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 					"auto_update": true}})
 	}
 
-	body := data.GetTree("pipeline").String()
 	branch := data.GetString("branch")
 
 	m := false
@@ -104,10 +103,10 @@ func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 	}
 
 	if exist.StatusCode == http.StatusOK {
-		err = goCdUpdate(name, data.GetString("environment"), url, body,
+		err = goCdUpdate(name, data.GetString("environment"), url, data.GetTree("pipeline.pipeline").String(),
 			map[string]string{"If-Match": exist.Header.Get("ETag"), "Accept": "application/vnd.go.cd.v6+json"}, depends)
 	} else if exist.StatusCode == http.StatusNotFound {
-		err = goCdCreate(name, data.GetString("environment"), url, body,
+		err = goCdCreate(name, data.GetString("environment"), url, data.GetTree("pipeline").String(),
 			map[string]string{"Accept": "application/vnd.go.cd.v6+json"})
 	} else {
 		return fmt.Errorf("Operation error: %s", exist.Status)
@@ -140,7 +139,7 @@ func goCdCreate(name string, env string, resource string, body string, headers m
 
 func goCdUnpause(resource string) error {
 	if resp, err := goCdRequest("POST", resource+"/unpause", "",
-		map[string]string{"Confirm": "true"}); err != nil {
+		map[string]string{"X-GoCD-Confirm": "true", "Accept": "application/vnd.go.cd.v1+json"}); err != nil {
 		return err
 	} else if resp.StatusCode != http.StatusOK {
 		if body, err := ioutil.ReadAll(resp.Body); err == nil {
