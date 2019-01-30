@@ -187,7 +187,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 	if err := backoff.Retry(func() error {
 		fmt.Printf("Creating marathon application %s...", app.ID)
-		_, err := marathonApi.UpdateApplication(app, false)
+		_, err := marathonApi.UpdateApplication(app, true)
 		return err
 	}, backoff.WithMaxRetries(backoff.NewConstantBackOff(time.Second*5), 3)); err != nil {
 		color.Yellow("marathon <- %s", app)
@@ -245,7 +245,7 @@ func (p DeployMarathon) Uninstall(data manifest.Manifest) error {
 
 	if err := backoff.Retry(func() error {
 		if _, err := marathonApi.Application(name); err == nil {
-			if _, err := marathonApi.DeleteApplication(name, false); err != nil {
+			if _, err := marathonApi.DeleteApplication(name, true); err != nil {
 				return err
 			}
 		} else {

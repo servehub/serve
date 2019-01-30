@@ -417,7 +417,7 @@ dashboard:
           collapsable: true
           notice: false
           panels:
-            - { "title": "All events", "error": false, "span": 12, "editable": true, "group": [ "default" ], "type": "table", "size": 100, "pages": 5, "offset": 0, "sort": [ "@timestamp", "desc" ], "style": { "font-size": "9pt" }, "overflow": "min-height", "fields": [ "@timestamp", "level", "message" ], "localTime": true, "timeField": "@timestamp", "highlight": [], "sortable": true, "header": true, "paging": true, "spyable": true, "queries": { "mode": "all", "ids": [ 0 ] }, "field_list": false, "status": "Stable", "trimFactor": 600, "normTimes": true, "all_fields": true }
+            - { "title": "All events", "error": false, "span": 12, "editable": true, "group": [ "default" ], "type": "table", "size": 100, "pages": 5, "offset": 0, "sort": [ "@timestamp", "desc" ], "style": { "font-size": "9pt" }, "overflow": "min-height", "fields": [ "@timestamp", "level", "message" ], "localTime": true, "timeField": "@timestamp", "highlight": [], "sortable": true, "header": true, "paging": true, "spyable": true, "queries": { "mode": "all", "ids": [ 0 ] }, "field_list": false, "status": "Stable", "trimFactor": 700, "normTimes": true, "all_fields": true }
 
 monitoring:
   env: "{{ vars.env }}"
