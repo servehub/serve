@@ -358,6 +358,16 @@ test:
     compose: {}
     timeout: 10m
 
+notify:
+  event: "{{ vars.event }}"
+
+  channels:
+    example:
+      type: slack
+      color: "#2EB886"
+      message: "Hello, my {{ info.full-name }} v{{ info.build-version }}"
+      webhook: "$NOTIFY_DEPLOY_SLACK_WEBHOOK"
+
 dashboard:
   kibana3:
     purge: "{{ vars.purge }}"
