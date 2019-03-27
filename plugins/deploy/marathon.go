@@ -106,7 +106,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 	}
 
 	for _, port := range data.GetArray("ports") {
-		portDef := marathon.PortDefinition{Name: port.GetStringOr("name", "")}
+		portDef := marathon.PortDefinition{Name: port.GetStringOr("name", "default")}
 		portDef.SetPort(port.GetIntOr("port", 0))
 		app.AddPortDefinition(portDef)
 	}
@@ -150,7 +150,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 			doc.Docker.ExposePort(marathon.PortMapping{
 				ContainerPort: port.GetIntOr("containerPort", 0),
 				HostPort:      port.GetIntOr("hostPort", 0),
-				Name:          port.GetStringOr("name", ""),
+				Name:          port.GetStringOr("name", "default"),
 				Protocol:      "tcp",
 			})
 
@@ -181,6 +181,25 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		health.Protocol = "TCP"
 		health.GracePeriodSeconds = 300
 		app.AddHealthCheck(*health)
+
+		if data.GetStringOr("readiness.path", "") != "" {
+			readyStatuses := make([]int, 0)
+			for _, code := range data.GetArrayForce("readiness.statuses")  {
+				if i, err := strconv.Atoi(fmt.Sprintf("%v", code)); err == nil {
+					readyStatuses = append(readyStatuses, i)
+				} else {
+					log.Println(color.RedString("Error parse `readiness.statuses`: `%s` — %v", data.GetTree("readiness.statuses"), err))
+				}
+			}
+
+			app.AddReadinessCheck(marathon.ReadinessCheck{
+				Path: data.GetString("readiness.path"),
+				PortName: "default",
+				IntervalSeconds: data.GetInt("readiness.interval-seconds"),
+				TimeoutSeconds: data.GetInt("readiness.timeout-seconds"),
+				HTTPStatusCodesForReady: &readyStatuses,
+			})
+		}
 	} else {
 		delete(*app.Env, "SERVICE_CHECK_TCP")
 	}
