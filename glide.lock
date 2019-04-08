@@ -54,7 +54,7 @@ imports:
 - name: github.com/mitchellh/go-homedir
   version: 3864e76763d94a6df2f9960b16a20a33da9f9a66
 - name: github.com/servehub/utils
-  version: edb6680cf9880c104035167e392725184cba33b1
+  version: f550d4369a0fbbcf0c61fe5424f375fdb3ec5139
   subpackages:
   - gabs
   - mergemap
