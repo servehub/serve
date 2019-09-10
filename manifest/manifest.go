@@ -149,6 +149,8 @@ func (m Manifest) FindPlugins(plugin string) ([]PluginData, error) {
 						result = append(result, makePluginPair(plugin+"."+subplugin, data))
 						break
 					}
+				} else if len(res) == 0 && !PluginRegestry.Has(plugin) {
+					// skip subplugin with empty data
 				} else {
 					result = append(result, makePluginPair(plugin, item))
 				}

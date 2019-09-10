@@ -10,8 +10,12 @@ manifest:
         workdir: 7
         tags: [7, 7.10, latest]
 
+  deploy:
+    - sh ? {{ vars.env }}:
+        qa: echo 'hello world!'
+
 tests:
-  - run: "build --build-number=34"
+  - run: "build --env=stage --build-number=34"
     expect:
       image: registry.superman.space/common/nodejs:v1.0.34
       tags: [7, 7.10, latest]
@@ -23,3 +27,10 @@ tests:
       login:
         user: "${DOCKER_REGISTRY_USER}"
         password: "${DOCKER_REGISTRY_PASSWORD}"
+
+  - run: "deploy --env=qa --build-number=128"
+    expect:
+      sh: "echo 'hello world!'"
+
+  - run: "deploy --env=stage --build-number=128"
+    expect: {}
