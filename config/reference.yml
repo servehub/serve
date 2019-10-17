@@ -366,12 +366,17 @@ test:
 notify:
   event: "{{ vars.event }}"
 
+  consul:
+    address: "{{ conf.consul.address }}"
+    path: "services/data/{{ info.full-name }}/notify.deploy"
+
   channels:
     example:
       type: slack
       color: "#2EB886"
       message: "Hello, my {{ info.full-name }} v{{ info.build-version }}"
       webhook: "$NOTIFY_DEPLOY_SLACK_WEBHOOK"
+      changelog-for: ""
 
 dashboard:
   kibana3:

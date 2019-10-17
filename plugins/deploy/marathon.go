@@ -225,6 +225,8 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 	}
 
 	bc := backoff.NewExponentialBackOff()
+	bc.MaxInterval = 15 * time.Second
+
 	if maxBc, err := time.ParseDuration(data.GetString("backoff-max-elapsed-time")); err == nil {
 		bc.MaxElapsedTime = maxBc
 	} else {
