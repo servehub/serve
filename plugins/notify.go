@@ -54,7 +54,7 @@ func (p Notify) Run(data manifest.Manifest) error {
 					return err
 				}
 
-				gitCmd := fmt.Sprintf(`git log --pretty=format:" — %%an: %%s" %s^..%s`, latestRelease.CommitHash, changelogFor)
+				gitCmd := fmt.Sprintf(`git log --pretty=format:" — %%an: %%s" %s..%s`, latestRelease.CommitHash, changelogFor)
 				log.Println(color.YellowString("> %s", gitCmd))
 
 				out, err := exec.Command("/bin/bash", "-ec", gitCmd).CombinedOutput()
