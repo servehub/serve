@@ -43,7 +43,7 @@ func (p Notify) Run(data manifest.Manifest) error {
 			},
 		}
 
-		changelogFor := ch.GetString("changelog-for")
+		changelogFor := ch.GetStringOr("changelog-for", "")
 
 		if changelogFor != "" {
 			consul, _ := utils.ConsulClient(data.GetString("consul.address"))
