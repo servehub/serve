@@ -362,6 +362,7 @@ test:
     name: "{{ info.name }}{{ info.feature-suffix }}"
     compose: {}
     timeout: 10m
+    check-file-exist: ""
 
 notify:
   event: "{{ vars.event }}"

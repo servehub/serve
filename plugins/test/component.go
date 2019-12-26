@@ -44,7 +44,12 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 		return fmt.Errorf("error write to tmpfile: %v", err)
 	}
 
-	if err := utils.RunCmd("docker-compose -p %s -f %s pull --parallel", data.GetString("name"), tmpfile.Name()); err != nil {
+	checkFile := data.GetStringOr("check-file-exist", "")
+	if checkFile != "" {
+		os.Remove(checkFile)
+	}
+
+	if err := utils.RunCmd("docker-compose -p %s -f %s pull", data.GetString("name"), tmpfile.Name()); err != nil {
 		return fmt.Errorf("error on pull new images for docker-compose: %v", err)
 	}
 
@@ -65,5 +70,15 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 		}
 	}()
 
-	return utils.RunCmd("DOCKER_CLIENT_TIMEOUT=300 COMPOSE_HTTP_TIMEOUT=300 docker-compose -p %s -f %s up --abort-on-container-exit", data.GetString("name"), tmpfile.Name())
+	if res := utils.RunCmd("DOCKER_CLIENT_TIMEOUT=300 COMPOSE_HTTP_TIMEOUT=300 docker-compose -p %s -f %s up --abort-on-container-exit", data.GetString("name"), tmpfile.Name()); res != nil {
+		return res
+	}
+
+	if checkFile != "" {
+		if _, err := os.Stat(checkFile); os.IsNotExist(err) {
+	    return fmt.Errorf("check file not exist! %s", checkFile)
+		}
+	}
+
+	return nil
 }
