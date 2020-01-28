@@ -38,7 +38,7 @@ build-serve:
 build-serve-tools:
 	go build -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve-tools${SUFFIX} tools/cmd.go
 
-install: build-configs build-serve
+install: build-configs build-serve build-serve-tools
 	for f in serve serve-tools; do \
 		if [ -f ${DEST}/$$f ]; then cp ${DEST}/$$f ${GOPATH}/bin/; fi \
 	done
