@@ -317,6 +317,13 @@ release:
       public: true
     routes: []
 
+  tcp:
+    consul-address: "{{ conf.consul.address }}"
+    full-name: "{{ info.full-name }}"
+    public: true
+    port: ""
+    protocol: ""
+
   kube-service:
     name: "{{ conf.kube.full-name }}"
     ports: [port: 80]
