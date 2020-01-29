@@ -148,6 +148,14 @@ build:
       user: ""
       password: ""
 
+  notify:
+    env: "{{ vars.env }}"
+    event: build
+    message: "{{ vars.message }}"
+    build-number: "{{ vars.build-number }}"
+    changelog-for: ""
+    manifest: "{{ vars.manifest }}"
+
 deploy:
   marathon:
     consul-address: "{{ conf.consul.address }}"
@@ -302,6 +310,14 @@ deploy:
       host: localhost
       user: root
       key: "/etc/serve/copy_db_ssh_key"
+
+  notify:
+    env: "{{ vars.env }}"
+    event: deploy
+    message: "{{ vars.message }}"
+    build-number: "{{ vars.build-number }}"
+    changelog-for: ""
+    manifest: "{{ vars.manifest }}"
 
 release:
   http:
