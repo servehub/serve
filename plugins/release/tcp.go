@@ -50,15 +50,9 @@ func (p ReleaseTcp) Run(data manifest.Manifest) error {
 		return err
 	}
 
-	routeVars := make(map[string]string, 1)
-	if data.Has("public") {
-		routeVars["public"] = data.GetString("public")
-	}
-
 	tcpJson, err := json.MarshalIndent(consulTcpRoute{
 		Port:     data.GetInt("port"),
 		Protocol: data.GetString("protocol"),
-		Vars:     routeVars,
 	}, "", "  ")
 
 	if err != nil {
@@ -78,5 +72,4 @@ func (p ReleaseTcp) Run(data manifest.Manifest) error {
 type consulTcpRoute struct {
 	Port     int               `json:"port"`
 	Protocol string            `json:"protocol"`
-	Vars     map[string]string `json:"vars,omitempty"`
 }

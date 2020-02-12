@@ -336,7 +336,6 @@ release:
   tcp:
     consul-address: "{{ conf.consul.address }}"
     full-name: "{{ info.full-name }}"
-    public: true
     port: ""
     protocol: ""
 
