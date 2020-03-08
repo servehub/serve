@@ -127,6 +127,7 @@ build:
       - '${PWD}:/usr/src'
     cmd: ''
     shell: '%s'
+    docker-args: '--user="$(id -u):$(id -g)"'
     properties: |
       sonar.projectKey={{ info.category }}/{{ info.name }}
       sonar.sourceEncoding=UTF-8
