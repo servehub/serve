@@ -132,6 +132,7 @@ build:
       sonar.projectKey={{ info.category }}/{{ info.name }}
       sonar.sourceEncoding=UTF-8
       sonar.projectVersion={{ info.build-version }}
+      sonar.java.binaries=build/classes
     envs:
       SONAR_HOST_URL: https://localhost:9000
       SONAR_TOKEN: xxx123
