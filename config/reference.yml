@@ -120,6 +120,21 @@ build:
     docker-args: "--entrypoint=''"
     cmd: gradle clean %s -Pversion="{{ info.build-version }}" --refresh-dependencies
 
+  sonarqube:
+    <<: *build-docker
+    image: sonarsource/sonar-scanner-cli
+    volumes:
+      - '${PWD}:/usr/src'
+    cmd: ''
+    shell: '%s'
+    properties: |
+      sonar.projectKey={{ info.category }}/{{ info.name }}
+      sonar.sourceEncoding=UTF-8
+      sonar.projectVersion={{ info.build-version }}
+    envs:
+      SONAR_HOST_URL: https://localhost:9000
+      SONAR_TOKEN: xxx123
+
   node:
     <<: *build-docker
     image: node:8
