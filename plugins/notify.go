@@ -59,7 +59,17 @@ func (p Notify) Run(data manifest.Manifest) error {
 
 				out, err := exec.Command("/bin/bash", "-ec", gitCmd).CombinedOutput()
 				if err != nil {
-					return fmt.Errorf("%s", out)
+					if strings.Contains(err.Error(), "fatal: Invalid revision range") {
+						if err2 := exec.Command("/bin/bash", "-ec", "git fetch --depth=100").Run(); err2 != nil {
+							return fmt.Errorf("%s", out)
+						}
+
+						out, err = exec.Command("/bin/bash", "-ec", gitCmd).CombinedOutput()
+					}
+
+					if err != nil {
+						return fmt.Errorf("%s", out)
+					}
 				}
 
 				attachments = append(attachments, map[string]string{
