@@ -12,7 +12,7 @@ import (
 func DeregisterCommand() cli.Command {
 	return cli.Command{
 		Name:  "deregister",
-		Usage: "Deregister all unhealth services on cluster",
+		Usage: "Deregister all unhealthy services on cluster",
 		Subcommands: []cli.Command{
 			{
 				Name: "service",
@@ -50,8 +50,8 @@ func DeregisterCommand() cli.Command {
 				},
 			},
 			{
-				Name:  "unhealth",
-				Usage: "Deregister all unhealth services on cluster",
+				Name:  "unhealthy",
+				Usage: "Deregister all unhealthy services on cluster",
 				Flags: []cli.Flag{
 					cli.BoolFlag{Name: "dry-run"},
 				},
