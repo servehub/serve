@@ -212,7 +212,7 @@ deploy:
       network: BRIDGE
       parameters: {}
       ports:
-        - { containerPort: 0, hostPort: 0, name: "default" }
+        - { containerPort: 8080, hostPort: 0, name: "default" }
       volumes: []
     envs: {}
     environment:
