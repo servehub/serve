@@ -33,10 +33,10 @@ test-manifests: build-configs build-serve build-serve-tools
 	done
 
 build-serve:
-	go build -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve${SUFFIX} serve.go
+	go build -trimpath -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve${SUFFIX} serve.go
 
 build-serve-tools:
-	go build -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve-tools${SUFFIX} tools/cmd.go
+	go build -trimpath -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve-tools${SUFFIX} tools/cmd.go
 
 install: build-configs build-serve build-serve-tools
 	for f in serve serve-tools; do \
