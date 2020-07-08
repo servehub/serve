@@ -49,7 +49,8 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 
 	cacheFrom := ""
 	if len(tags) == 0 {
-		tags = []string{image}
+		tags = []string{image, fmt.Sprintf("%s:%v", prefix, "latest")}
+		cacheFrom = "--cache-from=" + tags[1]
 	} else {
 		cacheFrom = "--cache-from=" + tags[0]
 	}
