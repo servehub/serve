@@ -400,6 +400,7 @@ test:
     env: "qa"
     name: "{{ info.name }}{{ info.feature-suffix }}"
     compose: {}
+    components: []
     timeout: 10m
     check-file-exist: ""
 

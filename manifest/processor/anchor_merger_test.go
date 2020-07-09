@@ -28,12 +28,15 @@ deploy:
 			yaml: `---
 vars: &v
   env: qa
+  test: 1
 deploy: &d
   <<: *v
+  new-data: 2
 release:
-  <<: *d`,
+  <<: *d
+  env: live`,
 			in:     "",
-			expect: `{"deploy":{"env":"qa"},"release":{"env":"qa"},"vars":{"env":"qa"}}`,
+			expect: `{"deploy":{"env":"qa","new-data":2,"test":1},"release":{"env":"live","new-data":2,"test":1},"vars":{"env":"qa","test":1}}`,
 		},
 	},
 	)

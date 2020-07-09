@@ -11,6 +11,7 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/servehub/serve/manifest"
 	"github.com/servehub/utils"
+	"github.com/servehub/utils/mergemap"
 )
 
 func init() {
@@ -23,6 +24,15 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 	if data.GetString("env") != data.GetString("current-env") {
 		log.Printf("No component test found for `%s`.\n", data.GetString("current-env"))
 		return nil
+	}
+
+	for i, multiComponent := range data.GetArray("components") {
+		component := manifest.ParseJSON(data.GetTree("compose.services.component").String())
+		merged, _ := mergemap.Merge(component.Unwrap().(map[string]interface{}), multiComponent.Unwrap().(map[string]interface{}))
+		name      := fmt.Sprintf("component-%d", i + 2)
+
+		data.Set("compose.services." + name, merged)
+		data.ArrayAppend("compose.services.tests.depends_on", name)
 	}
 
 	bytes, err := yaml.Marshal(data.GetTree("compose").Unwrap())
