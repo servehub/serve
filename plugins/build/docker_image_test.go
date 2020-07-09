@@ -20,8 +20,9 @@ func TestDockerImageBuild(t *testing.T) {
 		        password: ""
 				`,
 				Expects: []string{
-					"docker build --pull -t registry.superman.space/common/node:v1.0.34  .",
+					"docker build --pull -t registry.superman.space/common/node:v1.0.34 -t registry.superman.space/common/node:latest --cache-from=registry.superman.space/common/node:latest .",
 					"docker push registry.superman.space/common/node:v1.0.34",
+					"docker push registry.superman.space/common/node:latest",
 				},
 			},
 
@@ -141,8 +142,9 @@ func TestDockerImageBuild(t *testing.T) {
 				`,
 				Expects: []string{
 					`docker login -u "${DOCKER_REGISTRY_USER}" -p "${DOCKER_REGISTRY_PASSWORD}" registry.superman.space`,
-					"docker build --pull -t registry.superman.space/common/node:v1.0.34  .",
+					"docker build --pull -t registry.superman.space/common/node:v1.0.34 -t registry.superman.space/common/node:latest --cache-from=registry.superman.space/common/node:latest .",
 					"docker push registry.superman.space/common/node:v1.0.34",
+					"docker push registry.superman.space/common/node:latest",
 				},
 			},
 		},

@@ -158,7 +158,6 @@ build:
     name: ""
     category: ""
     tags: []
-    add-latest: false
     workdir: "."
     build-args: "--pull"
     no-push: "{{ vars.no-push }}"
