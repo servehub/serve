@@ -14,7 +14,7 @@ import (
 	"github.com/servehub/utils"
 )
 
-var routeVarsExclude = []string{"host", "location", "cache", "extra", "ssl", "stripPrefix", "redirectHttps", "enabled"}
+var routeVarsExclude = []string{"host", "location", "cache", "extra", "ssl", "stripPrefix", "redirectHttps", "enabled", "hostAliases"}
 
 func init() {
 	manifest.PluginRegestry.Add("release.http", ReleaseHttp{})
@@ -104,6 +104,14 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 
 		if route.GetBool("redirectHttps") {
 			params["redirectHttps"] = true
+		}
+
+		if route.Has("hostAliases") {
+			aliases := ""
+			for _, v := range data.GetArrayForce("hostAliases") {
+				aliases = fmt.Sprintf("%s %s", aliases, v)
+			}
+			params["hostAliases"] = aliases
 		}
 
 		var ssl map[string]interface{} = nil
