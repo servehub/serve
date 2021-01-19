@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/consul/api"
 
 	"github.com/servehub/utils"
+	"github.com/servehub/utils/mergemap"
 )
 
 var upstreamNameRegex = regexp.MustCompile("[^\\w]+")
@@ -44,6 +45,7 @@ func NginxTemplateContextCommand() cli.Command {
 
 			upstreams := make(map[string]map[string]map[string]interface{})
 			services := make(map[string]map[string][]map[string]interface{})
+			hostsParams := make(map[string]map[string]interface{})
 			duplicates := make(map[string]string)
 
 			allServicesRoutes, _, err := consul.KV().List("services/routes/", nil)
@@ -135,6 +137,14 @@ func NginxTemplateContextCommand() cli.Command {
 							route.Params = make(map[string]interface{})
 						}
 
+						if _, ok := hostsParams[host]; !ok {
+							hostsParams[host] = make(map[string]interface{}, 0)
+						}
+
+						if res, err := mergemap.Merge(hostsParams[host], route.Params); err == nil {
+							hostsParams[host] = res
+						}
+
 						services[host][location] = append(services[host][location], map[string]interface{}{
 							"upstream":    upstream,
 							"routeKeys":   routeKeys,
@@ -159,6 +169,7 @@ func NginxTemplateContextCommand() cli.Command {
 			out, _ := json.MarshalIndent(map[string]interface{}{
 				"upstreams": upstreams,
 				"services":  services,
+				"hostsParams": hostsParams,
 			}, "", "  ")
 
 			fmt.Fprintln(os.Stdout, string(out))
