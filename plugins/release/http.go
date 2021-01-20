@@ -107,11 +107,13 @@ func (p ReleaseHttp) Run(data manifest.Manifest) error {
 		}
 
 		if route.Has("hostAliases") {
-			aliases := ""
-			for _, v := range data.GetArrayForce("hostAliases") {
-				aliases = fmt.Sprintf("%s %s", aliases, v)
+			aliases := make([]string, 0)
+			for _, v := range route.GetArrayForce("hostAliases") {
+				aliases = append(aliases, fmt.Sprintf("%s", v))
 			}
-			params["hostAliases"] = aliases
+			if len(aliases) != 0 {
+				params["hostAliases"] = strings.Join(aliases, " ")
+			}
 		}
 
 		var ssl map[string]interface{} = nil
