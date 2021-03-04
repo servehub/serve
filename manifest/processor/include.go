@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -41,7 +42,7 @@ func (in Include) Process(tree *gabs.Container) error {
 				}
 
 				if err := tree.WithFallbackYamlFile(file); err != nil {
-					return err
+					return fmt.Errorf("Error on parse %s: %s", file, err)
 				}
 			}
 		}
@@ -50,10 +51,14 @@ func (in Include) Process(tree *gabs.Container) error {
 	if files, err := filepath.Glob(path + "/conf.d/*.yml"); err == nil {
 		for _, file := range files {
 			if err := tree.WithFallbackYamlFile(file); err != nil {
-				return err
+				return fmt.Errorf("Error on parse %s: %s", file, err)
 			}
 		}
 	}
 
-	return tree.WithFallbackYaml(config.MustAsset("config/reference.yml"))
+	if err := tree.WithFallbackYaml(config.MustAsset("config/reference.yml")); err != nil {
+		return fmt.Errorf("Error on parse reference.yml: %s", err)
+	}
+
+	return nil
 }

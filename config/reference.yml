@@ -3,21 +3,28 @@ info:
   version: "0.0"
   description: "{{ info.name }}"
 
-  build-version: "{{ info.version }}.{{ vars.build-number }}"
+  build-version ? {{ vars.branch }}:
+    "^hotfix[-/].+": "{{ info.version }}.{{ vars.build-number }}-{{ vars.branch | lower | replace('\\W|_', '-') }}"
+    "*": "{{ info.version }}.{{ vars.build-number }}"
+
+  hotfix-suffix ? {{ vars.branch }}:
+    "^hotfix[-/].+": "-{{ vars.branch | lower | replace('\\W|_', '-') }}"
+    "*": ""
 
   feature ? {{ vars.branch }}:
-     "": ""
-     "master": ""
-     "feature[-/](?P<feature>.+)": "{{ match.feature | lower | replace('\\W|_', '-') }}"
-     "*": "{{ vars.branch | lower | replace('\\W|_', '-') }}"
+    "": ""
+    "master": ""
+    "^hotfix[-/].+": ""
+    "^feature[-/](?P<feature>.+)": "{{ match.feature | lower | replace('\\W|_', '-') }}"
+    "*": "{{ vars.branch | lower | replace('\\W|_', '-') }}"
 
   feature-suffix ? {{ info.feature }}:
-     "": ""
-     "*": "-{{ info.feature }}"
+    "": ""
+    "*": "-{{ info.feature }}"
 
   feature-prefix ? {{ info.feature }}:
-     "": ""
-     "*": "{{ info.feature }}-"
+    "": ""
+    "*": "{{ info.feature }}-"
 
   full-name: "{{ info.category }}/{{ info.name }}{{ info.feature-suffix }}"
 
@@ -53,7 +60,7 @@ conf:
   gocd:
     api-url: https://localhost:8154
     environment: dev
-    pipeline-name: "{{ info.name }}{{ info.feature-suffix }}"
+    pipeline-name: "{{ info.name }}{{ info.feature-suffix }}{{ info.hotfix-suffix }}"
     template ? {{ info.feature }}:
       "": "serve-service-tpl"
       "*": "serve-featured-tpl"
@@ -339,7 +346,9 @@ deploy:
 release:
   http:
     consul-address: "{{ conf.consul.address }}"
-    name-prefix: "{{ info.full-name }}"
+    name-prefix ? {{ info.feature }}:
+      "": "{{ info.full-name }}-v"
+      "*": "{{ info.full-name }}"
     full-name: "{{ info.full-name }}"
     outdated-timeout-sec ? {{ vars.env }}: { qa: 60, "*": 600 }
     stage: "{{ vars.stage }}"
@@ -422,7 +431,7 @@ notify:
 dashboard:
   kibana3:
     purge: "{{ vars.purge }}"
-    enabled: true
+    enabled ? "{{ info.feature }}{{ info.hotfix-suffix }}": { "": true, "*": false }
     force-recreate: "{{ vars.force }}"
     user: guest
     group: guest
@@ -481,6 +490,7 @@ dashboard:
             - { "title": "All events", "error": false, "span": 12, "editable": true, "group": [ "default" ], "type": "table", "size": 100, "pages": 5, "offset": 0, "sort": [ "@timestamp", "desc" ], "style": { "font-size": "9pt" }, "overflow": "min-height", "fields": [ "@timestamp", "level", "message" ], "localTime": true, "timeField": "@timestamp", "highlight": [], "sortable": true, "header": true, "paging": true, "spyable": true, "queries": { "mode": "all", "ids": [ 0 ] }, "field_list": false, "status": "Stable", "trimFactor": 800, "normTimes": true, "all_fields": true }
 
 monitoring:
+  enabled ? "{{ info.feature }}{{ info.hotfix-suffix }}": { "": true, "*": false }
   env: "{{ vars.env }}"
 
   consul:

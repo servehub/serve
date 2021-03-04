@@ -3,6 +3,7 @@ package monitoring
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
 
@@ -19,6 +20,11 @@ var nameRegepx = regexp.MustCompile(`[^a-z0-9-]`)
 type MonitoringRun struct{}
 
 func (p MonitoringRun) Run(data manifest.Manifest) error {
+	if !data.GetBool("enabled") {
+		log.Println("Monitoring for this service not enabled!")
+		return nil
+	}
+
 	consul, err := utils.ConsulClient(data.GetString("consul.address"))
 	consulPath := data.GetString("consul.path")
 	if err != nil {
