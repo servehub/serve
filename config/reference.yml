@@ -386,6 +386,7 @@ release:
       apiVersion: extensions/v1beta1
 
 outdated:
+  enabled ? {{ info.hotfix-suffix }}: { "": true, "*": false }
   consul-address: "{{ conf.consul.address }}"
   full-name: "{{ info.full-name }}"
 

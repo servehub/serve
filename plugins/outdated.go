@@ -3,6 +3,7 @@ package plugins
 import (
 	"github.com/servehub/serve/manifest"
 	"github.com/servehub/utils"
+	"log"
 )
 
 func init() {
@@ -12,6 +13,11 @@ func init() {
 type Outdated struct{}
 
 func (p Outdated) Run(data manifest.Manifest) error {
+	if !data.GetBool("enabled") {
+		log.Println("Outdated disabled for this service!")
+		return nil
+	}
+
 	consul, err := utils.ConsulClient(data.GetString("consul-address"))
 	if err != nil {
 		return err
