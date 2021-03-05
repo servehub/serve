@@ -263,5 +263,6 @@ tests:
 
   - run: "outdated --env=dev --build-number=126 --branch=new-design"
     expect:
+      enabled: true
       consul-address: "consul.superman.space"
       full-name: "superman/web/rest-api-new-design"

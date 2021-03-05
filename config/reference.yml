@@ -425,7 +425,7 @@ notify:
     example:
       type: slack
       color: "#2EB886"
-      message: "Hello, my {{ info.full-name }} v{{ info.build-version }}"
+      message: "Hello, my {{ info.full-name }} v{{ info.build-version }}{{ info.hotfix-suffix }}"
       webhook: "$NOTIFY_DEPLOY_SLACK_WEBHOOK"
       changelog-for: ""
 
