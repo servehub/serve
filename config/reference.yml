@@ -61,8 +61,10 @@ conf:
     api-url: https://localhost:8154
     environment: dev
     pipeline-name: "{{ info.name }}{{ info.feature-suffix }}{{ info.hotfix-suffix }}"
-    template ? {{ info.feature }}:
-      "": "serve-service-tpl"
+    default-template: "serve-service-tpl"
+    template ? "{{ info.feature }}:{{ info.hotfix-suffix }}":
+      ":": "{{ conf.gocd.default-template }}"
+      "^:.+": "serve-hotfix-tpl"
       "*": "serve-featured-tpl"
 
   graphite:
