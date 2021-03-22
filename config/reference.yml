@@ -82,7 +82,9 @@ gocd:
       depends: []
 
       pipeline:
-        group: "{{ info.category | replace('\\W|_', '-') }}"
+        group ? {{ info.hotfix-suffix }}:
+          "": "{{ info.category | replace('\\W|_', '-') }}"
+          ".+": "hotfix"
         pipeline:
           name: "{{ conf.gocd.pipeline-name }}"
           template: "{{ conf.gocd.template }}"
