@@ -245,8 +245,8 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 		for _, s := range services {
 			if s.Checks.AggregatedStatus() != api.HealthPassing {
-				log.Printf("Service `%s` not started yet! Retry...", fullName)
-				return fmt.Errorf("Service `%s` not started!", fullName)
+				log.Printf("Service `%s` in `%s` status! Retry...", fullName, s.Checks.AggregatedStatus())
+				return fmt.Errorf("Service `%s` in `%s` status! Retry...", fullName, s.Checks.AggregatedStatus())
 			}
 		}
 
