@@ -2,6 +2,7 @@ package deploy
 
 import (
 	"fmt"
+	"github.com/hashicorp/consul/api"
 	"log"
 	"os"
 	"strconv"
@@ -235,11 +236,18 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 	}
 
 	if err := backoff.Retry(func() error {
-		services, _, err := consulApi.Health().Service(fullName, data.GetString("version"), true, nil)
+		services, _, err := consulApi.Health().Service(fullName, data.GetString("version"), false, nil)
 
 		if err != nil {
 			log.Println(color.RedString("Error in check health in consul: %v", err))
 			return err
+		}
+
+		for _, s := range services {
+			if s.Checks.AggregatedStatus() != api.HealthPassing {
+				log.Printf("Service `%s` not started yet! Retry...", fullName)
+				return fmt.Errorf("Service `%s` not started!", fullName)
+			}
 		}
 
 		if len(services) == 0 {
