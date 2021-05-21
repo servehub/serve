@@ -261,6 +261,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 		if successCheck < 3 {
 			successCheck += 1
+			log.Printf("Service `%s` started and waiting %d/3...", fullName, successCheck)
 			return fmt.Errorf("Service `%s` started and waiting %d/3...", fullName, successCheck)
 		}
 
