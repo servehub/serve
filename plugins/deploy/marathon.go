@@ -235,6 +235,8 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		log.Println(color.YellowString("Error on parse `backoff-max-elapsed-time` duration `%s`: %v", data.GetString("backoff-max-elapsed-time"), err))
 	}
 
+	successCheck := 0
+
 	if err := backoff.Retry(func() error {
 		services, _, err := consulApi.Health().Service(fullName, data.GetString("version"), false, nil)
 
@@ -245,14 +247,21 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 		for _, s := range services {
 			if s.Checks.AggregatedStatus() != api.HealthPassing {
+				successCheck = 0
 				log.Printf("Service `%s` in `%s` status! Retry...", fullName, s.Checks.AggregatedStatus())
 				return fmt.Errorf("Service `%s` in `%s` status! Retry...", fullName, s.Checks.AggregatedStatus())
 			}
 		}
 
 		if len(services) == 0 {
+			successCheck = 0
 			log.Printf("Service `%s` not started yet! Retry...", fullName)
 			return fmt.Errorf("Service `%s` not started!", fullName)
+		}
+
+		if successCheck < 1 {
+			successCheck += 1
+			return fmt.Errorf("Service `%s` started and waiting...", fullName)
 		}
 
 		log.Println(color.GreenString("Service `%s` successfully started!", fullName))
