@@ -227,7 +227,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 	}
 
 	bc := backoff.NewExponentialBackOff()
-	bc.MaxInterval = 15 * time.Second
+	bc.MaxInterval = 5 * time.Second
 
 	if maxBc, err := time.ParseDuration(data.GetString("backoff-max-elapsed-time")); err == nil {
 		bc.MaxElapsedTime = maxBc
@@ -259,9 +259,9 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 			return fmt.Errorf("Service `%s` not started!", fullName)
 		}
 
-		if successCheck < 1 {
+		if successCheck < 3 {
 			successCheck += 1
-			return fmt.Errorf("Service `%s` started and waiting...", fullName)
+			return fmt.Errorf("Service `%s` started and waiting %d/3...", fullName, successCheck)
 		}
 
 		log.Println(color.GreenString("Service `%s` successfully started!", fullName))
