@@ -1,9 +1,6 @@
 info:
   group: "{{ info.category | takeWhile('/') }}"
 
-vars:
-  env: dev
-
 conf:
   docker:
     registry: "registry-{{ info.group }}.superman.space/"

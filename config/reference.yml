@@ -29,7 +29,9 @@ info:
   full-name: "{{ info.category }}/{{ info.name }}{{ info.feature-suffix }}"
 
 vars:
-  env: qa
+  dc: 0
+  env: "{{ vars.zone | replace('\\d', '') }}"
+  zone: qa
   build-number: 0
   stage-counter: 0
   purge: false
@@ -228,6 +230,7 @@ deploy:
     envs: {}
     environment:
       ENV: "{{ vars.env }}"
+      ZONE: "{{ vars.zone }}"
       SERVICE_TAG: "{{ info.name }}{{ info.feature-suffix }}"
       SERVICE_NAME: "{{ conf.marathon.app-name }}"
       SERVICE_VERSION: "{{ info.build-version }}"
