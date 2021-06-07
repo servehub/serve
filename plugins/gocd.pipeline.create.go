@@ -92,11 +92,11 @@ func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 
 	if data.GetBool("purge") {
 		return goCdDelete(name, data.GetString("environment"), url,
-			map[string]string{"Accept": "application/vnd.go.cd.v10+json"})
+			map[string]string{"Accept": "application/vnd.go.cd.v11+json"})
 	}
 
 	exist, err := goCdRequest("GET", url+"/go/api/admin/pipelines/"+name, "",
-		map[string]string{"Accept": "application/vnd.go.cd.v10+json"})
+		map[string]string{"Accept": "application/vnd.go.cd.v11+json"})
 	if err != nil {
 		return err
 	}
@@ -105,11 +105,11 @@ func (p goCdPipelineCreate) Run(data manifest.Manifest) error {
 		pipeline := data.GetTree("pipeline.pipeline")
 		pipeline.Set("group", data.GetString("pipeline.group"))
 		err = goCdUpdate(name, data.GetString("environment"), url, pipeline.String(),
-			map[string]string{"If-Match": exist.Header.Get("ETag"), "Accept": "application/vnd.go.cd.v10+json"}, depends)
+			map[string]string{"If-Match": exist.Header.Get("ETag"), "Accept": "application/vnd.go.cd.v11+json"}, depends)
 
 	} else if exist.StatusCode == http.StatusNotFound {
 		err = goCdCreate(name, data.GetString("environment"), url, data.GetTree("pipeline").String(),
-			map[string]string{"Accept": "application/vnd.go.cd.v10+json"})
+			map[string]string{"Accept": "application/vnd.go.cd.v11+json"})
 
 	} else {
 		return fmt.Errorf("Operation error: %s", exist.Status)
