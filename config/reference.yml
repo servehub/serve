@@ -63,6 +63,8 @@ conf:
     api-url: https://localhost:8154
     environment: dev
     pipeline-name: "{{ info.name }}{{ info.feature-suffix }}{{ info.hotfix-suffix }}"
+    auto-update: true
+    workingdir: "sources"
     default-template: "serve-service-tpl"
     template ? "{{ info.feature }}:{{ info.hotfix-suffix }}":
       ":": "{{ conf.gocd.default-template }}"
@@ -96,6 +98,7 @@ gocd:
           params:
             repo.url: { value: "{{ vars.ssh-repo }}" }
             branch: { value: "{{ vars.branch }}" }
+            workingdir: { value: "{{ conf.gocd.workingdir }}" }
 
           materials:
             - type: "git"
@@ -103,7 +106,18 @@ gocd:
                 url: "#{repo.url}"
                 destination: "sources"
                 branch: "{{ vars.branch }}"
+                auto_update: "{{ conf.gocd.auto-update }}"
                 shallow_clone: true
+
+    run:
+      pipeline-name: "{{ conf.gocd.pipeline-name }}"
+      api-url: "{{ conf.gocd.api-url }}"
+      environment: "{{ conf.gocd.environment }}"
+      branch: "{{ vars.branch }}"
+      name-suffix: ""
+
+      schedule:
+        update_materials_before_scheduling: true
 
 build:
   docker: &build-docker
@@ -177,6 +191,11 @@ build:
     login:
       user: ""
       password: ""
+
+  monorepo:
+    branch: "{{ vars.branch }}"
+    commit: "{{ vars.commit }}"
+    command: docker run --rm -v ${PWD}:/src -v ~/.cache/yarn:/root/.cache/yarn -v ~/.npm:/root/.npm lerna lerna exec --since {{ vars.commit }} --loglevel=error pwd
 
   notify:
     env: "{{ vars.env }}"

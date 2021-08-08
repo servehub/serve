@@ -54,19 +54,21 @@ func (p Notify) Run(data manifest.Manifest) error {
 					return err
 				}
 
-				gitCmd := fmt.Sprintf(`git log --pretty=format:" — %%an: %%s" %s..%s`, latestRelease.CommitHash, changelogFor)
-				log.Println(color.YellowString("> %s", gitCmd))
+				gitLogCmd := fmt.Sprintf(`git log --pretty=format:" — %%an: %%s" %s..%s`, latestRelease.CommitHash, changelogFor)
+				log.Println(color.YellowString("> %s", gitLogCmd))
 
-				out, err := exec.Command("/bin/bash", "-ec", gitCmd).CombinedOutput()
+				out, err := exec.Command("/bin/bash", "-ec", gitLogCmd).CombinedOutput()
 				if err != nil {
-					if strings.Contains(string(out), "fatal: Invalid revision range") {
+					if strings.Contains(string(out), "Invalid revision range") {
+						log.Println(color.YellowString("> git fetch --depth=100"))
+
 						if err2 := exec.Command("/bin/bash", "-ec", "git fetch --depth=100").Run(); err2 == nil {
-							out, err = exec.Command("/bin/bash", "-ec", gitCmd).CombinedOutput()
+							out, err = exec.Command("/bin/bash", "-ec", gitLogCmd).CombinedOutput()
 						}
 					}
 
 					if err != nil {
-						return fmt.Errorf("%s", out)
+						log.Println(color.RedString("%s", out))
 					}
 				}
 
