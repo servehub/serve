@@ -29,11 +29,13 @@ func (p buildMonorepo) Run(data manifest.Manifest) error {
 		return err
 	}
 
+	log.Println(color.YellowString("<<< %s", string(out)))
+
 	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
 	pwd, _ := os.Getwd()
 
-	for i, line := range lines {
-		if i != 0 {
+	for _, line := range lines {
+		if strings.HasPrefix(line, "/src/") {
 			dir := pwd + "/" + strings.TrimPrefix(line, "/src/")
 
 			if _, err := os.Stat(dir + "/manifest.yml"); !os.IsNotExist(err) {
