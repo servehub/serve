@@ -193,9 +193,10 @@ build:
       password: ""
 
   monorepo:
+    lerna-image: "lerna"
     branch: "{{ vars.branch }}"
     commit: "{{ vars.commit }}"
-    command: docker run --rm -v ${PWD}:/src -v ~/.cache/yarn:/root/.cache/yarn -v ~/.npm:/root/.npm lerna lerna exec --since {{ vars.commit }} --loglevel=error pwd
+    command: docker run --rm -v ${PWD}:/src -v ~/.cache/yarn:/root/.cache/yarn -v ~/.npm:/root/.npm {{ build.monorepo.lerna-image }} lerna exec --since {{ vars.previous-commit }} --loglevel=error pwd
 
   notify:
     env: "{{ vars.env }}"

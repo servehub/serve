@@ -34,6 +34,8 @@ func (p buildMonorepo) Run(data manifest.Manifest) error {
 			dir := pwd + "/" + strings.TrimPrefix(line, "/src/")
 
 			if _, err := os.Stat(dir + "/manifest.yml"); !os.IsNotExist(err) {
+				log.Println(color.BlueString("%s was changed", dir))
+
 				if err := utils.RunCmd("cd %s && serve gocd.pipeline.run --branch=%s --commit=%s", dir, data.GetString("branch"), data.GetString("commit")); err != nil {
 					log.Println(color.RedString("%s", err))
 					return err
