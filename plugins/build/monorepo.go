@@ -1,6 +1,7 @@
 package build
 
 import (
+	"fmt"
 	"github.com/fatih/color"
 	"github.com/servehub/utils"
 	"log"
@@ -18,9 +19,11 @@ func init() {
 type buildMonorepo struct{}
 
 func (p buildMonorepo) Run(data manifest.Manifest) error {
-	log.Println(color.YellowString("> %s", data.GetString("command")))
+	lernaCmd := fmt.Sprintf(data.GetString("command"), data.GetString("lerna-image"))
 
-	out, err := exec.Command("/bin/bash", "-ec", data.GetString("command")).CombinedOutput()
+	log.Println(color.YellowString("> %s", lernaCmd))
+
+	out, err := exec.Command("/bin/bash", "-ec", lernaCmd).CombinedOutput()
 	if err != nil {
 		log.Println(color.RedString("%s", out))
 		return err
