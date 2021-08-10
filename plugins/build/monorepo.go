@@ -29,7 +29,7 @@ func (p buildMonorepo) Run(data manifest.Manifest) error {
 		return err
 	}
 
-	log.Println(color.YellowString("<<< %s", string(out)))
+	log.Println(color.WhiteString("%s", string(out)))
 
 	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
 	pwd, _ := os.Getwd()
@@ -39,7 +39,7 @@ func (p buildMonorepo) Run(data manifest.Manifest) error {
 			dir := pwd + "/" + strings.TrimPrefix(line, "/src/")
 
 			if _, err := os.Stat(dir + "/manifest.yml"); !os.IsNotExist(err) {
-				log.Println(color.BlueString("%s was changed", dir))
+				log.Println(color.GreenString("%s was changed", line))
 
 				if err := utils.RunCmd("cd %s && serve gocd.pipeline.run --branch=%s --commit=%s", dir, data.GetString("branch"), data.GetString("commit")); err != nil {
 					log.Println(color.RedString("%s", err))
