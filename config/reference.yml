@@ -152,11 +152,12 @@ build:
     image: sonarsource/sonar-scanner-cli
     volumes:
       - '${PWD}:/usr/src'
+      - '~/.sonar/cache:/opt/sonar-scanner/.sonar/cache'
     cmd: ''
     shell: '%s'
     docker-args: '--user="$(id -u):$(id -g)"'
     properties: |
-      sonar.projectKey={{ info.category }}/{{ info.name }}
+      sonar.projectKey={{ info.category | replace('\\W', '-') }}-{{ info.name | replace('\\W', '-') }}
       sonar.sourceEncoding=UTF-8
       sonar.projectVersion={{ info.build-version }}
       sonar.java.binaries=build/classes
