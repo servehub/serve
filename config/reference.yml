@@ -252,7 +252,7 @@ deploy:
     environment:
       ENV: "{{ vars.env }}"
       ZONE: "{{ vars.zone }}"
-      SERVICE_ID: "{{ info.category }}/{{ info.name }}"
+      SERVICE_KEY: "{{ info.category }}/{{ info.name }}"
       SERVICE_TAG: "{{ info.name }}{{ info.feature-suffix }}"
       SERVICE_NAME: "{{ conf.marathon.app-name }}"
       SERVICE_VERSION: "{{ info.build-version }}"
