@@ -70,6 +70,8 @@ release: dist
 		--repo serve \
 		--tag v${VERSION}
 
+	sleep 5
+
 	for GOOS in ${TARGET_OS}; do \
 		for GOARCH in ${TARGET_ARCH}; do \
 			github-release upload \

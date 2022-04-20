@@ -156,11 +156,13 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 			})
 
 			// set service name for docker-registrator: one name for all ports
-			if port.GetIntOr("containerPort", 0) != 0 && !port.GetBool("notRegistered") {
-				app.AddEnv(fmt.Sprintf("SERVICE_%d_NAME", port.GetInt("containerPort")), fullName)
-				app.AddEnv(fmt.Sprintf("SERVICE_%d_TAGS", port.GetInt("containerPort")), port.GetStringOr("name", "http")+","+data.GetString("version"))
-			} else {
-				app.AddEnv(fmt.Sprintf("SERVICE_%d_IGNORE", port.GetInt("containerPort")), "true")
+			if port.GetIntOr("containerPort", 0) != 0 {
+				if !port.GetBool("notRegistered") {
+					app.AddEnv(fmt.Sprintf("SERVICE_%d_NAME", port.GetInt("containerPort")), fullName)
+					app.AddEnv(fmt.Sprintf("SERVICE_%d_TAGS", port.GetInt("containerPort")), port.GetStringOr("name", "http")+","+data.GetString("version"))
+				} else {
+					app.AddEnv(fmt.Sprintf("SERVICE_%d_IGNORE", port.GetInt("containerPort")), "true")
+				}
 			}
 
 			// if exists only default port definition — disable healthcheck
