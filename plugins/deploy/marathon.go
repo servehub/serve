@@ -156,12 +156,14 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 			})
 
 			// set service name for docker-registrator: one name for all ports
-			if port.GetIntOr("containerPort", 0) != 0 {
+			if port.GetIntOr("containerPort", 0) != 0 && !port.GetBool("notRegistered") {
 				app.AddEnv(fmt.Sprintf("SERVICE_%d_NAME", port.GetInt("containerPort")), fullName)
 				app.AddEnv(fmt.Sprintf("SERVICE_%d_TAGS", port.GetInt("containerPort")), port.GetStringOr("name", "http")+","+data.GetString("version"))
+			} else {
+				app.AddEnv(fmt.Sprintf("SERVICE_%d_IGNORE", port.GetInt("containerPort")), "true")
 			}
 
-			// if exists only default port definition — disable healthcheck
+			// if exists only default port definition — disable healthcheck
 			if len(ports) == 1 && port.GetIntOr("containerPort", 0) == 0 && port.GetIntOr("hostPort", 0) == 0 && port.GetStringOr("name", "") == "" {
 				healthPort = ""
 			}
@@ -186,7 +188,7 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 
 		if data.GetStringOr("readiness.path", "") != "" {
 			readyStatuses := make([]int, 0)
-			for _, code := range data.GetArrayForce("readiness.statuses")  {
+			for _, code := range data.GetArrayForce("readiness.statuses") {
 				if i, err := strconv.Atoi(fmt.Sprintf("%v", code)); err == nil {
 					readyStatuses = append(readyStatuses, i)
 				} else {
@@ -195,10 +197,10 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 			}
 
 			app.AddReadinessCheck(marathon.ReadinessCheck{
-				Path: data.GetString("readiness.path"),
-				PortName: "default",
-				IntervalSeconds: data.GetInt("readiness.interval-seconds"),
-				TimeoutSeconds: data.GetInt("readiness.timeout-seconds"),
+				Path:                    data.GetString("readiness.path"),
+				PortName:                "default",
+				IntervalSeconds:         data.GetInt("readiness.interval-seconds"),
+				TimeoutSeconds:          data.GetInt("readiness.timeout-seconds"),
 				HTTPStatusCodesForReady: &readyStatuses,
 			})
 		}

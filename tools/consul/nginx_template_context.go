@@ -167,8 +167,8 @@ func NginxTemplateContextCommand() cli.Command {
 			}
 
 			out, _ := json.MarshalIndent(map[string]interface{}{
-				"upstreams": upstreams,
-				"services":  services,
+				"upstreams":   upstreams,
+				"services":    services,
 				"hostsParams": hostsParams,
 			}, "", "  ")
 
