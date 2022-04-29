@@ -18,10 +18,15 @@ func (p goCdPipelineRun) Run(data manifest.Manifest) error {
 	resp, err := goCdSchedule(name, url, data.GetTree("schedule").String(), map[string]string{"Accept": "application/vnd.go.cd.v1+json"})
 
 	if err == nil && resp.StatusCode == 404 {
-		return utils.RunCmd(
+		if err := utils.RunCmd(
 			"serve gocd.pipeline.create --ssh-repo=$GO_MATERIAL_URL_SOURCES --branch=%s",
 			data.GetString("branch"),
-		)
+		); err != nil {
+			return err
+		}
+
+		_, err := goCdSchedule(name, url, data.GetTree("schedule").String(), map[string]string{"Accept": "application/vnd.go.cd.v1+json"})
+		return err
 	}
 
 	return err
