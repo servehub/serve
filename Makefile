@@ -12,9 +12,7 @@ default: install
 
 deps:
 	@echo "==> Install dependencies..."
-	go get github.com/Masterminds/glide
-	glide i -v
-	go get github.com/jteeuwen/go-bindata/...
+	go install -a -v github.com/go-bindata/go-bindata/...@latest
 
 build-configs:
 	${GOPATH}/bin/go-bindata -pkg config -prefix=${PWD} -o manifest/config/config.go ${PWD}/config/

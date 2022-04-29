@@ -166,9 +166,8 @@ func goCdUpdate(name string, env string, resource string, body string, headers m
 	return nil
 }
 
-func goCdSchedule(name string, resource string, body string, headers map[string]string) error {
-	_, err := goCdRequest("POST", resource + "/go/api/pipelines/" + name + "/schedule", body, headers)
-	return err
+func goCdSchedule(name string, resource string, body string, headers map[string]string) (*http.Response, error) {
+	return goCdRequest("POST", resource+"/go/api/pipelines/"+name+"/schedule", body, headers)
 }
 
 func goCdDelete(name string, env string, resource string, headers map[string]string) error {
