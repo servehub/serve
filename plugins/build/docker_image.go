@@ -2,6 +2,9 @@ package build
 
 import (
 	"fmt"
+	"github.com/fatih/color"
+	"io/ioutil"
+	"log"
 	"strings"
 
 	"github.com/servehub/serve/manifest"
@@ -16,15 +19,20 @@ type BuildDockerImage struct{}
 
 func (p BuildDockerImage) Run(data manifest.Manifest) error {
 	image := data.GetString("image")
-	prefix := image[:strings.Index(image, ":")]
+
+	if data.Has("repository") {
+		image = data.GetString("repository") + image[strings.Index(image, "/"):]
+	}
 
 	if data.Has("category") {
-		prefix = prefix[:strings.Index(prefix, "/")] + "/" + data.GetString("category") + prefix[strings.LastIndex(prefix, "/"):]
+		image = image[:strings.Index(image, "/")] + "/" + data.GetString("category") + image[strings.LastIndex(image, "/"):]
 	}
 
 	if data.Has("name") {
-		prefix = prefix[:strings.LastIndex(prefix, "/")] + "/" + data.GetString("name")
+		image = image[:strings.LastIndex(image, "/")] + "/" + data.GetString("name") + image[strings.Index(image, ":"):]
 	}
+
+	prefix := image[:strings.Index(image, ":")]
 
 	if data.Has("login.user") {
 		if err := utils.RunCmd(
@@ -35,6 +43,12 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 		); err != nil {
 			return err
 		}
+	}
+
+	buildArgs := data.GetString("build-args")
+
+	if data.Has("dockerfile") {
+		buildArgs += " --file " + data.GetString("dockerfile")
 	}
 
 	tags := make([]string, 0)
@@ -57,7 +71,7 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 
 	if err := utils.RunCmd(
 		"docker build %s -t %s %s %s",
-		data.GetString("build-args"),
+		buildArgs,
 		strings.Join(tags, " -t "),
 		cacheFrom,
 		data.GetString("workdir"),
@@ -70,6 +84,34 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 			if err := utils.RunCmd("docker push %s", tag); err != nil {
 				return err
 			}
+		}
+	}
+
+	if data.Has("images") && len(data.GetArray("images")) > 0 {
+		for _, image := range data.GetArray("images") {
+			if image.Has("branch") && image.GetString("branch") != data.GetStringOr("current-branch", "master") {
+				continue
+			}
+
+			if _, err := ioutil.ReadFile(image.GetString("dockerfile")); err != nil {
+				continue
+			}
+
+			for k, v := range data.GetMap("/") {
+				if k != "images" && !image.Has(k) {
+					image.Set(k, v.Unwrap())
+				}
+			}
+
+			fmt.Printf("\n")
+
+			log.Printf("%s\n%s\n\n", color.GreenString(">>> build.docker-image sub-image:"), color.CyanString("%s", image.String()))
+
+			if err := p.Run(image); err != nil {
+				return err
+			}
+
+			fmt.Printf("\n")
 		}
 	}
 

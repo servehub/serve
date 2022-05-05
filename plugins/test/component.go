@@ -29,9 +29,9 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 	for i, multiComponent := range data.GetArray("components") {
 		component := manifest.ParseJSON(data.GetTree("compose.services.component").String())
 		merged, _ := mergemap.Merge(component.Unwrap().(map[string]interface{}), multiComponent.Unwrap().(map[string]interface{}))
-		name      := fmt.Sprintf("component-%d", i + 2)
+		name := fmt.Sprintf("component-%d", i+2)
 
-		data.Set("compose.services." + name, merged)
+		data.Set("compose.services."+name, merged)
 		data.ArrayAppend("compose.services.tests.depends_on", name)
 	}
 
@@ -74,19 +74,19 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 
 	go func() {
 		select {
-		case <- time.After(timeout):
+		case <-time.After(timeout):
 			color.Red("Timeout exceeded for tests, exit...")
 			utils.RunCmd("docker-compose -p %s -f %s down -v --remove-orphans", data.GetString("name"), tmpfile.Name())
 		}
 	}()
 
 	if res := utils.RunCmd("DOCKER_CLIENT_TIMEOUT=300 COMPOSE_HTTP_TIMEOUT=300 docker-compose -p %s -f %s up --abort-on-container-exit", data.GetString("name"), tmpfile.Name()); res != nil {
-		return res
+		return fmt.Errorf("error on running docker-compose with tests: %s", res)
 	}
 
 	if checkFile != "" {
 		if _, err := os.Stat(checkFile); os.IsNotExist(err) {
-	    return fmt.Errorf("check file not exist! %s", checkFile)
+			return fmt.Errorf("check file not exist! %s", checkFile)
 		}
 	}
 

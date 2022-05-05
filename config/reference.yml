@@ -189,6 +189,11 @@ build:
     workdir: "."
     build-args: "--pull"
     no-push: "{{ vars.no-push }}"
+    current-branch: "{{ vars.branch }}"
+    images: []
+#      - branch: master
+#        dockerfile: Dockerfile.custom
+#        repository: docker.custom.com
     login:
       user: ""
       password: ""
