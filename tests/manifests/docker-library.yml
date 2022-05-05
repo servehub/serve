@@ -24,6 +24,8 @@ tests:
       category: ""
       no-push: "false"
       build-args: "--pull"
+      current-branch: ""
+      images: []
       login:
         user: "${DOCKER_REGISTRY_USER}"
         password: "${DOCKER_REGISTRY_PASSWORD}"
