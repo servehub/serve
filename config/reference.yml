@@ -121,6 +121,12 @@ gocd:
       schedule:
         update_materials_before_scheduling: true
 
+github:
+  status:
+    repo: "{{ vars.repo }}"
+    state: "{{ vars.state }}"
+    target-url: "https://go.boople.co/{{ conf.gocd.pipeline-name }}/runs/{{ vars.build-number }}"
+
 build:
   docker: &build-docker
     image: "{{ info.full-name }}"
