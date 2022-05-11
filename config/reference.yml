@@ -66,10 +66,12 @@ conf:
     auto-update: true
     workingdir: "sources"
     default-template: "serve-service-tpl"
+    feature-template: "serve-featured-tpl"
+    hotfix-template: "serve-hotfix-tpl"
     template ? "{{ info.feature }}:{{ info.hotfix-suffix }}":
       ":": "{{ conf.gocd.default-template }}"
-      "^:.+": "serve-hotfix-tpl"
-      "*": "serve-featured-tpl"
+      "^:.+": "{{ conf.gocd.feature-template }}"
+      "*": "{{ conf.gocd.feature-template }}"
 
   graphite:
     host: graphite
