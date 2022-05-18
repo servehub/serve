@@ -39,11 +39,28 @@ func (p buildMonorepo) Run(data manifest.Manifest) error {
 			dir := pwd + "/" + strings.TrimPrefix(line, "/src/")
 
 			if _, err := os.Stat(dir + "/manifest.yml"); !os.IsNotExist(err) {
-				log.Println(color.GreenString("%s was changed", line))
+				log.Println(color.GreenString("\n :::: %s was changed\n", line))
 
-				if err := utils.RunCmd("cd %s && serve gocd.pipeline.run --branch=%s --commit=%s", dir, data.GetString("branch"), data.GetString("commit")); err != nil {
-					log.Println(color.RedString("%s", err))
-					return err
+				if data.GetStringOr("feature", "") == "" {
+					if err := utils.RunCmd(`cd %s && serve gocd.pipeline.run --branch="%s" --commit=%s`, dir, data.GetString("branch"), data.GetString("commit")); err != nil {
+						log.Println(color.RedString("%s", err))
+						return err
+					}
+				} else {
+					if err := utils.RunCmd(`cd %s && serve build --branch="%s" --build-number="%s"`, dir, data.GetString("branch"), data.GetString("build-number")); err != nil {
+						log.Println(color.RedString("%s", err))
+						return err
+					}
+
+					if err := utils.RunCmd(`cd %s && serve deploy --zone=qa1 --branch="%s" --build-number="%s"`, dir, data.GetString("branch"), data.GetString("build-number")); err != nil {
+						log.Println(color.RedString("%s", err))
+						return err
+					}
+
+					if err := utils.RunCmd(`cd %s && serve release --zone=qa1 --branch="%s" --build-number="%s"`, dir, data.GetString("branch"), data.GetString("build-number")); err != nil {
+						log.Println(color.RedString("%s", err))
+						return err
+					}
 				}
 			}
 		}

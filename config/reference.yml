@@ -212,6 +212,8 @@ build:
 
   monorepo:
     lerna-image: "lerna"
+    feature: "{{ info.feature }}"
+    build-number: "{{ vars.build-number }}"
     branch: "{{ vars.branch }}"
     commit: "{{ vars.commit }}"
     command: docker run --rm -v ${PWD}:/src -v ~/.cache/yarn:/root/.cache/yarn -v ~/.npm:/root/.npm %s lerna exec --since {{ vars.previous-commit }} --loglevel=error pwd
