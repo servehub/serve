@@ -47,19 +47,11 @@ func (p buildMonorepo) Run(data manifest.Manifest) error {
 						return err
 					}
 				} else {
-					if err := utils.RunCmd(`cd %s && serve build --branch="%s" --build-number="%s"`, dir, data.GetString("branch"), data.GetString("build-number")); err != nil {
-						log.Println(color.RedString("%s", err))
-						return err
-					}
-
-					if err := utils.RunCmd(`cd %s && serve deploy --zone=qa1 --branch="%s" --build-number="%s"`, dir, data.GetString("branch"), data.GetString("build-number")); err != nil {
-						log.Println(color.RedString("%s", err))
-						return err
-					}
-
-					if err := utils.RunCmd(`cd %s && serve release --zone=qa1 --branch="%s" --build-number="%s"`, dir, data.GetString("branch"), data.GetString("build-number")); err != nil {
-						log.Println(color.RedString("%s", err))
-						return err
+					for _, task := range data.GetArray("feature-tasks") {
+						if err := utils.RunCmd(`cd %s && %s`, dir, task.Unwrap()); err != nil {
+							log.Println(color.RedString("%s: %s", task, err))
+							return err
+						}
 					}
 				}
 			}

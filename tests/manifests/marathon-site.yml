@@ -42,6 +42,7 @@ tests:
       gradle: install
       image: frekele/gradle:4.2-jdk8
       shell: "/bin/sh -c '%s'"
+      no-push: "false"
       volumes:
         - "~/.gradle/caches:/root/.gradle/caches"
         - "~/.gradle/wrapper:/root/.gradle/wrapper"

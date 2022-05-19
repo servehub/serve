@@ -138,6 +138,7 @@ build:
     build: ""
     cmd: "test"
     shell: "/bin/sh -c '%s'"
+    no-push: "{{ vars.no-push }}"
     workdir: "{{ conf.docker.workdir }}"
     volumes: []
     envs: {}
@@ -217,6 +218,10 @@ build:
     branch: "{{ vars.branch }}"
     commit: "{{ vars.commit }}"
     command: docker run --rm -v ${PWD}:/src -v ~/.cache/yarn:/root/.cache/yarn -v ~/.npm:/root/.npm %s lerna exec --since {{ vars.previous-commit }} --loglevel=error pwd
+    feature-tasks: []
+      # - serve build --branch="{{ vars.branch }}" --build-number="{{ vars.build-number }}"
+      # - serve deploy --zone=qa --branch="{{ vars.branch }}" --build-number="{{ vars.build-number }}"
+      # - serve release --zone=qa --branch="{{ vars.branch }}" --build-number="{{ vars.build-number }}"
 
   notify:
     env: "{{ vars.env }}"
