@@ -123,13 +123,12 @@ gocd:
 
 github:
   status:
-    owner: "{{ vars.owner }}"
     repo: "{{ vars.repo }}"
     ref: "{{ vars.ref }}"
     state: "{{ vars.state }}"
     target-url: "{{ vars.target-url }}"
-    description: "The build current status: {{ github.status.state }}"
-    context: "continuous-integration/serve"
+    description: "Build is {{ vars.state }}"
+    context: "GoCD"
 
 build:
   docker: &build-docker
