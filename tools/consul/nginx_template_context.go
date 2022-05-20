@@ -27,22 +27,13 @@ func NginxTemplateContextCommand() cli.Command {
 		Usage: "Collect and return data for consul-template",
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "filter"},
+			cli.StringFlag{Name: "exclude"},
 		},
 		Action: func(c *cli.Context) error {
 			consul, _ := api.NewClient(api.DefaultConfig())
 
-			filters := make(map[string]string)
-			for _, filter := range strings.Split(c.String("filter"), ",") {
-				if filter != "" {
-					fvs := strings.SplitN(filter, "=", 2)
-
-					if len(fvs) > 1 {
-						filters[fvs[0]] = strings.TrimSpace(fvs[1])
-					} else {
-						filters[fvs[0]] = "true"
-					}
-				}
-			}
+			filters := parseFilters(c.String("filter"))
+			excludes := parseFilters(c.String("exclude"))
 
 			upstreams := make(map[string]map[string]map[string]interface{})
 			services := make(map[string]map[string][]map[string]interface{})
@@ -80,14 +71,22 @@ func NginxTemplateContextCommand() cli.Command {
 					for _, host := range spacesRegex.Split(route.Host, -1) {
 
 						skipedByFilters := false
-
 						for fk, fv := range filters {
 							if vval, ok := route.Vars[fk]; !ok || vval != fv {
 								skipedByFilters = true
 								break
 							}
+						}
 
-							delete(route.Vars, fk)
+						if skipedByFilters {
+							break
+						}
+
+						for ek, ev := range excludes {
+							if vval, ok := route.Vars[ek]; ok || vval == ev {
+								skipedByFilters = true
+								break
+							}
 						}
 
 						if skipedByFilters {
@@ -181,6 +180,22 @@ func NginxTemplateContextCommand() cli.Command {
 			return nil
 		},
 	}
+}
+
+func parseFilters(filter string) map[string]string {
+	filters := make(map[string]string)
+	for _, filter := range strings.Split(filter, ",") {
+		if filter != "" {
+			fvs := strings.SplitN(filter, "=", 2)
+
+			if len(fvs) > 1 {
+				filters[fvs[0]] = strings.TrimSpace(fvs[1])
+			} else {
+				filters[fvs[0]] = "true"
+			}
+		}
+	}
+	return filters
 }
 
 func putUpstream(upstream string, inst *api.ServiceEntry, upstreams map[string]map[string]map[string]interface{}) {
