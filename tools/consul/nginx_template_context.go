@@ -19,6 +19,7 @@ import (
 
 var upstreamNameRegex = regexp.MustCompile("[^\\w]+")
 var spacesRegex = regexp.MustCompile("\\s+")
+var allowedRouteVars = []string{"stage", "canary"}
 
 func NginxTemplateContextCommand() cli.Command {
 	return cli.Command{
@@ -93,7 +94,11 @@ func NginxTemplateContextCommand() cli.Command {
 							break
 						}
 
-						delete(route.Vars, "public") // todo: remove hardcoded filter
+						for k, _ := range route.Vars {
+							if !utils.Contains(k, allowedRouteVars) {
+								delete(route.Vars, k)
+							}
+						}
 
 						location := route.Location
 						if location == "" {
