@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/cenk/backoff"
 	"github.com/google/go-github/v44/github"
 	"github.com/servehub/serve/manifest"
 	"golang.org/x/oauth2"
@@ -43,8 +44,10 @@ func (p githubStatus) Run(data manifest.Manifest) error {
 		Context:     github.String(data.GetStringOr("context", "continuous-integration/serve")),
 	}
 
-	_, _, err := client.Repositories.CreateStatus(context.Background(), rps[0], strings.TrimSuffix(rps[1], ".git"), data.GetString("ref"), input)
-	return err
+	return backoff.Retry(func() error {
+		_, _, err := client.Repositories.CreateStatus(context.Background(), rps[0], strings.TrimSuffix(rps[1], ".git"), data.GetString("ref"), input)
+		return err
+	}, backoff.NewExponentialBackOff())
 }
 
 func IsValidState(state string) bool {
