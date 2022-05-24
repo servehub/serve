@@ -226,6 +226,8 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		return err
 	}
 
+	data.Set("deployed-at", time.Now().UnixMilli())
+
 	if err := utils.RegisterPluginData("deploy.marathon", fullName, data.String(), data.GetString("consul-address")); err != nil {
 		return err
 	}

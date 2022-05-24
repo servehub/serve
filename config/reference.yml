@@ -236,6 +236,8 @@ deploy:
     marathon-address: "{{ conf.marathon.address }}"
     app-name: "{{ conf.marathon.app-name }}"
     version: "v{{ info.build-version }}"
+    branch: "{{ vars.branch }}"
+    git-repo: "{{ vars.git-repo }}"
     package-uri: []
     instances: 1
     mem: 128
