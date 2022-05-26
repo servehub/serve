@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -199,6 +200,11 @@ func Load(path string, vars map[string]string) *Manifest {
 
 	for k, v := range vars {
 		tree.Set(v, "vars", k)
+	}
+
+	for _, e := range os.Environ() {
+		pair := strings.SplitN(e, "=", 2)
+		tree.Set(pair[1], "envs", pair[0])
 	}
 
 	for _, proc := range processor.GetAll() {

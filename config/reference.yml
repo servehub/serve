@@ -128,7 +128,7 @@ github:
     state: "{{ vars.state }}"
     target-url: "{{ vars.target-url }}"
     description: "Build is {{ vars.state }}"
-    context: "GoCD"
+    context: "CI"
 
 build:
   docker: &build-docker
