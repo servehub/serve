@@ -70,7 +70,7 @@ conf:
     hotfix-template: "serve-hotfix-tpl"
     template ? "{{ info.feature }}:{{ info.hotfix-suffix }}":
       ":": "{{ conf.gocd.default-template }}"
-      "^:.+": "{{ conf.gocd.feature-template }}"
+      "^:.+": "{{ conf.gocd.hotfix-template }}"
       "*": "{{ conf.gocd.feature-template }}"
 
   graphite:
