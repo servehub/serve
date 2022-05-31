@@ -5,6 +5,7 @@ import (
 	"github.com/fatih/color"
 	"io/ioutil"
 	"log"
+	"regexp"
 	"strings"
 
 	"github.com/servehub/serve/manifest"
@@ -90,7 +91,15 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 	if data.Has("images") && len(data.GetArray("images")) > 0 {
 		for _, image := range data.GetArray("images") {
 			if image.Has("branch") && image.GetString("branch") != data.GetStringOr("current-branch", "master") {
-				continue
+				if image.GetString("branch") == "master" {
+					continue
+				}
+
+				if image.GetString("branch") != "*" {
+					if m, _ := regexp.MatchString("^"+image.GetString("branch")+"$", data.GetStringOr("current-branch", "master")); !m {
+						continue
+					}
+				}
 			}
 
 			if _, err := ioutil.ReadFile(image.GetString("dockerfile")); err != nil {
