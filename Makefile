@@ -22,6 +22,7 @@ lint: build-configs
 
 test: build-configs
 	go test -cover -v `go list ./... | grep -v /vendor/`
+	@make test-manifests
 
 test-manifests: build-configs build-serve build-serve-tools
 	for file in `ls ${PWD}/tests/manifests/*.yml`; do \

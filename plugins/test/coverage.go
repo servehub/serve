@@ -2,6 +2,7 @@ package test
 
 import (
 	"errors"
+	"github.com/servehub/utils"
 	"os"
 
 	"gorm.io/driver/postgres"
@@ -22,6 +23,7 @@ func (p TestCoverageUpload) Run(data manifest.Manifest) error {
 		Repo     string `json:"repo"   gorm:"index"`
 		Branch   string `json:"branch" gorm:"index"`
 		Ref      string `json:"ref"`
+		Version  string `json:"version"`
 		TestType string `json:"test_type"`
 	}
 
@@ -36,11 +38,15 @@ func (p TestCoverageUpload) Run(data manifest.Manifest) error {
 		Repo:     data.GetString("repo"),
 		Branch:   data.GetString("branch"),
 		Ref:      data.GetString("ref"),
+		Version:  data.GetString("version"),
 		TestType: data.GetString("test-type"),
 	}
 
-	coverage_filename := data.GetString("coverage-file")
-	coverage_file, err := os.ReadFile(coverage_filename)
+	if generateCmd := data.GetString("generate"); generateCmd != "" {
+		utils.RunCmd(generateCmd)
+	}
+
+	coverageFile, err := os.ReadFile(data.GetString("coverage-file"))
 	if err != nil {
 		return errors.New("failed to read coverage file")
 	}
@@ -50,7 +56,7 @@ func (p TestCoverageUpload) Run(data manifest.Manifest) error {
 	// "postgres://username:password@localhost:5432/database_name"
 	//  -- or --
 	// "host=localhost user=postgres password=postgres port=5432"
-	dsn := os.Getenv("DATABASE_URL")
+	dsn := os.Getenv(data.GetString("database-connection-env"))
 
 	// https://gorm.io/docs/connecting_to_the_database.html#PostgreSQL
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -61,7 +67,7 @@ func (p TestCoverageUpload) Run(data manifest.Manifest) error {
 	// Migrate the DB schema
 	db.AutoMigrate(&CoverageReport{})
 
-	db.Create(&CoverageReport{Meta: meta, CoverageFile: coverage_file})
+	db.Create(&CoverageReport{Meta: meta, CoverageFile: coverageFile})
 
 	return nil
 }

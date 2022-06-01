@@ -4,7 +4,7 @@
 
 ## Go
 
-Make sure you have Go installed:
+Make sure you have Go 1.18.+ installed:
 
 ```sh
 brew install go
@@ -18,6 +18,9 @@ make deps
 
 # set $GOPATH env variable (should be your home directory)
 export GOPATH=${HOME}/go
+
+# download dependency 
+go mod vendor
 
 # build
 make
