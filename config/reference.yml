@@ -467,6 +467,18 @@ test:
     components: []
     timeout: 10m
     check-file-exist: ""
+    pre-hooks: []
+    post-hooks: []
+
+  coverage:
+    generate: "java -jar jacococli.jar report coverage/coverage.exec --html coverage --sourcefiles src/main/scala --classfiles classes"
+    database-connection-env: "TEST_COVERAGE_DATABASE_URL"
+    coverage-file: "{{ vars.coverage-file }}"
+    repo: "{{ vars.repo }}"
+    branch: "{{ vars.branch }}"
+    ref: "{{ vars.ref }}"
+    version: "{{ info.build-version }}"
+    test-type: "{{ vars.test-type }}"
 
 notify:
   event: "{{ vars.event }}"
