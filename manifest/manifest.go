@@ -192,7 +192,7 @@ func (m Manifest) ToEnvMap(prefix string) map[string]string {
 	return result
 }
 
-func Load(path string, vars map[string]string) *Manifest {
+func Load(path string, plugin string, vars map[string]string) *Manifest {
 	tree, err := gabs.LoadYamlFile(path)
 	if err != nil {
 		log.Fatalln("Error on load file:", err)
@@ -205,6 +205,21 @@ func Load(path string, vars map[string]string) *Manifest {
 	for _, e := range os.Environ() {
 		pair := strings.SplitN(e, "=", 2)
 		tree.Set(pair[1], "envs", pair[0])
+	}
+
+	// automatically append plugin with this name, if not specified explicitly
+	if !tree.ExistsP(plugin) && strings.Contains(plugin, ".") {
+		ns := strings.SplitN(plugin, ".", 2)
+
+		if array, ok := tree.Path(ns[0]).Data().([]interface{}); ok {
+			tmpM := &Manifest{tree}
+
+			if result, err := tmpM.FindPlugins(plugin); err != nil || len(result) == 0 {
+				obj := make(map[string]interface{})
+				obj[ns[1]] = nil
+				tree.Set(append(array, obj), ns[0])
+			}
+		}
 	}
 
 	for _, proc := range processor.GetAll() {

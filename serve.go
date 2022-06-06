@@ -58,7 +58,7 @@ func main() {
 	if pluginDataExists {
 		manifestData = manifest.LoadJSON(pluginDataFile)
 	} else {
-		manifestData = manifest.Load(manifestFile, vars)
+		manifestData = manifest.Load(manifestFile, plugin, vars)
 	}
 
 	_, dryRun := vars["dry-run"]

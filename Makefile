@@ -35,9 +35,12 @@ build-serve:
 build-serve-tools:
 	go build -trimpath -ldflags "-s -w -X main.version=${VERSION}" -o ${DEST}/serve-tools${SUFFIX} tools/cmd.go
 
-install: build-configs build-serve build-serve-tools
-	for f in serve serve-tools; do \
-		if [ -f ${DEST}/$$f ]; then cp ${DEST}/$$f ${GOPATH}/bin/; fi \
+install: build-configs build-serve
+	for f in serve; do \
+		if [ -f ${DEST}/$$f ]; then \
+		  	rm -f ${GOPATH}/bin/$$f; \
+  			cp ${DEST}/$$f ${GOPATH}/bin/; \
+  		fi \
 	done
 
 clean:
