@@ -471,9 +471,11 @@ test:
     post-hooks: []
 
   coverage:
-    generate: "java -jar jacococli.jar report coverage/coverage.exec --html coverage --sourcefiles src/main/scala --classfiles classes"
+    generate: "java -jar jacococli.jar report coverage/coverage.exec --html coverage --xml coverage.xml --sourcefiles src/main/scala --classfiles classes"
     database-connection-env: "TEST_COVERAGE_DATABASE_URL"
     coverage-file: "{{ vars.coverage-file }}"
+    coverage-xml: "{{ vars.coverage-xml }}"
+    coverage-tolerance: "{{ vars.coverage-tolerance }}"
     repo: "{{ vars.repo }}"
     branch: "{{ vars.branch }}"
     ref: "{{ vars.ref }}"
