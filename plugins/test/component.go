@@ -88,12 +88,12 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 	}()
 
 	if res := utils.RunCmd("DOCKER_CLIENT_TIMEOUT=300 COMPOSE_HTTP_TIMEOUT=300 docker-compose -p %s -f %s up --abort-on-container-exit", data.GetString("name"), tmpfile.Name()); res != nil {
-		return fmt.Errorf("error on running docker-compose with tests: %s", res)
+		err = fmt.Errorf("error on running docker-compose with tests: %s", res)
 	}
 
-	if checkFile != "" {
+	if checkFile != "" && err == nil {
 		if info, err := os.Stat(checkFile); os.IsNotExist(err) || info.Size() < 16 {
-			return fmt.Errorf("check file not exist! %s", checkFile)
+			err = fmt.Errorf("check file not exist! %s", checkFile)
 		}
 	}
 
@@ -104,5 +104,5 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 		}
 	}
 
-	return nil
+	return err
 }
