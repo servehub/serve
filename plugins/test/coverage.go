@@ -2,6 +2,7 @@ package test
 
 import (
 	"errors"
+	"github.com/behance/go-logrus"
 	"github.com/servehub/utils"
 	"os"
 
@@ -42,13 +43,14 @@ func (p TestCoverageUpload) Run(data manifest.Manifest) error {
 		TestType: data.GetString("test-type"),
 	}
 
-	if generateCmd := data.GetString("generate"); generateCmd != "" {
-		utils.RunCmd(generateCmd)
-	}
-
 	coverageFile, err := os.ReadFile(data.GetString("coverage-file"))
 	if err != nil {
-		return errors.New("failed to read coverage file")
+		logrus.Warnf("failed to read coverage file: %s", data.GetString("coverage-file"))
+		return nil
+	}
+
+	if generateReportCmd := data.GetString("generate"); generateReportCmd != "" {
+		utils.RunCmd(generateReportCmd)
 	}
 
 	// https://github.com/jackc/pgx#example-usage
