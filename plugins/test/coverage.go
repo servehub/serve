@@ -78,7 +78,7 @@ func (p CoverageUpload) Run(data manifest.Manifest) error {
 		return errors.New("`GITHUB_TOKEN` is required")
 	}
 	targetUrl := data.GetString("check.target-url")
-	statusContext := data.GetStringOr("checkcontext", "coverage")
+	statusContext := data.GetStringOr("check.context", "coverage")
 	// allow a small tolerance for decrease in coverage
 	coverageTolerance := data.GetFloat("check.tolerance")
 	// get latest coverage report from database
