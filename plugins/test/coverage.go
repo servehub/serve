@@ -143,7 +143,7 @@ type CoverageReportXML struct {
 func generateReportsAndGetCoveragePercent(execCoverageFiles []string, data manifest.Manifest) (float64, error) {
 	builder := strings.Builder{}
 	builder.WriteString(fmt.Sprintf("java -jar %s report %s",
-		data.GetStringOr("generate.jacococl-jar", "jacococli.jar"),
+		data.GetStringOr("generate.jacococli-jar", "jacococli.jar"),
 		strings.Join(execCoverageFiles, " "),
 	))
 	if data.Has("generate.sourcefiles") {

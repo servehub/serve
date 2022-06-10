@@ -472,7 +472,7 @@ test:
 
   coverage:
     generate:
-      jacococl-jar: "jacococli.jar"
+      jacococli-jar: "jacococli.jar"
       sourcefiles:
         - "src/main/java"
         - "src/main/scala"
