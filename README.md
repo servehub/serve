@@ -39,7 +39,6 @@ TEST_COVERAGE_DATABASE_URL="postgres://postgres:postgres@localhost:5432" \
 go run serve.go test.coverage \
     --manifest=project/manifest.yml \
     --coverage-file=test.exec \
-    --coverage-xml=jacoco.xml \
     --coverage-tolerance=1.0 \
     --repo=my-repo \
     --branch=main \

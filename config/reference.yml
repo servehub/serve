@@ -471,16 +471,26 @@ test:
     post-hooks: []
 
   coverage:
-    generate: "java -jar jacococli.jar report coverage/coverage.exec --html coverage --xml coverage.xml --sourcefiles src/main/scala --classfiles classes"
+    generate:
+      jacococl-jar: "jacococli.jar"
+      sourcefiles:
+        - "src/main/java"
+        - "src/main/scala"
+      classfiles:
+        - "classes"
+      html-output-dir: "coverage"
     database-connection-env: "TEST_COVERAGE_DATABASE_URL"
-    coverage-file: "{{ vars.coverage-file }}"
-    coverage-xml: "{{ vars.coverage-xml }}"
-    coverage-tolerance: "{{ vars.coverage-tolerance }}"
+    exec-file: "{{ vars.coverage-file }}"
+    main-branch: "master"
     repo: "{{ vars.repo }}"
     branch: "{{ vars.branch }}"
     ref: "{{ vars.ref }}"
     version: "{{ info.build-version }}"
     test-type: "{{ vars.test-type }}"
+    check:
+      context: "coverage"
+      target-url: "{{ vars.target-url }}"
+      tolerance: "{{ vars.coverage-tolerance }}"
 
 notify:
   event: "{{ vars.event }}"

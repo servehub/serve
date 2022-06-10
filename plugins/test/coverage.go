@@ -4,7 +4,11 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"github.com/behance/go-logrus"
+	"github.com/servehub/serve/tools/github"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/servehub/utils"
 
@@ -15,13 +19,12 @@ import (
 )
 
 func init() {
-	manifest.PluginRegestry.Add("test.coverage", TestCoverageUpload{})
+	manifest.PluginRegestry.Add("test.coverage", CoverageUpload{})
 }
 
-type TestCoverageUpload struct{}
+type CoverageUpload struct{}
 
-func (p TestCoverageUpload) Run(data manifest.Manifest) error {
-
+func (p CoverageUpload) Run(data manifest.Manifest) error {
 	// get repo, commit information
 	meta := Meta{
 		Repo:     data.GetString("repo"),
@@ -31,89 +34,82 @@ func (p TestCoverageUpload) Run(data manifest.Manifest) error {
 		TestType: data.GetString("test-type"),
 	}
 
-	// configurable main branch name
-	mainBranch := data.GetStringOr("main-branch", "master")
-
-	// allow a small tolerance for decrease in coverage
-	coverage_tolerance := data.GetFloat("coverage-tolerance")
-	// the jacoco metric to
-	coverage_metric := data.GetStringOr("coverage-metric", "INSTRUCTION")
-	println("coverage_tolerance =", coverage_tolerance)
-
-	if generateCmd := data.GetString("generate"); generateCmd != "" {
-		utils.RunCmd(generateCmd)
+	execFilePath := data.GetString("exec-file")
+	if _, err := os.Stat(execFilePath); errors.Is(err, os.ErrNotExist) {
+		logrus.Warnf("coverage file doesn't exist - skipping: %s", execFilePath)
+		return nil
 	}
 
-	coverageFile, err := os.ReadFile(data.GetString("coverage-file"))
+	coveragePercent, err := generateReportsAndGetCoveragePercent([]string{execFilePath}, data)
 	if err != nil {
-		return errors.New("failed to read coverage file")
+		return err
 	}
-	coverageXml, err := os.ReadFile(data.GetString("coverage-xml"))
+
+	// main branch name
+	mainBranchName := data.GetStringOr("main-branch", "master")
+
+	connectionUrl := os.Getenv(data.GetString("database-connection-env"))
+	db, err := gorm.Open(postgres.Open(connectionUrl), &gorm.Config{})
 	if err != nil {
-		return errors.New("failed to read coverage XML file")
+		return fmt.Errorf("failed to connect to database: %w", err)
 	}
-
-	// (partially) unmarshall report from xml
-	var coverageReportXml CoverageReportXML
-	xml.Unmarshal(coverageXml, &coverageReportXml)
-
-	// search for the XML counter matching the desired coverage metric
-	var coverageCounter CounterXML
-	for _, counter := range coverageReportXml.Counter {
-		if counter.Type == coverage_metric {
-			coverageCounter = counter
-			break
-		}
-	}
-
-	// calculate coverage for current branch
-	coveragePercent := getCoveragePercent(coverageCounter)
-
-	// --- DB Access ---
-	// https://github.com/jackc/pgx#example-usage
-	// DSN should be in format:
-	// "postgres://username:password@localhost:5432/database_name"
-	//  -- or --
-	// "host=localhost user=postgres password=postgres port=5432"
-	dsn := os.Getenv(data.GetString("database-connection-env"))
-
-	// https://gorm.io/docs/connecting_to_the_database.html#PostgreSQL
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return errors.New("failed to connect to database")
-	}
-
 	// Migrate the DB schema
-	db.AutoMigrate(&CoverageReport{})
-
-	// only the main branch should publish coverage
-	if meta.Branch == mainBranch {
-		db.Create(&CoverageReport{
+	if err := db.AutoMigrate(&CoverageReport{}); err != nil {
+		return fmt.Errorf("failed to apply database migration: %w", err)
+	}
+	if meta.Branch == mainBranchName {
+		coverageData, err := os.ReadFile(execFilePath)
+		if err != nil {
+			return fmt.Errorf("failed to read coverage exec file: %w", err)
+		}
+		if err := db.Create(&CoverageReport{
 			Meta:            meta,
 			CoveragePercent: coveragePercent,
-			CoverageFile:    coverageFile,
-		})
-	} else {
-		// get latest coverage report from database
-		var latestCoverage CoverageReport
-		db.Where(&CoverageReport{Meta: Meta{
-			Repo:     meta.Repo,
-			Branch:   mainBranch,
-			TestType: meta.TestType,
-		}}).Last(&latestCoverage)
-
-		fmt.Printf("latest coverage: %s => %f", latestCoverage.CreatedAt, latestCoverage.CoveragePercent)
-
-		// TODO: handle no results from db
-
-		// TODO: check the current coverage against latest main branch coverage
+			CoverageFile:    coverageData,
+		}).Error; err != nil {
+			return fmt.Errorf("failed to upload coverage exec file: %w", err)
+		}
+		return nil
 	}
 
-	return nil
-}
+	// check mode
+	accessToken := os.Getenv("GITHUB_TOKEN")
+	if accessToken == "" {
+		return errors.New("`GITHUB_TOKEN` is required")
+	}
+	targetUrl := data.GetString("check.target-url")
+	statusContext := data.GetStringOr("checkcontext", "coverage")
+	// allow a small tolerance for decrease in coverage
+	coverageTolerance := data.GetFloat("check.tolerance")
+	// get latest coverage report from database
+	var latestCoverage CoverageReport
+	if err := db.Where(&CoverageReport{Meta: Meta{
+		Repo:     meta.Repo,
+		Branch:   mainBranchName,
+		TestType: meta.TestType,
+	}}).Last(&latestCoverage).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return github.SendStatus(accessToken, meta.Repo, meta.Ref, "success",
+				"No previous coverage exists - check skipped ",
+				statusContext, targetUrl)
+		}
+		return err
+	}
 
-func getCoveragePercent(counter CounterXML) float64 {
-	return 100 * float64(counter.Covered) / float64(counter.Covered+counter.Missed)
+	diff := latestCoverage.CoveragePercent - coveragePercent
+	if diff < 0 {
+		return github.SendStatus(accessToken, meta.Repo, meta.Ref, "success",
+			fmt.Sprintf("Thank you for increasing the test coverage by %.2f%", -diff),
+			statusContext, targetUrl)
+	} else if diff < coverageTolerance {
+		return github.SendStatus(accessToken, meta.Repo, meta.Ref, "success",
+			fmt.Sprintf("Coverage changed by %.2f%", diff),
+			statusContext, targetUrl)
+	} else {
+		return github.SendStatus(accessToken, meta.Repo, meta.Ref, "failure",
+			fmt.Sprintf("Please increase test coverage at least by %.2f%", diff),
+			statusContext, targetUrl)
+	}
 }
 
 type Meta struct {
@@ -128,7 +124,7 @@ type CoverageReport struct {
 	gorm.Model
 	Meta
 	// coverage percentage in the range [0.0, 100.0]
-	CoveragePercent float64 `json:"coverage_percent"`
+	CoveragePercent float64
 	CoverageFile    []byte
 }
 
@@ -142,4 +138,68 @@ type CounterXML struct {
 type CoverageReportXML struct {
 	XMLName xml.Name     `xml:"report"`
 	Counter []CounterXML `xml:"counter"`
+}
+
+func generateReportsAndGetCoveragePercent(execCoverageFiles []string, data manifest.Manifest) (float64, error) {
+	builder := strings.Builder{}
+	builder.WriteString(fmt.Sprintf("java -jar %s report %s",
+		data.GetStringOr("generate.jacococl-jar", "jacococli.jar"),
+		strings.Join(execCoverageFiles, " "),
+	))
+	if data.Has("generate.sourcefiles") {
+		for _, sourceFiles := range data.GetArray("generate.sourcefiles") {
+			builder.WriteString(fmt.Sprintf(" --sourcefiles %s", sourceFiles))
+		}
+	}
+	for _, classFiles := range data.GetArray("generate.classfiles") {
+		builder.WriteString(fmt.Sprintf(" --classfiles %s", classFiles))
+	}
+	if data.Has("generate.html-output-dir") {
+		htmlOutputDir := data.GetString("generate.html-output-dir")
+		if htmlOutputDir != "" {
+			builder.WriteString(fmt.Sprintf(" --html %s", htmlOutputDir))
+		}
+	}
+
+	dirName, err := os.MkdirTemp("", "xml-report")
+	if err != nil {
+		return 0, errors.New("failed to create directory for temporary XML report file")
+	}
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			logrus.Fatal(err)
+		}
+	}(dirName)
+	xmlReportFile := filepath.Join(dirName, "coverage.xml")
+	builder.WriteString(fmt.Sprintf(" --xml %s", xmlReportFile))
+
+	if err = utils.RunCmd(builder.String()); err != nil {
+		return 0, err
+	}
+	return getCoveragePercent(xmlReportFile)
+}
+
+func getCoveragePercent(xmlReportFile string) (float64, error) {
+	coverageXml, err := os.ReadFile(xmlReportFile)
+	if err != nil {
+		return 0, fmt.Errorf("failed to read xml coverage report file: %w", err)
+	}
+
+	// (partially) unmarshall report from xml
+	var coverageReportXml CoverageReportXML
+	if err = xml.Unmarshal(coverageXml, &coverageReportXml); err != nil {
+		return 0, fmt.Errorf("failed to parse xml coverage report file: %w", err)
+	}
+
+	// search for the XML counter matching the desired coverage metric
+	var coverageCounter CounterXML
+	for _, counter := range coverageReportXml.Counter {
+		if counter.Type == "INSTRUCTION" {
+			coverageCounter = counter
+			break
+		}
+	}
+
+	return 100 * float64(coverageCounter.Covered) / float64(coverageCounter.Covered+coverageCounter.Missed), nil
 }
