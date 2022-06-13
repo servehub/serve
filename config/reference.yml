@@ -480,7 +480,7 @@ test:
         - "classes"
       html-output-dir: "coverage"
     database-connection-env: "TEST_COVERAGE_DATABASE_URL"
-    exec-file: "{{ vars.coverage-file }}"
+    exec-file: "coverage/coverage.exec"
     main-branch: "master"
     repo: "{{ vars.repo }}"
     branch: "{{ vars.branch }}"
@@ -490,7 +490,7 @@ test:
     check:
       context: "coverage"
       target-url: "{{ vars.target-url }}"
-      tolerance: "{{ vars.coverage-tolerance }}"
+      tolerance: "0"
 
 notify:
   event: "{{ vars.event }}"
