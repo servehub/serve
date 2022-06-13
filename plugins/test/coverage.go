@@ -4,18 +4,17 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/behance/go-logrus"
-	"github.com/servehub/serve/tools/github"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/servehub/utils"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	"github.com/servehub/serve/manifest"
+	"github.com/servehub/serve/tools/github"
+	"github.com/servehub/utils"
 )
 
 func init() {
@@ -36,7 +35,7 @@ func (p CoverageUpload) Run(data manifest.Manifest) error {
 
 	execFilePath := data.GetString("exec-file")
 	if _, err := os.Stat(execFilePath); errors.Is(err, os.ErrNotExist) {
-		logrus.Warnf("coverage file doesn't exist - skipping: %s", execFilePath)
+		log.Printf("coverage file doesn't exist - skipping: %s", execFilePath)
 		return nil
 	}
 
@@ -53,15 +52,18 @@ func (p CoverageUpload) Run(data manifest.Manifest) error {
 	if err != nil {
 		return fmt.Errorf("failed to connect to database: %w", err)
 	}
+
 	// Migrate the DB schema
 	if err := db.AutoMigrate(&CoverageReport{}); err != nil {
 		return fmt.Errorf("failed to apply database migration: %w", err)
 	}
+
 	if meta.Branch == mainBranchName {
 		coverageData, err := os.ReadFile(execFilePath)
 		if err != nil {
 			return fmt.Errorf("failed to read coverage exec file: %w", err)
 		}
+
 		if err := db.Create(&CoverageReport{
 			Meta:            meta,
 			CoveragePercent: coveragePercent,
@@ -69,6 +71,7 @@ func (p CoverageUpload) Run(data manifest.Manifest) error {
 		}).Error; err != nil {
 			return fmt.Errorf("failed to upload coverage exec file: %w", err)
 		}
+		
 		return nil
 	}
 
@@ -77,12 +80,16 @@ func (p CoverageUpload) Run(data manifest.Manifest) error {
 	if accessToken == "" {
 		return errors.New("`GITHUB_TOKEN` is required")
 	}
+
 	targetUrl := data.GetString("check.target-url")
 	statusContext := data.GetStringOr("check.context", "coverage")
+
 	// allow a small tolerance for decrease in coverage
 	coverageTolerance := data.GetFloat("check.tolerance")
+
 	// get latest coverage report from database
 	var latestCoverage CoverageReport
+
 	if err := db.Where(&CoverageReport{Meta: Meta{
 		Repo:     meta.Repo,
 		Branch:   mainBranchName,
@@ -97,6 +104,7 @@ func (p CoverageUpload) Run(data manifest.Manifest) error {
 	}
 
 	diff := latestCoverage.CoveragePercent - coveragePercent
+
 	if diff < 0 {
 		return github.SendStatus(accessToken, meta.Repo, meta.Ref, "success",
 			fmt.Sprintf("Thank you for increasing the test coverage by %.2f%", -diff),
@@ -146,14 +154,17 @@ func generateReportsAndGetCoveragePercent(execCoverageFiles []string, data manif
 		data.GetStringOr("generate.jacococli-jar", "jacococli.jar"),
 		strings.Join(execCoverageFiles, " "),
 	))
+
 	if data.Has("generate.sourcefiles") {
 		for _, sourceFiles := range data.GetArray("generate.sourcefiles") {
 			builder.WriteString(fmt.Sprintf(" --sourcefiles %s", sourceFiles))
 		}
 	}
+
 	for _, classFiles := range data.GetArray("generate.classfiles") {
 		builder.WriteString(fmt.Sprintf(" --classfiles %s", classFiles))
 	}
+
 	if data.Has("generate.html-output-dir") {
 		htmlOutputDir := data.GetString("generate.html-output-dir")
 		if htmlOutputDir != "" {
@@ -165,18 +176,21 @@ func generateReportsAndGetCoveragePercent(execCoverageFiles []string, data manif
 	if err != nil {
 		return 0, errors.New("failed to create directory for temporary XML report file")
 	}
+
 	defer func(path string) {
 		err := os.RemoveAll(path)
 		if err != nil {
-			logrus.Fatal(err)
+			log.Fatal(err)
 		}
 	}(dirName)
+
 	xmlReportFile := filepath.Join(dirName, "coverage.xml")
 	builder.WriteString(fmt.Sprintf(" --xml %s", xmlReportFile))
 
 	if err = utils.RunCmd(builder.String()); err != nil {
 		return 0, err
 	}
+
 	return getCoveragePercent(xmlReportFile)
 }
 

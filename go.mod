@@ -20,7 +20,7 @@ require (
 require (
 	github.com/ChannelMeter/iso8601duration v0.0.0-20150204201828-8da3af7a2a61 // indirect
 	github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da // indirect
-	github.com/behance/go-logrus v0.6.6-0.20150302122843-eb84da520d0b // indirect
+	github.com/behance/go-logrus v0.6.5 // indirect
 	github.com/channelmeter/iso8601duration v0.0.0-20150204201828-8da3af7a2a61 // indirect
 	github.com/donovanhide/eventsource v0.0.0-20171031113327-3ed64d21fb0b // indirect
 	github.com/golang/protobuf v1.5.2 // indirect

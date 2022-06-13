@@ -28,6 +28,7 @@ func SendStatus(accessToken string, repo string, ref string, state string, descr
 		oauth2.NewClient(
 			context.Background(),
 			oauth2.StaticTokenSource(&oauth2.Token{AccessToken: accessToken})))
+
 	return backoff.Retry(func() error {
 		_, _, err := client.Repositories.CreateStatus(context.Background(), rps[0], strings.TrimSuffix(rps[1], ".git"), ref, input)
 		return err
