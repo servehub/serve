@@ -36,6 +36,7 @@ vars:
   stage-counter: 0
   purge: false
   no-push: false
+  context: build
 
 conf:
   marathon:

@@ -21,6 +21,7 @@ func (p githubStatus) Run(data manifest.Manifest) error {
 	}
 
 	state := data.GetStringOr("state", "success")
+
 	return github.SendStatus(accessToken,
 		data.GetString("repo"),
 		data.GetString("ref"),
