@@ -99,15 +99,15 @@ func (p CoverageUpload) Run(data manifest.Manifest) error {
 	diff := latestCoverage.CoveragePercent - coveragePercent
 	if diff < 0 {
 		return github.SendStatus(accessToken, meta.Repo, meta.Ref, "success",
-			fmt.Sprintf("Thank you for increasing the test coverage by %.2f%", -diff),
+			fmt.Sprintf("Thank you for increasing the test coverage by %.2f%%", -diff),
 			statusContext, targetUrl)
 	} else if diff < coverageTolerance {
 		return github.SendStatus(accessToken, meta.Repo, meta.Ref, "success",
-			fmt.Sprintf("Coverage changed by %.2f%", diff),
+			fmt.Sprintf("Coverage changed by %.2f%%", diff),
 			statusContext, targetUrl)
 	} else {
 		return github.SendStatus(accessToken, meta.Repo, meta.Ref, "failure",
-			fmt.Sprintf("Please increase test coverage at least by %.2f%", diff),
+			fmt.Sprintf("Please increase test coverage at least by %.2f%%", diff),
 			statusContext, targetUrl)
 	}
 }

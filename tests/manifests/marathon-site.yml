@@ -284,13 +284,25 @@ tests:
       consul-address: "consul.superman.space"
       full-name: "superman/web/rest-api-new-design"
 
-  - run: "test.coverage --branch=new-test --build-number=128 --test-type=component"
+  - run: "test.coverage --branch=new-test --build-number=128 --test-type=component --coverage-file=coverage/coverage.exec --target-url=https://localhost.localdomain/ref/path --coverage-tolerance=1.2"
     expect:
       branch: "new-test"
-      coverage-file: ""
+      exec-file: "coverage/coverage.exec"
       database-connection-env: "TEST_COVERAGE_DATABASE_URL"
-      generate: "java -jar jacococli.jar report coverage/coverage.exec --html coverage --sourcefiles src/main/scala --classfiles classes"
+      generate:
+        classfiles:
+          - "classes"
+        sourcefiles:
+          - "src/main/java"
+          - "src/main/scala"
+        jacococli-jar: "jacococli.jar"
+        html-output-dir: "coverage"
       ref: ""
       repo: ""
       test-type: "component"
       version: "2.1.128"
+      main-branch: "master"
+      check:
+        context: "coverage"
+        target-url: "https://localhost.localdomain/ref/path"
+        tolerance: "1.2"
