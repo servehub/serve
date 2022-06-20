@@ -145,13 +145,13 @@ func (m Manifest) FindPlugins(plugin string) ([]PluginData, error) {
 			if _, ok := item.Data().(string); ok {
 				result = append(result, makePluginPair(plugin, item))
 			} else if res, err := item.ChildrenMap(); err == nil {
-				if len(res) == 1 {
+				if len(res) == 1 && !strings.Contains(plugin, ".") {
 					for subplugin, data := range res {
 						result = append(result, makePluginPair(plugin+"."+subplugin, data))
 						break
 					}
 				} else if len(res) == 0 && !PluginRegestry.Has(plugin) {
-					// skip subplugin with empty data
+					// skip sub-plugin with empty data
 				} else {
 					result = append(result, makePluginPair(plugin, item))
 				}

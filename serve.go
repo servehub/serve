@@ -68,6 +68,8 @@ func main() {
 		return
 	}
 
+	pluginFilter, pluginFilterExists := vars["plugin"]
+
 	var plugins []manifest.PluginData
 	if pluginDataExists {
 		plugins = []manifest.PluginData{manifestData.GetPluginWithData(plugin)}
@@ -82,6 +84,10 @@ func main() {
 	startTime := time.Now()
 
 	for _, pair := range plugins {
+		if pluginFilterExists && pair.PluginName != pluginFilter {
+			continue
+		}
+
 		log.Printf("%s\n%s\n\n", color.GreenString(">>> %s:", pair.PluginName), color.CyanString("%s", pair.Data))
 
 		if !dryRun {

@@ -129,7 +129,7 @@ github:
     ref: "{{ vars.ref }}"
     state: "{{ vars.state }}"
     target-url: "{{ vars.target-url }}"
-    description: "Build is {{ vars.state }}"
+    description: "{{ vars.state }}"
     context: "CI"
 
 build:

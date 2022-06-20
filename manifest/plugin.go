@@ -2,6 +2,7 @@ package manifest
 
 import (
 	"log"
+	"runtime/debug"
 
 	"github.com/fatih/color"
 )
@@ -37,6 +38,7 @@ func (r *pluginRegestry) Add(name string, plugin Plugin) {
 func (r *pluginRegestry) Get(name string) Plugin {
 	p, ok := r.plugins[name]
 	if !ok {
+		debug.PrintStack()
 		log.Fatalf(color.RedString("Plugin '%s' doesn't exist!", name))
 	}
 	return p
