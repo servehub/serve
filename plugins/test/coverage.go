@@ -64,12 +64,21 @@ func (p CoverageUpload) Run(data manifest.Manifest) error {
 			return fmt.Errorf("failed to read coverage exec file: %w", err)
 		}
 
-		if err := db.Create(&CoverageReport{
+		reportRecord := CoverageReport{
 			Meta:            meta,
 			CoveragePercent: coveragePercent,
 			CoverageFile:    coverageData,
-		}).Error; err != nil {
+		}
+		if err := db.Create(&reportRecord).Error; err != nil {
 			return fmt.Errorf("failed to upload coverage exec file: %w", err)
+		}
+
+		if err := db.Unscoped().Where(&CoverageReport{Meta: Meta{
+			Repo:     meta.Repo,
+			Branch:   mainBranchName,
+			TestType: meta.TestType,
+		}}).Where("id != ?", reportRecord.ID).Delete(&CoverageReport{}).Error; err != nil {
+			log.Printf("failed to removed outdated records: %s", err)
 		}
 
 		return nil
