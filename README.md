@@ -29,26 +29,3 @@ make
 make test
 ```
 
-# Testing
-
-## Coverage report plugin
-
-```sh
-# run coverage uploader plugin (using "project" as an example)
-TEST_COVERAGE_DATABASE_URL="postgres://postgres:postgres@localhost:5432" \
-go run serve.go test.coverage \
-    --manifest=project/manifest.yml \
-    --coverage-file=test.exec \
-    --coverage-tolerance=1.0 \
-    --repo=my-repo \
-    --branch=main \
-    --ref=abc123 \
-    --test-type=unit
-```
-
-```sql
--- view binary data (postgres)
-SELECT encode(coverage_file::bytea, 'escape')
-FROM public.coverage_reports
-ORDER BY id ASC
-```
