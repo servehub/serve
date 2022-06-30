@@ -42,14 +42,14 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 		}
 	}
 
-	bytes, err := yaml.Marshal(data.GetTree("compose").Unwrap())
-	if err != nil {
-		return fmt.Errorf("error on serialize yaml: %v", err)
+	bytes, finalErr := yaml.Marshal(data.GetTree("compose").Unwrap())
+	if finalErr != nil {
+		return fmt.Errorf("error on serialize yaml: %v", finalErr)
 	}
 
-	tmpfile, err := ioutil.TempFile("", "serve-component-test")
-	if err != nil {
-		return fmt.Errorf("error create tmpfile: %v", err)
+	tmpfile, finalErr := ioutil.TempFile("", "serve-component-test")
+	if finalErr != nil {
+		return fmt.Errorf("error create tmpfile: %v", finalErr)
 	}
 
 	defer func() {
@@ -74,9 +74,9 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 		utils.RunCmd("docker-compose -p %s -f %s down -v --remove-orphans", data.GetString("name"), tmpfile.Name())
 	}()
 
-	timeout, err := time.ParseDuration(data.GetString("timeout"))
-	if err != nil {
-		return fmt.Errorf("error parse timeout: %v", err)
+	timeout, finalErr := time.ParseDuration(data.GetString("timeout"))
+	if finalErr != nil {
+		return fmt.Errorf("error parse timeout: %v", finalErr)
 	}
 
 	go func() {
@@ -88,12 +88,14 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 	}()
 
 	if res := utils.RunCmd("DOCKER_CLIENT_TIMEOUT=300 COMPOSE_HTTP_TIMEOUT=300 docker-compose -p %s -f %s up --abort-on-container-exit", data.GetString("name"), tmpfile.Name()); res != nil {
-		err = fmt.Errorf("error on running docker-compose with tests: %s", res)
+		finalErr = fmt.Errorf("error on running docker-compose with tests: %s", res)
 	}
 
-	if checkFile != "" && err == nil {
+	if checkFile != "" && finalErr == nil {
+		log.Printf("Check if %s exist...", checkFile)
+
 		if info, err := os.Stat(checkFile); os.IsNotExist(err) || info.Size() < 16 {
-			err = fmt.Errorf("check file not exist! %s", checkFile)
+			finalErr = fmt.Errorf("check file not exist! %s. %s", checkFile, err)
 		}
 	}
 
@@ -104,5 +106,5 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 		}
 	}
 
-	return err
+	return finalErr
 }
