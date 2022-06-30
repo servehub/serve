@@ -35,13 +35,6 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 		data.ArrayAppend("compose.services.tests.depends_on", name)
 	}
 
-	for _, task := range data.GetArray("pre-hooks") {
-		if err := utils.RunCmd(`%s`, task.Unwrap()); err != nil {
-			log.Println(color.RedString("%s: %s", task, err))
-			return err
-		}
-	}
-
 	bytes, finalErr := yaml.Marshal(data.GetTree("compose").Unwrap())
 	if finalErr != nil {
 		return fmt.Errorf("error on serialize yaml: %v", finalErr)
@@ -96,13 +89,6 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 
 		if info, err := os.Stat(checkFile); os.IsNotExist(err) || info.Size() < 16 {
 			finalErr = fmt.Errorf("check file not exist! %s. %s", checkFile, err)
-		}
-	}
-
-	for _, task := range data.GetArray("post-hooks") {
-		if err := utils.RunCmd(`%s`, task.Unwrap()); err != nil {
-			log.Println(color.RedString("%s: %s", task, err))
-			return err
 		}
 	}
 

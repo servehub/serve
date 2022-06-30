@@ -469,8 +469,6 @@ test:
     components: []
     timeout: 10m
     check-file-exist: ""
-    pre-hooks: []
-    post-hooks: []
 
   coverage:
     generate:
@@ -579,3 +577,10 @@ monitoring:
     path: "services/alerts/%s/{{ info.full-name | replace('\\W|_', '-') }}"
 
   alerts: {}
+
+hooks: {}
+#  pre.build:
+#    hook-name: echo "pre hello1"
+#
+#  post.build:
+#    hook-name: echo "post hello1"

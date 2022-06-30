@@ -83,22 +83,41 @@ func main() {
 
 	startTime := time.Now()
 
+	hooks := &manifest.Hooks{Manifest: manifestData, DryRun: dryRun}
+
+	if err := hooks.Run("pre." + plugin); err != nil {
+		log.Fatalln(color.RedString("Pre hooks failed"))
+	}
+
 	for _, pair := range plugins {
 		if pluginFilterExists && pair.PluginName != pluginFilter {
 			continue
+		}
+
+		if err := hooks.Run("pre." + pair.PluginName); err != nil {
+			log.Fatalln(color.RedString("Pre hooks failed"))
 		}
 
 		log.Printf("%s\n%s\n\n", color.GreenString(">>> %s:", pair.PluginName), color.CyanString("%s", pair.Data))
 
 		if !dryRun {
 			if err := pair.Plugin.Run(pair.Data); err != nil {
+				hooks.Run("post." + pair.PluginName)
+				hooks.Run("post." + plugin)
+
 				fmt.Println("")
 				log.Fatalln(color.RedString("Error on run plugin `%s`: %v", pair.PluginName, err))
 			} else {
+				if err := hooks.Run("post." + pair.PluginName); err != nil {
+					log.Fatalln(color.RedString("Post hooks failed"))
+				}
+
 				log.Println(color.GreenString("<<< %s: OK", pair.PluginName))
 			}
 		}
 	}
+
+	hooks.Run("post." + plugin)
 
 	log.Println(color.GreenString("Time: %d seconds", int(time.Now().Sub(startTime).Seconds())))
 }
