@@ -306,3 +306,8 @@ tests:
         context: "coverage"
         target-url: "https://test.example.com"
         tolerance: "0"
+
+  - run: "test.upload-zephyr"
+    expect:
+      report-file: "tests-output/results.xml"
+      project-key: "JIRA"

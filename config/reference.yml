@@ -493,6 +493,10 @@ test:
       target-url: "{{ vars.target-url }}"
       tolerance: "0"
 
+  upload-zephyr:
+    report-file: "tests-output/results.xml"
+    project-key: "JIRA"
+
 notify:
   event: "{{ vars.event }}"
 
