@@ -224,5 +224,9 @@ func getCoveragePercent(xmlReportFile string) (float64, error) {
 		}
 	}
 
-	return 100 * float64(coverageCounter.Covered) / float64(coverageCounter.Covered+coverageCounter.Missed), nil
+	total := coverageCounter.Covered + coverageCounter.Missed
+	if total == 0 {
+		return 0, err
+	}
+	return 100 * float64(coverageCounter.Covered) / float64(total), nil
 }
