@@ -2,10 +2,11 @@ package test
 
 import (
 	"errors"
-	"github.com/servehub/serve/manifest"
-	"github.com/servehub/serve/tools/zephyr"
 	"log"
 	"os"
+
+	"github.com/servehub/serve/manifest"
+	"github.com/servehub/serve/tools/zephyr"
 )
 
 func init() {
