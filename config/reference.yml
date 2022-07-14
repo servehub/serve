@@ -496,6 +496,11 @@ test:
   upload-zephyr:
     report-file: "tests-output/results.xml"
     project-key: "JIRA"
+    main-branch: "master"
+    branch: "{{ vars.branch }}"
+    app-name: "{{ info.full-name }}"
+    version: "{{ info.build-version }}"
+    test-type: "{{ vars.test-type }}"
 
 notify:
   event: "{{ vars.event }}"
