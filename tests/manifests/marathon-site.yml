@@ -307,7 +307,12 @@ tests:
         target-url: "https://test.example.com"
         tolerance: "0"
 
-  - run: "test.upload-zephyr"
+  - run: "test.upload-zephyr --branch=new-test --build-number=42 --test-type=units"
     expect:
       report-file: "tests-output/results.xml"
       project-key: "JIRA"
+      main-branch: "master"
+      branch: "new-test"
+      app-name: "superman/web/rest-api-new-test"
+      test-type: "units"
+      version: "2.1.42"

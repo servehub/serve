@@ -45,10 +45,10 @@ type ErrorResponse struct {
 
 type TestCycle struct {
 	Name               string `json:"name"`
-	Description        string `json:"description"`
-	JiraProjectVersion int    `json:"jiraProjectVersion"`
-	FolderId           int    `json:"folderId"`
-	CustomFields       string `json:"customFields"`
+	Description        string `json:"description,omitempty"`
+	JiraProjectVersion int    `json:"jiraProjectVersion,omitempty"`
+	FolderId           int    `json:"folderId,omitempty"`
+	CustomFields       string `json:"customFields,omitempty"`
 }
 
 const URL = "https://api.zephyrscale.smartbear.com/v2/automations/executions/junit?"
