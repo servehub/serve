@@ -88,7 +88,7 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 		log.Printf("Check if %s exist...", checkFile)
 
 		if info, err := os.Stat(checkFile); os.IsNotExist(err) || info.Size() < 16 {
-			finalErr = fmt.Errorf("check file not exist! %s. %s", checkFile, err)
+			finalErr = fmt.Errorf("check file not exist! %s. %v", checkFile, err)
 		}
 	}
 
