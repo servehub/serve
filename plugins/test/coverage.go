@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -124,7 +125,7 @@ func (p CoverageUpload) Run(data manifest.Manifest) error {
 			statusContext, targetUrl)
 	} else {
 		return github.SendStatus(accessToken, meta.Repo, meta.Ref, "failure",
-			fmt.Sprintf("Please increase test coverage at least by %.2f%%", diff),
+			fmt.Sprintf("Please increase test coverage at least by %.2f%%", math.Max(diff, 1)),
 			statusContext, targetUrl)
 	}
 }
