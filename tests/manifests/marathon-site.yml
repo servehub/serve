@@ -312,6 +312,7 @@ tests:
       report-file: "tests-output/results.xml"
       project-key: "JIRA"
       main-branch: "master"
+      auto-create-test-cases: false
       branch: "new-test"
       app-name: "superman/web/rest-api-new-test"
       test-type: "units"

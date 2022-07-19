@@ -497,6 +497,7 @@ test:
     report-file: "tests-output/results.xml"
     project-key: "JIRA"
     main-branch: "master"
+    auto-create-test-cases: false
     branch: "{{ vars.branch }}"
     app-name: "{{ info.full-name }}"
     version: "{{ info.build-version }}"

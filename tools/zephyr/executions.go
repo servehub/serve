@@ -13,6 +13,7 @@ import (
 	"net/textproto"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/cenk/backoff"
@@ -43,6 +44,14 @@ type ErrorResponse struct {
 	Message   string `json:"message"`
 }
 
+type ExecutionResponse struct {
+	TestCycle struct {
+		Id  int    `json:"id"`
+		Url string `json:"url"`
+		Key string `json:"key"`
+	} `json:"testCycle"`
+}
+
 type TestCycle struct {
 	Name               string `json:"name"`
 	Description        string `json:"description,omitempty"`
@@ -53,7 +62,7 @@ type TestCycle struct {
 
 const URL = "https://api.zephyrscale.smartbear.com/v2/automations/executions/junit?"
 
-func UploadJunitReport(token string, projectKey string, reportFilePath string, testCycleInfo *TestCycle) error {
+func UploadJunitReport(token string, projectKey string, reportFilePath string, autoCreateTestCases bool, testCycleInfo *TestCycle) error {
 	reportFile, err := os.Open(reportFilePath)
 	if err != nil {
 		return err
@@ -61,7 +70,7 @@ func UploadJunitReport(token string, projectKey string, reportFilePath string, t
 	defer reportFile.Close()
 
 	values := map[string]TypedReader{
-		"file": {"application/xml", reportFile.Name(), reportFile},
+		"file": {getMimeType(reportFilePath), reportFile.Name(), reportFile},
 	}
 	if testCycleInfo != nil {
 		testCycleBytes, _ := json.Marshal(testCycleInfo)
@@ -87,7 +96,9 @@ func UploadJunitReport(token string, projectKey string, reportFilePath string, t
 
 	params := url.Values{
 		"projectKey": {projectKey},
-		//"autoCreateTestCases": {"true"},
+	}
+	if autoCreateTestCases {
+		params.Set("autoCreateTestCases", "true")
 	}
 	remoteURL := URL + params.Encode()
 
@@ -116,6 +127,17 @@ func UploadJunitReport(token string, projectKey string, reportFilePath string, t
 				return nil
 			}
 			log.Printf("failed to upload report to zephyr: [%d] %s", msg.ErrorCode, msg.Message)
+		} else {
+			defer response.Body.Close()
+			body, err := ioutil.ReadAll(response.Body)
+			if err == nil {
+				msg := ExecutionResponse{}
+				if err := json.Unmarshal(body, &msg); err == nil {
+					log.Printf("successfully uploaded to zephyr: %s", msg.TestCycle.Url)
+					return nil
+				}
+			}
+			log.Printf("successfully uploaded to zephyr: %s", string(body))
 		}
 		return nil
 	}, backoff.NewExponentialBackOff())
@@ -127,4 +149,16 @@ func shouldBeRetried(statusCode int) bool {
 		return true
 	}
 	return false
+}
+
+func getMimeType(path string) string {
+	ext := filepath.Ext(path)
+	//
+	switch ext {
+	case ".zip":
+		return "application/zip"
+	case ".xml":
+		return "application/json"
+	}
+	return "application/octet-stream"
 }
