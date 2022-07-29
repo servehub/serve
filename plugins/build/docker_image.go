@@ -48,8 +48,13 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 
 	buildArgs := data.GetString("build-args")
 
+	workdir := ""
+	if data.Has("workdir") {
+		workdir = data.GetString("workdir") + "/"
+	}
+
 	if data.Has("dockerfile") {
-		buildArgs += " --file " + data.GetString("dockerfile")
+		buildArgs += " --file " + workdir + data.GetString("dockerfile")
 	}
 
 	tags := make([]string, 0)
