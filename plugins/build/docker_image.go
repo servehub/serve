@@ -47,9 +47,10 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 	}
 
 	buildArgs := data.GetString("build-args")
+	workdir := data.GetString("workdir") + "/"
 
 	if data.Has("dockerfile") {
-		buildArgs += " --file " + data.GetString("dockerfile")
+		buildArgs += " --file " + workdir + data.GetString("dockerfile")
 	}
 
 	tags := make([]string, 0)
@@ -96,11 +97,6 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 						continue
 					}
 				}
-			}
-
-			workdir := ""
-			if data.GetString("workdir") != "." {
-				workdir = data.GetString("workdir") + "/"
 			}
 
 			if _, err := ioutil.ReadFile(workdir + image.GetString("dockerfile")); err != nil {
