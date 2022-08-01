@@ -48,13 +48,8 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 
 	buildArgs := data.GetString("build-args")
 
-	workdir := ""
-	if data.Has("workdir") {
-		workdir = data.GetString("workdir") + "/"
-	}
-
 	if data.Has("dockerfile") {
-		buildArgs += " --file " + workdir + data.GetString("dockerfile")
+		buildArgs += " --file " + data.GetString("dockerfile")
 	}
 
 	tags := make([]string, 0)
@@ -96,10 +91,6 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 	if data.Has("images") && len(data.GetArray("images")) > 0 {
 		for _, image := range data.GetArray("images") {
 			if image.Has("branch") && image.GetString("branch") != data.GetStringOr("current-branch", "master") {
-				if image.GetString("branch") == "master" {
-					continue
-				}
-
 				if image.GetString("branch") != "*" {
 					if m, _ := regexp.MatchString("^"+image.GetString("branch")+"$", data.GetStringOr("current-branch", "master")); !m {
 						continue
@@ -107,7 +98,12 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 				}
 			}
 
-			if _, err := ioutil.ReadFile(image.GetString("dockerfile")); err != nil {
+			workdir := ""
+			if data.GetString("workdir") != "." {
+				workdir = data.GetString("workdir") + "/"
+			}
+
+			if _, err := ioutil.ReadFile(workdir + image.GetString("dockerfile")); err != nil {
 				continue
 			}
 

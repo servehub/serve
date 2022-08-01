@@ -160,7 +160,7 @@ func TestDockerImageBuild(t *testing.T) {
 		        password: ""
 				`,
 				Expects: []string{
-					"docker build --pull --file ./Dockerfile.stt -t registry.superman.space/common/node:v1.0.34 -t registry.superman.space/common/node:latest --cache-from=registry.superman.space/common/node:latest .",
+					"docker build --pull --file Dockerfile.stt -t registry.superman.space/common/node:v1.0.34 -t registry.superman.space/common/node:latest --cache-from=registry.superman.space/common/node:latest .",
 					"docker push registry.superman.space/common/node:v1.0.34",
 					"docker push registry.superman.space/common/node:latest",
 				},
@@ -169,16 +169,23 @@ func TestDockerImageBuild(t *testing.T) {
 			"custom dockerfile nested": {
 				In: `---
 		      image: registry.superman.space/common/node:v1.0.34
-		      dockerfile: Dockerfile.stt
 		      tags: []
 		      workdir: "this_is_subdirectory"
+		      current-branch: "master"
+		      images:
+		         - branch: "master"
+		           dockerfile: "Dockerfile.stt"
+		           repository: "docker.custom-repo.com/subdir/path"
+		         - branch: "master"
+		           dockerfile: "Dockerfile.stt"
+		           repository: "new-other-repo.text.com"
 		      build-args: "--pull"
 		      login:
 		        user: ""
 		        password: ""
 				`,
 				Expects: []string{
-					"docker build --pull --file this_is_subdirectory/Dockerfile.stt -t registry.superman.space/common/node:v1.0.34 -t registry.superman.space/common/node:latest --cache-from=registry.superman.space/common/node:latest this_is_subdirectory",
+					"docker build --pull -t registry.superman.space/common/node:v1.0.34 -t registry.superman.space/common/node:latest --cache-from=registry.superman.space/common/node:latest this_is_subdirectory",
 					"docker push registry.superman.space/common/node:v1.0.34",
 					"docker push registry.superman.space/common/node:latest",
 				},
