@@ -167,17 +167,16 @@ func generateReportsAndGetCoveragePercent(execCoverageFiles []string, data manif
 
 	if data.Has("generate.sourcefiles") {
 		for _, sourceFiles := range data.GetArray("generate.sourcefiles") {
-			builder.WriteString(fmt.Sprintf(" --sourcefiles %s", sourceFiles))
+			if _, err := os.Stat(fmt.Sprintf("%s", sourceFiles)); !os.IsNotExist(err) {
+				builder.WriteString(fmt.Sprintf(" --sourcefiles %s", sourceFiles))
+			}
 		}
 	}
 
-	for _, classFiles := range data.GetArrayForce("generate.classfiles") {
-		path := fmt.Sprintf("%s", classFiles)
-		if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-			log.Printf("cannot find classfiles location - will be skipped: %s", err)
-			continue
+	for _, classFiles := range data.GetArray("generate.classfiles") {
+		if _, err := os.Stat(fmt.Sprintf("%s", classFiles)); !os.IsNotExist(err) {
+			builder.WriteString(fmt.Sprintf(" --classfiles %s", classFiles))
 		}
-		builder.WriteString(fmt.Sprintf(" --classfiles %s", path))
 	}
 
 	if data.Has("generate.html-output-dir") {
