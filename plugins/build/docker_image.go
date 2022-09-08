@@ -114,7 +114,11 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 			log.Printf("%s\n%s\n\n", color.GreenString(">>> build.docker-image sub-image:"), color.CyanString("%s", image.String()))
 
 			if err := p.Run(image); err != nil {
-				return err
+				if image.GetBool("skip-errors") {
+					log.Printf("Error on build sub-image: %v", err)
+				} else {
+					return err
+				}
 			}
 
 			fmt.Printf("\n")
