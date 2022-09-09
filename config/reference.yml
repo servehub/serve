@@ -209,6 +209,7 @@ build:
 #      - branch: master
 #        dockerfile: Dockerfile.custom
 #        repository: docker.custom.com
+#        skip-errors: true
     login:
       user: ""
       password: ""

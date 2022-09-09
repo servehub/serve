@@ -35,7 +35,7 @@ func (p CoverageUpload) Run(data manifest.Manifest) error {
 	}
 
 	execFilePath := data.GetString("exec-file")
-	if _, err := os.Stat(execFilePath); errors.Is(err, os.ErrNotExist) {
+	if _, err := os.Stat(execFilePath); os.IsNotExist(err) {
 		log.Printf("coverage file doesn't exist - skipping: %s", execFilePath)
 		return nil
 	}
@@ -166,16 +166,16 @@ func generateReportsAndGetCoveragePercent(execCoverageFiles []string, data manif
 	))
 
 	if data.Has("generate.sourcefiles") {
-		for _, sourceFiles := range data.GetArray("generate.sourcefiles") {
+		for _, sourceFiles := range data.GetArrayForce("generate.sourcefiles") {
 			if _, err := os.Stat(fmt.Sprintf("%s", sourceFiles)); !os.IsNotExist(err) {
-				builder.WriteString(fmt.Sprintf(" --sourcefiles %s", sourceFiles))
+				builder.WriteString(fmt.Sprintf(" --sourcefiles '%s'", sourceFiles))
 			}
 		}
 	}
 
-	for _, classFiles := range data.GetArray("generate.classfiles") {
+	for _, classFiles := range data.GetArrayForce("generate.classfiles") {
 		if _, err := os.Stat(fmt.Sprintf("%s", classFiles)); !os.IsNotExist(err) {
-			builder.WriteString(fmt.Sprintf(" --classfiles %s", classFiles))
+			builder.WriteString(fmt.Sprintf(" --classfiles '%s'", classFiles))
 		}
 	}
 
@@ -199,7 +199,7 @@ func generateReportsAndGetCoveragePercent(execCoverageFiles []string, data manif
 	}(dirName)
 
 	xmlReportFile := filepath.Join(dirName, "coverage.xml")
-	builder.WriteString(fmt.Sprintf(" --xml %s", xmlReportFile))
+	builder.WriteString(fmt.Sprintf(" --xml '%s'", xmlReportFile))
 
 	if err = utils.RunCmd(builder.String()); err != nil {
 		return 0, err
