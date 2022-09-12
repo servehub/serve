@@ -123,15 +123,12 @@ func (p DeployMarathon) Install(data manifest.Manifest) error {
 		app.AddEnv(k, strings.TrimSpace(fmt.Sprintf("%v", v.Unwrap())))
 	}
 
-	if javaOpts, ok := (*app.Env)["JAVA_OPTS"]; ok {
-		percent := "25"
-		if *app.Mem > 1024 && *app.Mem < 2048 {
-			percent = "50"
-		} else {
-			percent = "75"
+	if javaOpts, ok := (*app.Env)["JAVA_OPTS"]; ok && !strings.Contains(javaOpts, "MaxRAMPercentage") {
+		if *app.Mem >= 1024 && *app.Mem < 2048 {
+			app.AddEnv("JAVA_OPTS", javaOpts+" -XX:MaxRAMPercentage=50")
+		} else if *app.Mem >= 2048 {
+			app.AddEnv("JAVA_OPTS", javaOpts+" -XX:MaxRAMPercentage=75")
 		}
-
-		app.AddEnv("JAVA_OPTS", javaOpts+" -XX:MaxRAMPercentage="+percent)
 	}
 
 	for _, uri := range data.GetArrayForce("package-uri") {
