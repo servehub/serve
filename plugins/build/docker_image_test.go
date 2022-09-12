@@ -15,6 +15,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      tags: []
 		      workdir: "."
 		      build-args: "--pull"
+		      environment: {}
 		      login:
 		        user: ""
 		        password: ""
@@ -32,6 +33,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      tags: [7, "7.10", latest]
 		      workdir: 7
 		      build-args: "--pull"
+		      environment: {}
 		      login:
 		        user: ""
 		        password: ""
@@ -54,6 +56,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      name: php
 		      workdir: 7
 		      build-args: "--pull"
+		      environment: {}
 		      login:
 		        user: ""
 		        password: ""
@@ -73,12 +76,13 @@ func TestDockerImageBuild(t *testing.T) {
 				In: `---
 		      image: registry.superman.space/web/common/:v0.0.0
 		      name: "postgres-for-tests"
-				  tags: [9.6, "latest"]
-				  workdir: "postgres-for-tests/9.6"
-				  build-args: "--pull"
-				  login:
-				    password: "${DOCKER_REGISTRY_PASSWORD}"
-				    user: "${DOCKER_REGISTRY_USER}"
+		      tags: [9.6, "latest"]
+		      workdir: "postgres-for-tests/9.6"
+		      build-args: "--pull"
+		      environment: {}
+		      login:
+		        password: "${DOCKER_REGISTRY_PASSWORD}"
+		        user: "${DOCKER_REGISTRY_USER}"
 				`,
 				Expects: []string{
 					`docker login -u "${DOCKER_REGISTRY_USER}" -p "${DOCKER_REGISTRY_PASSWORD}" registry.superman.space`,
@@ -95,12 +99,13 @@ func TestDockerImageBuild(t *testing.T) {
 		      image: registry.superman.space/web/common/:v0.0.0
 		      name: "new-container"
 		      category: "utility"
-				  tags: [9.6, "latest"]
-				  workdir: "new-container/9.6"
-				  build-args: "--pull"
-				  login:
-				    user: ""
-				    password: ""
+		      tags: [9.6, "latest"]
+		      workdir: "new-container/9.6"
+		      build-args: "--pull"
+		      environment: {}
+		      login:
+		        user: ""
+		        password: ""
 				`,
 				Expects: []string{
 					"docker pull registry.superman.space/utility/new-container:9.6",
@@ -116,12 +121,13 @@ func TestDockerImageBuild(t *testing.T) {
 		      image: registry.superman.space/web/common/front/some-app:v0.0.0
 		      name: "newyear"
 		      category: "library/utils"
-				  tags: latest
-				  workdir: "."
-				  build-args: "--pull"
-				  login:
-				    user: ""
-				    password: ""
+		      tags: latest
+		      workdir: "."
+		      build-args: "--pull"
+		      environment: {}
+		      login:
+		        user: ""
+		        password: ""
 				`,
 				Expects: []string{
 					"docker pull registry.superman.space/library/utils/newyear:latest",
@@ -136,9 +142,10 @@ func TestDockerImageBuild(t *testing.T) {
 		      tags: []
 		      workdir: "."
 		      build-args: "--pull"
+		      environment: {}
 		      login:
 		        user: "${DOCKER_REGISTRY_USER}"
-						password: "${DOCKER_REGISTRY_PASSWORD}"
+		        password: "${DOCKER_REGISTRY_PASSWORD}"
 				`,
 				Expects: []string{
 					`docker login -u "${DOCKER_REGISTRY_USER}" -p "${DOCKER_REGISTRY_PASSWORD}" registry.superman.space`,
@@ -155,6 +162,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      tags: []
 		      workdir: "."
 		      build-args: "--pull"
+		      environment: {}
 		      login:
 		        user: ""
 		        password: ""
@@ -180,6 +188,7 @@ func TestDockerImageBuild(t *testing.T) {
 		           dockerfile: "Dockerfile.stt"
 		           repository: "new-other-repo.text.com"
 		      build-args: "--pull"
+		      environment: {}
 		      login:
 		        user: ""
 		        password: ""

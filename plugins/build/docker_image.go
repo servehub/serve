@@ -71,12 +71,20 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 		cacheFrom = "--cache-from=" + tags[0]
 	}
 
-	if err := utils.RunCmd(
-		"docker build %s -t %s %s %s",
-		buildArgs,
-		strings.Join(tags, " -t "),
-		cacheFrom,
-		data.GetString("workdir"),
+	envs := make(map[string]string)
+	for k, v := range data.GetMap("environment") {
+		envs[k] = strings.TrimSpace(fmt.Sprintf("%v", v.Unwrap()))
+	}
+
+	if err := utils.RunCmdWithEnv(
+		fmt.Sprintf(
+			"docker build %s -t %s %s %s",
+			buildArgs,
+			strings.Join(tags, " -t "),
+			cacheFrom,
+			data.GetString("workdir"),
+		),
+		envs,
 	); err != nil {
 		return err
 	}

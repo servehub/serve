@@ -12,7 +12,7 @@ import (
 )
 
 type TestCase struct {
-	In     string
+	In      string
 	Expects []string
 }
 
@@ -43,7 +43,7 @@ func RunAllMultiCmdTests(t *testing.T, cases map[string]TestCase, plugin manifes
 			}
 
 			if err := loadTestData(utils.StripLeftMargin(test.In), plugin); err != nil {
-				t.Errorf("Error: %v", err)
+				t.Errorf("Error %s: %v", name, err)
 				t.Fail()
 			}
 		})

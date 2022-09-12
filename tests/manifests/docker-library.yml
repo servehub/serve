@@ -24,6 +24,7 @@ tests:
       category: ""
       no-push: "false"
       build-args: "--pull"
+      environment: {}
       current-branch: ""
       images: []
       login:
