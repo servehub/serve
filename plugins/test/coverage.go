@@ -36,7 +36,20 @@ func (p CoverageUpload) Run(data manifest.Manifest) error {
 
 	execFilePath := data.GetString("exec-file")
 	if _, err := os.Stat(execFilePath); os.IsNotExist(err) {
-		log.Printf("coverage file doesn't exist - skipping: %s", execFilePath)
+		log.Printf("coverage report file doesn't exist - skipping: %s", execFilePath)
+		return nil
+	}
+
+	classfilesExist := false
+	for _, classFiles := range data.GetArrayForce("generate.classfiles") {
+		if _, err := os.Stat(fmt.Sprintf("%s", classFiles)); !os.IsNotExist(err) {
+			classfilesExist = true
+			break
+		}
+	}
+
+	if !classfilesExist {
+		log.Printf("coverage classfiles doesn't exist - skipping: %v", data.GetArrayForce("generate.classfiles"))
 		return nil
 	}
 
