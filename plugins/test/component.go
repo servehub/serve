@@ -59,6 +59,8 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 		os.Remove(checkFile)
 	}
 
+	log.Printf("docker-compose file:\n%s\n\n", string(bytes))
+
 	if err := utils.RunCmd("docker-compose -p %s -f %s pull", data.GetString("name"), tmpfile.Name()); err != nil {
 		return fmt.Errorf("error on pull new images for docker-compose: %v", err)
 	}
