@@ -159,6 +159,8 @@ func (m Manifest) FindPlugins(plugin string) ([]PluginData, error) {
 		}
 	} else if PluginRegestry.Has(plugin) {
 		result = append(result, makePluginPair(plugin, tree))
+	} else if strings.HasPrefix(plugin, "command.") {
+		result = append(result, makePluginPair("command", tree))
 	} else {
 		log.Println(color.YellowString("Plugins for `%s` section not specified, skip...", plugin))
 	}
