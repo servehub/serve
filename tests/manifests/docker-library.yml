@@ -25,6 +25,7 @@ tests:
       no-push: "false"
       build-args: "--pull"
       environment: {}
+      labels: {}
       current-branch: ""
       images: []
       login:

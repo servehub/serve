@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/servehub/serve/manifest"
@@ -56,6 +57,18 @@ func (p BuildDockerImage) Run(data manifest.Manifest) error {
 	tags := make([]string, 0)
 	for _, tag := range data.GetArrayForce("tags") {
 		tags = append(tags, fmt.Sprintf("%s:%v", prefix, tag))
+	}
+
+	labels := make([]string, 0)
+	for labelName, labelValue := range data.GetMap("labels") {
+		if labelValue.Unwrap() != "" {
+			labels = append(labels, fmt.Sprintf(` --label "%s=%s"`, labelName, labelValue.Unwrap()))
+		}
+	}
+
+	if len(labels) > 0 {
+		sort.Strings(labels)
+		buildArgs += strings.Join(labels, "")
 	}
 
 	// pull exists tagged images for cache

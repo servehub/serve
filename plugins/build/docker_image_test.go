@@ -16,12 +16,34 @@ func TestDockerImageBuild(t *testing.T) {
 		      workdir: "."
 		      build-args: "--pull"
 		      environment: {}
+		      labels: {}
 		      login:
 		        user: ""
 		        password: ""
 				`,
 				Expects: []string{
 					"docker build --pull -t registry.superman.space/common/node:v1.0.34 -t registry.superman.space/common/node:latest --cache-from=registry.superman.space/common/node:latest .",
+					"docker push registry.superman.space/common/node:v1.0.34",
+					"docker push registry.superman.space/common/node:latest",
+				},
+			},
+
+			"labels": {
+				In: `---
+		      image: registry.superman.space/common/node:v1.0.34
+		      tags: []
+		      workdir: "."
+		      build-args: "--pull"
+		      environment: {}
+		      labels: 
+		        revision: "XXX890" 
+		        version: "1.0.34" 
+		      login:
+		        user: ""
+		        password: ""
+				`,
+				Expects: []string{
+					`docker build --pull --label "revision=XXX890" --label "version=1.0.34" -t registry.superman.space/common/node:v1.0.34 -t registry.superman.space/common/node:latest --cache-from=registry.superman.space/common/node:latest .`,
 					"docker push registry.superman.space/common/node:v1.0.34",
 					"docker push registry.superman.space/common/node:latest",
 				},
@@ -34,6 +56,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      workdir: 7
 		      build-args: "--pull"
 		      environment: {}
+		      labels: {}
 		      login:
 		        user: ""
 		        password: ""
@@ -57,6 +80,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      workdir: 7
 		      build-args: "--pull"
 		      environment: {}
+		      labels: {}
 		      login:
 		        user: ""
 		        password: ""
@@ -80,6 +104,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      workdir: "postgres-for-tests/9.6"
 		      build-args: "--pull"
 		      environment: {}
+		      labels: {}
 		      login:
 		        password: "${DOCKER_REGISTRY_PASSWORD}"
 		        user: "${DOCKER_REGISTRY_USER}"
@@ -103,6 +128,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      workdir: "new-container/9.6"
 		      build-args: "--pull"
 		      environment: {}
+		      labels: {}
 		      login:
 		        user: ""
 		        password: ""
@@ -125,6 +151,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      workdir: "."
 		      build-args: "--pull"
 		      environment: {}
+		      labels: {}
 		      login:
 		        user: ""
 		        password: ""
@@ -143,6 +170,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      workdir: "."
 		      build-args: "--pull"
 		      environment: {}
+		      labels: {}
 		      login:
 		        user: "${DOCKER_REGISTRY_USER}"
 		        password: "${DOCKER_REGISTRY_PASSWORD}"
@@ -163,6 +191,7 @@ func TestDockerImageBuild(t *testing.T) {
 		      workdir: "."
 		      build-args: "--pull"
 		      environment: {}
+		      labels: {}
 		      login:
 		        user: ""
 		        password: ""
@@ -189,6 +218,7 @@ func TestDockerImageBuild(t *testing.T) {
 		           repository: "new-other-repo.text.com"
 		      build-args: "--pull"
 		      environment: {}
+		      labels: {}
 		      login:
 		        user: ""
 		        password: ""

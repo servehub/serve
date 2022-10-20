@@ -206,6 +206,7 @@ build:
     no-push: "{{ vars.no-push }}"
     current-branch: "{{ vars.branch }}"
     environment: {}
+    labels: {}
     images: []
 #      - branch: master
 #        dockerfile: Dockerfile.custom
