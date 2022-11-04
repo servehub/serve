@@ -59,7 +59,8 @@ func NginxTemplateContextCommand() cli.Command {
 
 				routes := consulRoutes{}
 				if err := json.Unmarshal(kv.Value, &routes); err != nil {
-					return fmt.Errorf("Error on parse route json: %s. Serive `%s`, json: %s", err, name, string(kv.Value))
+					fmt.Fprintln(os.Stderr, color.RedString("Error on parse route json: %s. Service `%s`, json: %s", err, name, string(kv.Value)))
+					continue
 				}
 
 				upstream := upstreamNameRegex.ReplaceAllString("serve_"+name, "_")
