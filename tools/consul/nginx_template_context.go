@@ -95,7 +95,7 @@ func NginxTemplateContextCommand() cli.Command {
 						}
 
 						for k, _ := range route.Vars {
-							if !utils.Contains(k, allowedRouteVars) {
+							if !utils.Contains(k, allowedRouteVars) && !strings.HasPrefix(k, "cookie_") {
 								delete(route.Vars, k)
 							}
 						}
