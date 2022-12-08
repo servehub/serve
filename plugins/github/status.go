@@ -3,8 +3,10 @@ package gocd
 import (
 	"errors"
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/servehub/serve/manifest"
 	"github.com/servehub/serve/tools/github"
+	"log"
 	"os"
 )
 
@@ -22,7 +24,7 @@ func (p githubStatus) Run(data manifest.Manifest) error {
 
 	state := data.GetStringOr("state", "success")
 
-	return github.SendStatus(accessToken,
+	err := github.SendStatus(accessToken,
 		data.GetString("repo"),
 		data.GetString("ref"),
 		state,
@@ -30,4 +32,10 @@ func (p githubStatus) Run(data manifest.Manifest) error {
 		data.GetStringOr("context", "continuous-integration/serve"),
 		data.GetString("target-url"),
 	)
+
+	if err != nil {
+		log.Println(color.YellowString("Github request error: %v", err))
+	}
+
+	return nil
 }
