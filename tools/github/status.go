@@ -32,7 +32,7 @@ func SendStatus(accessToken string, repo string, ref string, state string, descr
 	return backoff.Retry(func() error {
 		_, _, err := client.Repositories.CreateStatus(context.Background(), rps[0], strings.TrimSuffix(rps[1], ".git"), ref, input)
 		return err
-	}, backoff.NewExponentialBackOff())
+	}, backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 5))
 }
 
 func IsValidState(state string) bool {

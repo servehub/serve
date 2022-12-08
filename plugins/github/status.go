@@ -3,10 +3,8 @@ package gocd
 import (
 	"errors"
 	"fmt"
-	"github.com/fatih/color"
 	"github.com/servehub/serve/manifest"
 	"github.com/servehub/serve/tools/github"
-	"log"
 	"os"
 )
 
@@ -34,7 +32,7 @@ func (p githubStatus) Run(data manifest.Manifest) error {
 	)
 
 	if err != nil {
-		log.Println(color.YellowString("Github request error: %v", err))
+		fmt.Printf("Github request error: %v\n", err)
 	}
 
 	return nil
