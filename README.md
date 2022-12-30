@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/servehub/serve.svg?branch=master)](https://travis-ci.org/servehub/serve)
-
 # Installing
 
 ## Go
@@ -20,6 +18,7 @@ make deps
 export GOPATH=${HOME}/go
 
 # download dependency 
+
 go mod vendor
 
 # build
@@ -28,4 +27,3 @@ make
 # test to ensure everything is working
 make test
 ```
-
