@@ -14,11 +14,13 @@ brew install go
 # install dependencies via makefile script
 make deps
 
+# build codegen configs
+make build-configs
+
 # set $GOPATH env variable (should be your home directory)
 export GOPATH=${HOME}/go
 
 # download dependency 
-
 go mod vendor
 
 # build
