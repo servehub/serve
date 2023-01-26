@@ -1,0 +1,11 @@
+info:
+  name: serve
+  description: "Serve"
+  version: "1.7"
+  category: infra
+
+include:
+  - file: /etc/serve/include.d/library.yml
+
+build:
+  - sh: "make docker-dist VERSION={{ info.build-version }}"

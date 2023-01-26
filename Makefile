@@ -57,7 +57,7 @@ dist: clean build-configs
 	done
 
 docker-dist:
-	docker run --rm -v "${PWD}":/go/src/${PACKAGE} -w /go/src/${PACKAGE} golang:1.19 /bin/sh -c 'make deps && make build-configs && go mod vendor && make dist'
+	docker run --rm -v "${PWD}":/go/src/${PACKAGE} -w /go/src/${PACKAGE} -e VERSION golang:1.19 /bin/sh -c 'make deps && make build-configs && go mod vendor && make dist'
 
 bump-tag:
 	TAG=$$(echo "v${VERSION}" | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g'); \
