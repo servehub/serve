@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/fatih/color"
@@ -89,7 +90,15 @@ func main() {
 		log.Fatalln(color.RedString("Pre hooks failed"))
 	}
 
-	for _, pair := range plugins {
+	for index, pair := range plugins {
+		onlyIndex, onlyIndexExists := vars["only-index"]
+		if onlyIndexExists {
+			if strconv.Itoa(index+1) != onlyIndex {
+				log.Printf("Current plugin index run %d does not match specified only-index %s, skipping...", index+1, onlyIndex)
+				continue
+			}
+		}
+
 		if pluginFilterExists && pair.PluginName != pluginFilter {
 			continue
 		}
