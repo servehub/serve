@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/fatih/color"
@@ -69,6 +70,7 @@ func main() {
 	}
 
 	pluginFilter, pluginFilterExists := vars["plugin"]
+	pluginIndex, pluginIndexExists := vars["plugin-index"]
 
 	var plugins []manifest.PluginData
 	if pluginDataExists {
@@ -89,8 +91,12 @@ func main() {
 		log.Fatalln(color.RedString("Pre hooks failed"))
 	}
 
-	for _, pair := range plugins {
+	for index, pair := range plugins {
 		if pluginFilterExists && pair.PluginName != pluginFilter {
+			continue
+		}
+
+		if pluginIndexExists && strconv.Itoa(index) != pluginIndex {
 			continue
 		}
 
