@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/fatih/color"
@@ -61,7 +62,7 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 
 	log.Printf("docker-compose file:\n%s\n\n", string(bytes))
 
-	testsName := utils.RandomString(6) + "-" + data.GetString("name")
+	testsName := strings.ToLower(utils.RandomString(6)) + "-" + data.GetString("name")
 
 	if err := utils.RunCmd("docker-compose -p %s -f %s pull", testsName, tmpfile.Name()); err != nil {
 		return fmt.Errorf("error on pull new images for docker-compose: %v", err)
