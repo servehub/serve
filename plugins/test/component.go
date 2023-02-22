@@ -61,12 +61,14 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 
 	log.Printf("docker-compose file:\n%s\n\n", string(bytes))
 
-	if err := utils.RunCmd("docker-compose -p %s -f %s pull", data.GetString("name"), tmpfile.Name()); err != nil {
+	testsName := utils.RandomString(6) + "-" + data.GetString("name")
+
+	if err := utils.RunCmd("docker-compose -p %s -f %s pull", testsName, tmpfile.Name()); err != nil {
 		return fmt.Errorf("error on pull new images for docker-compose: %v", err)
 	}
 
 	defer func() {
-		utils.RunCmd("docker-compose -p %s -f %s down -v --remove-orphans", data.GetString("name"), tmpfile.Name())
+		utils.RunCmd("docker-compose -p %s -f %s down -v --remove-orphans", testsName, tmpfile.Name())
 	}()
 
 	timeout, finalErr := time.ParseDuration(data.GetString("timeout"))
@@ -78,11 +80,11 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 		select {
 		case <-time.After(timeout):
 			color.Red("Timeout exceeded for tests, exit...")
-			utils.RunCmd("docker-compose -p %s -f %s down -v --remove-orphans", data.GetString("name"), tmpfile.Name())
+			utils.RunCmd("docker-compose -p %s -f %s down -v --remove-orphans", testsName, tmpfile.Name())
 		}
 	}()
 
-	if res := utils.RunCmd("DOCKER_CLIENT_TIMEOUT=300 COMPOSE_HTTP_TIMEOUT=300 docker-compose -p %s -f %s up --abort-on-container-exit", data.GetString("name"), tmpfile.Name()); res != nil {
+	if res := utils.RunCmd("DOCKER_CLIENT_TIMEOUT=300 COMPOSE_HTTP_TIMEOUT=300 docker-compose -p %s -f %s up --abort-on-container-exit", testsName, tmpfile.Name()); res != nil {
 		finalErr = fmt.Errorf("error on running docker-compose with tests: %s", res)
 	}
 
