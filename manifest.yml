@@ -7,7 +7,12 @@ info:
 include:
   - file: /etc/serve/include.d/library.yml
 
+gocd:
+  pipeline:
+    create:
+      allowed-branches: ["master"]
+
 build:
   - sh: "make docker-dist VERSION={{ info.build-version }}"
-  - sh: 'curl -sSf -uci:${ART_CI_PASSWORD} -T bin/serve-v{{ info.build-version }}-linux-amd64 "http://art.boople.co/artifactory/infra/serve/"'
-  - sh: 'curl -sSf -uci:${ART_CI_PASSWORD} -T bin/serve-tools-v{{ info.build-version }}-linux-amd64 "http://art.boople.co/artifactory/infra/serve/"'
+  - sh: 'curl -sSf -uci:${ART_CI_PASSWORD} -T bin/serve-v{{ info.build-version }}-linux-amd64 "https://art.boople.co/artifactory/infra/serve/"'
+  - sh: 'curl -sSf -uci:${ART_CI_PASSWORD} -T bin/serve-tools-v{{ info.build-version }}-linux-amd64 "https://art.boople.co/artifactory/infra/serve/"'
