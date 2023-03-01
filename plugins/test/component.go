@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -34,6 +35,18 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 
 		data.Set("compose.services."+name, merged)
 		data.ArrayAppend("compose.services.tests.depends_on", name)
+	}
+
+	// if future branch image with tests is defined, and exists in docker registry - use it
+	if featureImage := data.GetStringOr("feature-test-image", ""); featureImage != "" {
+		parts := strings.SplitN(featureImage, "/", 2)
+		nameParts := strings.SplitN(parts[1], ":", 2)
+
+		req, _ := http.NewRequest("GET", "https://"+parts[0]+"/v2/"+nameParts[0]+"/manifests/"+nameParts[1], nil)
+
+		if resp, err := http.DefaultClient.Do(req); err == nil && resp.StatusCode == 200 {
+			data.Set("compose.services.tests.image", featureImage)
+		}
 	}
 
 	bytes, finalErr := yaml.Marshal(data.GetTree("compose").Unwrap())

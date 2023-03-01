@@ -473,6 +473,7 @@ test:
     components: []
     timeout: 10m
     check-file-exist: ""
+    feature-test-image: ""
 
   coverage:
     generate:
