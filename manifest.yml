@@ -14,5 +14,7 @@ gocd:
 
 build:
   - sh: "make docker-dist VERSION={{ info.build-version }}"
-  - sh: 'curl -sSf -uci:${ART_CI_PASSWORD} -T bin/serve-v{{ info.build-version }}-linux-amd64 "https://art.boople.co/artifactory/infra/serve/"'
-  - sh: 'curl -sSf -uci:${ART_CI_PASSWORD} -T bin/serve-tools-v{{ info.build-version }}-linux-amd64 "https://art.boople.co/artifactory/infra/serve/"'
+
+deploy:
+  - artifact: bin/serve-v{{ info.build-version }}-linux-amd64
+  - artifact: bin/serve-tools-v{{ info.build-version }}-linux-amd64
