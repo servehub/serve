@@ -11,7 +11,7 @@ require (
 	github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39
 	github.com/google/go-github/v44 v44.0.0
 	github.com/hashicorp/consul/api v1.11.0
-	github.com/servehub/utils v1.0.2
+	github.com/servehub/utils v1.0.3
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 	gorm.io/driver/postgres v1.3.7
 	gorm.io/gorm v1.23.5

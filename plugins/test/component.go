@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/fatih/color"
@@ -35,6 +37,18 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 		data.ArrayAppend("compose.services.tests.depends_on", name)
 	}
 
+	// if future branch image with tests is defined, and exists in docker registry - use it
+	if featureImage := data.GetStringOr("feature-test-image", ""); featureImage != "" {
+		parts := strings.SplitN(featureImage, "/", 2)
+		nameParts := strings.SplitN(parts[1], ":", 2)
+
+		req, _ := http.NewRequest("GET", "https://"+parts[0]+"/v2/"+nameParts[0]+"/manifests/"+nameParts[1], nil)
+
+		if resp, err := http.DefaultClient.Do(req); err == nil && resp.StatusCode == 200 {
+			data.Set("compose.services.tests.image", featureImage)
+		}
+	}
+
 	bytes, finalErr := yaml.Marshal(data.GetTree("compose").Unwrap())
 	if finalErr != nil {
 		return fmt.Errorf("error on serialize yaml: %v", finalErr)
@@ -61,12 +75,14 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 
 	log.Printf("docker-compose file:\n%s\n\n", string(bytes))
 
-	if err := utils.RunCmd("docker-compose -p %s -f %s pull", data.GetString("name"), tmpfile.Name()); err != nil {
+	testsName := strings.ToLower(utils.RandomString(6)) + "-" + data.GetString("name")
+
+	if err := utils.RunCmd("docker-compose -p %s -f %s pull", testsName, tmpfile.Name()); err != nil {
 		return fmt.Errorf("error on pull new images for docker-compose: %v", err)
 	}
 
 	defer func() {
-		utils.RunCmd("docker-compose -p %s -f %s down -v --remove-orphans", data.GetString("name"), tmpfile.Name())
+		utils.RunCmd("docker-compose -p %s -f %s down -v --remove-orphans", testsName, tmpfile.Name())
 	}()
 
 	timeout, finalErr := time.ParseDuration(data.GetString("timeout"))
@@ -78,11 +94,11 @@ func (p TestComponent) Run(data manifest.Manifest) error {
 		select {
 		case <-time.After(timeout):
 			color.Red("Timeout exceeded for tests, exit...")
-			utils.RunCmd("docker-compose -p %s -f %s down -v --remove-orphans", data.GetString("name"), tmpfile.Name())
+			utils.RunCmd("docker-compose -p %s -f %s down -v --remove-orphans", testsName, tmpfile.Name())
 		}
 	}()
 
-	if res := utils.RunCmd("DOCKER_CLIENT_TIMEOUT=300 COMPOSE_HTTP_TIMEOUT=300 docker-compose -p %s -f %s up --abort-on-container-exit", data.GetString("name"), tmpfile.Name()); res != nil {
+	if res := utils.RunCmd("DOCKER_CLIENT_TIMEOUT=300 COMPOSE_HTTP_TIMEOUT=300 docker-compose -p %s -f %s up --abort-on-container-exit", testsName, tmpfile.Name()); res != nil {
 		finalErr = fmt.Errorf("error on running docker-compose with tests: %s", res)
 	}
 

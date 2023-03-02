@@ -20,7 +20,10 @@ var nameRegepx = regexp.MustCompile("[^\\w.]+")
 func (p BuildDockerRun) Run(data manifest.Manifest) error {
 	envs := make([]string, 0)
 	for k, v := range data.GetTree("envs").ToEnvMap("") {
-		envs = append(envs, "-e "+k+"="+v)
+		if v != "" {
+			v = "=" + v
+		}
+		envs = append(envs, "-e "+k+v)
 	}
 
 	cmds := make([]string, 0)

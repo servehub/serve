@@ -350,6 +350,14 @@ deploy:
     hooks: []
       # - postinstall: ./install.sh
 
+  artifact:
+    auth: "user:password"
+    artifact: ""
+    artifactory-url: "https://artifactory.example.com"
+    upload-path: "/artifactory/{{ info.category }}/{{ info.name }}/{{ info.feature }}/"
+    current-branch: "{{ vars.branch }}"
+    branch: "master"
+
   secrets:
     env: "{{ vars.env }}"
     consul:
@@ -473,6 +481,7 @@ test:
     components: []
     timeout: 10m
     check-file-exist: ""
+    feature-test-image: ""
 
   coverage:
     generate:

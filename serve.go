@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github.com/servehub/utils"
 	"log"
 	"os"
 	"regexp"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/fatih/color"
@@ -69,6 +72,12 @@ func main() {
 	}
 
 	pluginFilter, pluginFilterExists := vars["plugin"]
+	pluginIndex, pluginIndexExists := vars["plugin-index"]
+
+	pluginIndexes := []string{}
+	if pluginIndexExists {
+		pluginIndexes = strings.Split(pluginIndex, ",")
+	}
 
 	var plugins []manifest.PluginData
 	if pluginDataExists {
@@ -89,8 +98,12 @@ func main() {
 		log.Fatalln(color.RedString("Pre hooks failed"))
 	}
 
-	for _, pair := range plugins {
+	for index, pair := range plugins {
 		if pluginFilterExists && pair.PluginName != pluginFilter {
+			continue
+		}
+
+		if pluginIndexExists && !utils.Contains(strconv.Itoa(index), pluginIndexes) {
 			continue
 		}
 

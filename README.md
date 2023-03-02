@@ -2,7 +2,7 @@
 
 ## Go
 
-Make sure you have Go 1.18.+ installed:
+Make sure you have Go 1.19.+ installed:
 
 ```sh
 brew install go
